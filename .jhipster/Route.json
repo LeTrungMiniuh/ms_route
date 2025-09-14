@@ -2,60 +2,33 @@
   "annotations": {
     "changelogDate": "20250831164112"
   },
-  "applications": ["gateway", "ms_route"],
+  "applications": ["ms_route"],
   "clientRootFolder": "ms_route",
   "databaseType": "sql",
   "dto": "mapstruct",
   "fields": [
     {
-      "fieldName": "id",
-      "fieldType": "UUID",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "routeName",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "origin",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "destination",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "distance",
-      "fieldType": "Double",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "estimatedDuration",
-      "fieldType": "Integer",
-      "fieldValidateRules": ["required"]
-    },
-    {
       "fieldName": "transportType",
       "fieldType": "TransportType",
       "fieldValidateRules": ["required"],
-      "fieldValues": "TRAIN,BUS"
+      "fieldValues": "BUS,TRAIN,FERRY"
+    },
+    {
+      "fieldName": "distance",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "estimatedDuration",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "basePrice",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
     },
     {
       "fieldName": "isActive",
       "fieldType": "Boolean",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "createdAt",
-      "fieldType": "Instant",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "updatedAt",
-      "fieldType": "Instant",
       "fieldValidateRules": ["required"]
     }
   ],
@@ -65,11 +38,31 @@
   "pagination": "infinite-scroll",
   "relationships": [
     {
-      "otherEntityName": "schedule",
+      "otherEntityName": "trip",
       "otherEntityRelationshipName": "route",
-      "relationshipName": "routeName",
+      "relationshipName": "trips",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "station",
+      "relationshipName": "origin",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "station",
+      "relationshipName": "destination",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "operator",
+      "otherEntityRelationshipName": "routes",
+      "relationshipName": "operator",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     }
   ],
   "searchEngine": "elasticsearch",
