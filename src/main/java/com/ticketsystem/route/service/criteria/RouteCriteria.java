@@ -40,44 +40,41 @@ public class RouteCriteria implements Serializable, Criteria {
 
     private static final long serialVersionUID = 1L;
 
-    private UUIDFilter id;
-
-    private StringFilter routeName;
-
-    private StringFilter origin;
-
-    private StringFilter destination;
-
-    private DoubleFilter distance;
-
-    private IntegerFilter estimatedDuration;
+    private LongFilter id;
 
     private TransportTypeFilter transportType;
 
+    private BigDecimalFilter distance;
+
+    private IntegerFilter estimatedDuration;
+
+    private BigDecimalFilter basePrice;
+
     private BooleanFilter isActive;
 
-    private InstantFilter createdAt;
+    private LongFilter tripsId;
 
-    private InstantFilter updatedAt;
+    private LongFilter originId;
 
-    private UUIDFilter routeNameId;
+    private LongFilter destinationId;
+
+    private LongFilter operatorId;
 
     private Boolean distinct;
 
     public RouteCriteria() {}
 
     public RouteCriteria(RouteCriteria other) {
-        this.id = other.optionalId().map(UUIDFilter::copy).orElse(null);
-        this.routeName = other.optionalRouteName().map(StringFilter::copy).orElse(null);
-        this.origin = other.optionalOrigin().map(StringFilter::copy).orElse(null);
-        this.destination = other.optionalDestination().map(StringFilter::copy).orElse(null);
-        this.distance = other.optionalDistance().map(DoubleFilter::copy).orElse(null);
-        this.estimatedDuration = other.optionalEstimatedDuration().map(IntegerFilter::copy).orElse(null);
+        this.id = other.optionalId().map(LongFilter::copy).orElse(null);
         this.transportType = other.optionalTransportType().map(TransportTypeFilter::copy).orElse(null);
+        this.distance = other.optionalDistance().map(BigDecimalFilter::copy).orElse(null);
+        this.estimatedDuration = other.optionalEstimatedDuration().map(IntegerFilter::copy).orElse(null);
+        this.basePrice = other.optionalBasePrice().map(BigDecimalFilter::copy).orElse(null);
         this.isActive = other.optionalIsActive().map(BooleanFilter::copy).orElse(null);
-        this.createdAt = other.optionalCreatedAt().map(InstantFilter::copy).orElse(null);
-        this.updatedAt = other.optionalUpdatedAt().map(InstantFilter::copy).orElse(null);
-        this.routeNameId = other.optionalRouteNameId().map(UUIDFilter::copy).orElse(null);
+        this.tripsId = other.optionalTripsId().map(LongFilter::copy).orElse(null);
+        this.originId = other.optionalOriginId().map(LongFilter::copy).orElse(null);
+        this.destinationId = other.optionalDestinationId().map(LongFilter::copy).orElse(null);
+        this.operatorId = other.optionalOperatorId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -86,98 +83,60 @@ public class RouteCriteria implements Serializable, Criteria {
         return new RouteCriteria(this);
     }
 
-    public UUIDFilter getId() {
+    public LongFilter getId() {
         return id;
     }
 
-    public Optional<UUIDFilter> optionalId() {
+    public Optional<LongFilter> optionalId() {
         return Optional.ofNullable(id);
     }
 
-    public UUIDFilter id() {
+    public LongFilter id() {
         if (id == null) {
-            setId(new UUIDFilter());
+            setId(new LongFilter());
         }
         return id;
     }
 
-    public void setId(UUIDFilter id) {
+    public void setId(LongFilter id) {
         this.id = id;
     }
 
-    public StringFilter getRouteName() {
-        return routeName;
+    public TransportTypeFilter getTransportType() {
+        return transportType;
     }
 
-    public Optional<StringFilter> optionalRouteName() {
-        return Optional.ofNullable(routeName);
+    public Optional<TransportTypeFilter> optionalTransportType() {
+        return Optional.ofNullable(transportType);
     }
 
-    public StringFilter routeName() {
-        if (routeName == null) {
-            setRouteName(new StringFilter());
+    public TransportTypeFilter transportType() {
+        if (transportType == null) {
+            setTransportType(new TransportTypeFilter());
         }
-        return routeName;
+        return transportType;
     }
 
-    public void setRouteName(StringFilter routeName) {
-        this.routeName = routeName;
+    public void setTransportType(TransportTypeFilter transportType) {
+        this.transportType = transportType;
     }
 
-    public StringFilter getOrigin() {
-        return origin;
-    }
-
-    public Optional<StringFilter> optionalOrigin() {
-        return Optional.ofNullable(origin);
-    }
-
-    public StringFilter origin() {
-        if (origin == null) {
-            setOrigin(new StringFilter());
-        }
-        return origin;
-    }
-
-    public void setOrigin(StringFilter origin) {
-        this.origin = origin;
-    }
-
-    public StringFilter getDestination() {
-        return destination;
-    }
-
-    public Optional<StringFilter> optionalDestination() {
-        return Optional.ofNullable(destination);
-    }
-
-    public StringFilter destination() {
-        if (destination == null) {
-            setDestination(new StringFilter());
-        }
-        return destination;
-    }
-
-    public void setDestination(StringFilter destination) {
-        this.destination = destination;
-    }
-
-    public DoubleFilter getDistance() {
+    public BigDecimalFilter getDistance() {
         return distance;
     }
 
-    public Optional<DoubleFilter> optionalDistance() {
+    public Optional<BigDecimalFilter> optionalDistance() {
         return Optional.ofNullable(distance);
     }
 
-    public DoubleFilter distance() {
+    public BigDecimalFilter distance() {
         if (distance == null) {
-            setDistance(new DoubleFilter());
+            setDistance(new BigDecimalFilter());
         }
         return distance;
     }
 
-    public void setDistance(DoubleFilter distance) {
+    public void setDistance(BigDecimalFilter distance) {
         this.distance = distance;
     }
 
@@ -200,23 +159,23 @@ public class RouteCriteria implements Serializable, Criteria {
         this.estimatedDuration = estimatedDuration;
     }
 
-    public TransportTypeFilter getTransportType() {
-        return transportType;
+    public BigDecimalFilter getBasePrice() {
+        return basePrice;
     }
 
-    public Optional<TransportTypeFilter> optionalTransportType() {
-        return Optional.ofNullable(transportType);
+    public Optional<BigDecimalFilter> optionalBasePrice() {
+        return Optional.ofNullable(basePrice);
     }
 
-    public TransportTypeFilter transportType() {
-        if (transportType == null) {
-            setTransportType(new TransportTypeFilter());
+    public BigDecimalFilter basePrice() {
+        if (basePrice == null) {
+            setBasePrice(new BigDecimalFilter());
         }
-        return transportType;
+        return basePrice;
     }
 
-    public void setTransportType(TransportTypeFilter transportType) {
-        this.transportType = transportType;
+    public void setBasePrice(BigDecimalFilter basePrice) {
+        this.basePrice = basePrice;
     }
 
     public BooleanFilter getIsActive() {
@@ -238,61 +197,80 @@ public class RouteCriteria implements Serializable, Criteria {
         this.isActive = isActive;
     }
 
-    public InstantFilter getCreatedAt() {
-        return createdAt;
+    public LongFilter getTripsId() {
+        return tripsId;
     }
 
-    public Optional<InstantFilter> optionalCreatedAt() {
-        return Optional.ofNullable(createdAt);
+    public Optional<LongFilter> optionalTripsId() {
+        return Optional.ofNullable(tripsId);
     }
 
-    public InstantFilter createdAt() {
-        if (createdAt == null) {
-            setCreatedAt(new InstantFilter());
+    public LongFilter tripsId() {
+        if (tripsId == null) {
+            setTripsId(new LongFilter());
         }
-        return createdAt;
+        return tripsId;
     }
 
-    public void setCreatedAt(InstantFilter createdAt) {
-        this.createdAt = createdAt;
+    public void setTripsId(LongFilter tripsId) {
+        this.tripsId = tripsId;
     }
 
-    public InstantFilter getUpdatedAt() {
-        return updatedAt;
+    public LongFilter getOriginId() {
+        return originId;
     }
 
-    public Optional<InstantFilter> optionalUpdatedAt() {
-        return Optional.ofNullable(updatedAt);
+    public Optional<LongFilter> optionalOriginId() {
+        return Optional.ofNullable(originId);
     }
 
-    public InstantFilter updatedAt() {
-        if (updatedAt == null) {
-            setUpdatedAt(new InstantFilter());
+    public LongFilter originId() {
+        if (originId == null) {
+            setOriginId(new LongFilter());
         }
-        return updatedAt;
+        return originId;
     }
 
-    public void setUpdatedAt(InstantFilter updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setOriginId(LongFilter originId) {
+        this.originId = originId;
     }
 
-    public UUIDFilter getRouteNameId() {
-        return routeNameId;
+    public LongFilter getDestinationId() {
+        return destinationId;
     }
 
-    public Optional<UUIDFilter> optionalRouteNameId() {
-        return Optional.ofNullable(routeNameId);
+    public Optional<LongFilter> optionalDestinationId() {
+        return Optional.ofNullable(destinationId);
     }
 
-    public UUIDFilter routeNameId() {
-        if (routeNameId == null) {
-            setRouteNameId(new UUIDFilter());
+    public LongFilter destinationId() {
+        if (destinationId == null) {
+            setDestinationId(new LongFilter());
         }
-        return routeNameId;
+        return destinationId;
     }
 
-    public void setRouteNameId(UUIDFilter routeNameId) {
-        this.routeNameId = routeNameId;
+    public void setDestinationId(LongFilter destinationId) {
+        this.destinationId = destinationId;
+    }
+
+    public LongFilter getOperatorId() {
+        return operatorId;
+    }
+
+    public Optional<LongFilter> optionalOperatorId() {
+        return Optional.ofNullable(operatorId);
+    }
+
+    public LongFilter operatorId() {
+        if (operatorId == null) {
+            setOperatorId(new LongFilter());
+        }
+        return operatorId;
+    }
+
+    public void setOperatorId(LongFilter operatorId) {
+        this.operatorId = operatorId;
     }
 
     public Boolean getDistinct() {
@@ -325,16 +303,15 @@ public class RouteCriteria implements Serializable, Criteria {
         final RouteCriteria that = (RouteCriteria) o;
         return (
             Objects.equals(id, that.id) &&
-            Objects.equals(routeName, that.routeName) &&
-            Objects.equals(origin, that.origin) &&
-            Objects.equals(destination, that.destination) &&
+            Objects.equals(transportType, that.transportType) &&
             Objects.equals(distance, that.distance) &&
             Objects.equals(estimatedDuration, that.estimatedDuration) &&
-            Objects.equals(transportType, that.transportType) &&
+            Objects.equals(basePrice, that.basePrice) &&
             Objects.equals(isActive, that.isActive) &&
-            Objects.equals(createdAt, that.createdAt) &&
-            Objects.equals(updatedAt, that.updatedAt) &&
-            Objects.equals(routeNameId, that.routeNameId) &&
+            Objects.equals(tripsId, that.tripsId) &&
+            Objects.equals(originId, that.originId) &&
+            Objects.equals(destinationId, that.destinationId) &&
+            Objects.equals(operatorId, that.operatorId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -343,16 +320,15 @@ public class RouteCriteria implements Serializable, Criteria {
     public int hashCode() {
         return Objects.hash(
             id,
-            routeName,
-            origin,
-            destination,
+            transportType,
             distance,
             estimatedDuration,
-            transportType,
+            basePrice,
             isActive,
-            createdAt,
-            updatedAt,
-            routeNameId,
+            tripsId,
+            originId,
+            destinationId,
+            operatorId,
             distinct
         );
     }
@@ -362,16 +338,15 @@ public class RouteCriteria implements Serializable, Criteria {
     public String toString() {
         return "RouteCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
-            optionalRouteName().map(f -> "routeName=" + f + ", ").orElse("") +
-            optionalOrigin().map(f -> "origin=" + f + ", ").orElse("") +
-            optionalDestination().map(f -> "destination=" + f + ", ").orElse("") +
+            optionalTransportType().map(f -> "transportType=" + f + ", ").orElse("") +
             optionalDistance().map(f -> "distance=" + f + ", ").orElse("") +
             optionalEstimatedDuration().map(f -> "estimatedDuration=" + f + ", ").orElse("") +
-            optionalTransportType().map(f -> "transportType=" + f + ", ").orElse("") +
+            optionalBasePrice().map(f -> "basePrice=" + f + ", ").orElse("") +
             optionalIsActive().map(f -> "isActive=" + f + ", ").orElse("") +
-            optionalCreatedAt().map(f -> "createdAt=" + f + ", ").orElse("") +
-            optionalUpdatedAt().map(f -> "updatedAt=" + f + ", ").orElse("") +
-            optionalRouteNameId().map(f -> "routeNameId=" + f + ", ").orElse("") +
+            optionalTripsId().map(f -> "tripsId=" + f + ", ").orElse("") +
+            optionalOriginId().map(f -> "originId=" + f + ", ").orElse("") +
+            optionalDestinationId().map(f -> "destinationId=" + f + ", ").orElse("") +
+            optionalOperatorId().map(f -> "operatorId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

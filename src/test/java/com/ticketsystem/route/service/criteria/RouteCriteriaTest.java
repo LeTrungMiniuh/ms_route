@@ -76,16 +76,15 @@ class RouteCriteriaTest {
 
     private static void setAllFilters(RouteCriteria routeCriteria) {
         routeCriteria.id();
-        routeCriteria.routeName();
-        routeCriteria.origin();
-        routeCriteria.destination();
+        routeCriteria.transportType();
         routeCriteria.distance();
         routeCriteria.estimatedDuration();
-        routeCriteria.transportType();
+        routeCriteria.basePrice();
         routeCriteria.isActive();
-        routeCriteria.createdAt();
-        routeCriteria.updatedAt();
-        routeCriteria.routeNameId();
+        routeCriteria.tripsId();
+        routeCriteria.originId();
+        routeCriteria.destinationId();
+        routeCriteria.operatorId();
         routeCriteria.distinct();
     }
 
@@ -93,16 +92,15 @@ class RouteCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
-                condition.apply(criteria.getRouteName()) &&
-                condition.apply(criteria.getOrigin()) &&
-                condition.apply(criteria.getDestination()) &&
+                condition.apply(criteria.getTransportType()) &&
                 condition.apply(criteria.getDistance()) &&
                 condition.apply(criteria.getEstimatedDuration()) &&
-                condition.apply(criteria.getTransportType()) &&
+                condition.apply(criteria.getBasePrice()) &&
                 condition.apply(criteria.getIsActive()) &&
-                condition.apply(criteria.getCreatedAt()) &&
-                condition.apply(criteria.getUpdatedAt()) &&
-                condition.apply(criteria.getRouteNameId()) &&
+                condition.apply(criteria.getTripsId()) &&
+                condition.apply(criteria.getOriginId()) &&
+                condition.apply(criteria.getDestinationId()) &&
+                condition.apply(criteria.getOperatorId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -112,16 +110,15 @@ class RouteCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
-                condition.apply(criteria.getRouteName(), copy.getRouteName()) &&
-                condition.apply(criteria.getOrigin(), copy.getOrigin()) &&
-                condition.apply(criteria.getDestination(), copy.getDestination()) &&
+                condition.apply(criteria.getTransportType(), copy.getTransportType()) &&
                 condition.apply(criteria.getDistance(), copy.getDistance()) &&
                 condition.apply(criteria.getEstimatedDuration(), copy.getEstimatedDuration()) &&
-                condition.apply(criteria.getTransportType(), copy.getTransportType()) &&
+                condition.apply(criteria.getBasePrice(), copy.getBasePrice()) &&
                 condition.apply(criteria.getIsActive(), copy.getIsActive()) &&
-                condition.apply(criteria.getCreatedAt(), copy.getCreatedAt()) &&
-                condition.apply(criteria.getUpdatedAt(), copy.getUpdatedAt()) &&
-                condition.apply(criteria.getRouteNameId(), copy.getRouteNameId()) &&
+                condition.apply(criteria.getTripsId(), copy.getTripsId()) &&
+                condition.apply(criteria.getOriginId(), copy.getOriginId()) &&
+                condition.apply(criteria.getDestinationId(), copy.getDestinationId()) &&
+                condition.apply(criteria.getOperatorId(), copy.getOperatorId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

@@ -5,14 +5,11 @@ import com.ticketsystem.route.domain.enumeration.TransportType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.time.Instant;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 /**
  * A Route.
@@ -26,36 +23,10 @@ public class Route implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @NotNull
     @Id
-    @GeneratedValue
-    @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "id", length = 36, nullable = false)
-    private UUID id;
-
-    @NotNull
-    @Column(name = "route_name", nullable = false)
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
-    private String routeName;
-
-    @NotNull
-    @Column(name = "origin", nullable = false)
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
-    private String origin;
-
-    @NotNull
-    @Column(name = "destination", nullable = false)
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
-    private String destination;
-
-    @NotNull
-    @Column(name = "distance", nullable = false)
-    private Double distance;
-
-    @NotNull
-    @Column(name = "estimated_duration", nullable = false)
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
-    private Integer estimatedDuration;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -63,89 +34,77 @@ public class Route implements Serializable {
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
     private TransportType transportType;
 
+    @Column(name = "distance", precision = 21, scale = 2)
+    private BigDecimal distance;
+
+    @Column(name = "estimated_duration")
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
+    private Integer estimatedDuration;
+
+    @NotNull
+    @Column(name = "base_price", precision = 21, scale = 2, nullable = false)
+    private BigDecimal basePrice;
+
     @NotNull
     @Column(name = "is_active", nullable = false)
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
     private Boolean isActive;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
-
-    @NotNull
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "route")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @org.springframework.data.annotation.Transient
-    @JsonIgnoreProperties(value = { "route" }, allowSetters = true)
-    private Set<Schedule> routeNames = new HashSet<>();
+    @JsonIgnoreProperties(value = { "seats", "route" }, allowSetters = true)
+    private Set<Trip> trips = new HashSet<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Station origin;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Station destination;
+
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "vehicles", "routes" }, allowSetters = true)
+    private Operator operator;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
-    public UUID getId() {
+    public Long getId() {
         return this.id;
     }
 
-    public Route id(UUID id) {
+    public Route id(Long id) {
         this.setId(id);
         return this;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getRouteName() {
-        return this.routeName;
+    public TransportType getTransportType() {
+        return this.transportType;
     }
 
-    public Route routeName(String routeName) {
-        this.setRouteName(routeName);
+    public Route transportType(TransportType transportType) {
+        this.setTransportType(transportType);
         return this;
     }
 
-    public void setRouteName(String routeName) {
-        this.routeName = routeName;
+    public void setTransportType(TransportType transportType) {
+        this.transportType = transportType;
     }
 
-    public String getOrigin() {
-        return this.origin;
-    }
-
-    public Route origin(String origin) {
-        this.setOrigin(origin);
-        return this;
-    }
-
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
-
-    public String getDestination() {
-        return this.destination;
-    }
-
-    public Route destination(String destination) {
-        this.setDestination(destination);
-        return this;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-
-    public Double getDistance() {
+    public BigDecimal getDistance() {
         return this.distance;
     }
 
-    public Route distance(Double distance) {
+    public Route distance(BigDecimal distance) {
         this.setDistance(distance);
         return this;
     }
 
-    public void setDistance(Double distance) {
+    public void setDistance(BigDecimal distance) {
         this.distance = distance;
     }
 
@@ -162,17 +121,17 @@ public class Route implements Serializable {
         this.estimatedDuration = estimatedDuration;
     }
 
-    public TransportType getTransportType() {
-        return this.transportType;
+    public BigDecimal getBasePrice() {
+        return this.basePrice;
     }
 
-    public Route transportType(TransportType transportType) {
-        this.setTransportType(transportType);
+    public Route basePrice(BigDecimal basePrice) {
+        this.setBasePrice(basePrice);
         return this;
     }
 
-    public void setTransportType(TransportType transportType) {
-        this.transportType = transportType;
+    public void setBasePrice(BigDecimal basePrice) {
+        this.basePrice = basePrice;
     }
 
     public Boolean getIsActive() {
@@ -188,60 +147,73 @@ public class Route implements Serializable {
         this.isActive = isActive;
     }
 
-    public Instant getCreatedAt() {
-        return this.createdAt;
+    public Set<Trip> getTrips() {
+        return this.trips;
     }
 
-    public Route createdAt(Instant createdAt) {
-        this.setCreatedAt(createdAt);
-        return this;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return this.updatedAt;
-    }
-
-    public Route updatedAt(Instant updatedAt) {
-        this.setUpdatedAt(updatedAt);
-        return this;
-    }
-
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Set<Schedule> getRouteNames() {
-        return this.routeNames;
-    }
-
-    public void setRouteNames(Set<Schedule> schedules) {
-        if (this.routeNames != null) {
-            this.routeNames.forEach(i -> i.setRoute(null));
+    public void setTrips(Set<Trip> trips) {
+        if (this.trips != null) {
+            this.trips.forEach(i -> i.setRoute(null));
         }
-        if (schedules != null) {
-            schedules.forEach(i -> i.setRoute(this));
+        if (trips != null) {
+            trips.forEach(i -> i.setRoute(this));
         }
-        this.routeNames = schedules;
+        this.trips = trips;
     }
 
-    public Route routeNames(Set<Schedule> schedules) {
-        this.setRouteNames(schedules);
+    public Route trips(Set<Trip> trips) {
+        this.setTrips(trips);
         return this;
     }
 
-    public Route addRouteName(Schedule schedule) {
-        this.routeNames.add(schedule);
-        schedule.setRoute(this);
+    public Route addTrips(Trip trip) {
+        this.trips.add(trip);
+        trip.setRoute(this);
         return this;
     }
 
-    public Route removeRouteName(Schedule schedule) {
-        this.routeNames.remove(schedule);
-        schedule.setRoute(null);
+    public Route removeTrips(Trip trip) {
+        this.trips.remove(trip);
+        trip.setRoute(null);
+        return this;
+    }
+
+    public Station getOrigin() {
+        return this.origin;
+    }
+
+    public void setOrigin(Station station) {
+        this.origin = station;
+    }
+
+    public Route origin(Station station) {
+        this.setOrigin(station);
+        return this;
+    }
+
+    public Station getDestination() {
+        return this.destination;
+    }
+
+    public void setDestination(Station station) {
+        this.destination = station;
+    }
+
+    public Route destination(Station station) {
+        this.setDestination(station);
+        return this;
+    }
+
+    public Operator getOperator() {
+        return this.operator;
+    }
+
+    public void setOperator(Operator operator) {
+        this.operator = operator;
+    }
+
+    public Route operator(Operator operator) {
+        this.setOperator(operator);
         return this;
     }
 
@@ -269,15 +241,11 @@ public class Route implements Serializable {
     public String toString() {
         return "Route{" +
             "id=" + getId() +
-            ", routeName='" + getRouteName() + "'" +
-            ", origin='" + getOrigin() + "'" +
-            ", destination='" + getDestination() + "'" +
+            ", transportType='" + getTransportType() + "'" +
             ", distance=" + getDistance() +
             ", estimatedDuration=" + getEstimatedDuration() +
-            ", transportType='" + getTransportType() + "'" +
+            ", basePrice=" + getBasePrice() +
             ", isActive='" + getIsActive() + "'" +
-            ", createdAt='" + getCreatedAt() + "'" +
-            ", updatedAt='" + getUpdatedAt() + "'" +
             "}";
     }
 }

@@ -4,7 +4,6 @@ import co.elastic.clients.elasticsearch._types.query_dsl.QueryStringQuery;
 import com.ticketsystem.route.domain.Route;
 import com.ticketsystem.route.repository.RouteRepository;
 import java.util.List;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,7 @@ import org.springframework.scheduling.annotation.Async;
 /**
  * Spring Data Elasticsearch repository for the {@link Route} entity.
  */
-public interface RouteSearchRepository extends ElasticsearchRepository<Route, UUID>, RouteSearchRepositoryInternal {}
+public interface RouteSearchRepository extends ElasticsearchRepository<Route, Long>, RouteSearchRepositoryInternal {}
 
 interface RouteSearchRepositoryInternal {
     Page<Route> search(String query, Pageable pageable);
@@ -30,7 +29,7 @@ interface RouteSearchRepositoryInternal {
     void index(Route entity);
 
     @Async
-    void deleteFromIndexById(UUID id);
+    void deleteFromIndexById(Long id);
 }
 
 class RouteSearchRepositoryInternalImpl implements RouteSearchRepositoryInternal {
@@ -62,7 +61,7 @@ class RouteSearchRepositoryInternalImpl implements RouteSearchRepositoryInternal
     }
 
     @Override
-    public void deleteFromIndexById(UUID id) {
+    public void deleteFromIndexById(Long id) {
         elasticsearchTemplate.delete(String.valueOf(id), Route.class);
     }
 }

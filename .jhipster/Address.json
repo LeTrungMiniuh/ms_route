@@ -1,5 +1,7 @@
 {
-  "annotations": {},
+  "annotations": {
+    "changelogDate": "20250914155523"
+  },
   "applications": ["ms_route"],
   "dto": "mapstruct",
   "fields": [

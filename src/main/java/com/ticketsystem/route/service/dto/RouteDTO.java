@@ -3,9 +3,8 @@ package com.ticketsystem.route.service.dto;
 import com.ticketsystem.route.domain.enumeration.TransportType;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.time.Instant;
+import java.math.BigDecimal;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * A DTO for the {@link com.ticketsystem.route.domain.Route} entity.
@@ -13,73 +12,49 @@ import java.util.UUID;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class RouteDTO implements Serializable {
 
-    @NotNull
-    private UUID id;
-
-    @NotNull
-    private String routeName;
-
-    @NotNull
-    private String origin;
-
-    @NotNull
-    private String destination;
-
-    @NotNull
-    private Double distance;
-
-    @NotNull
-    private Integer estimatedDuration;
+    private Long id;
 
     @NotNull
     private TransportType transportType;
 
+    private BigDecimal distance;
+
+    private Integer estimatedDuration;
+
+    @NotNull
+    private BigDecimal basePrice;
+
     @NotNull
     private Boolean isActive;
 
-    @NotNull
-    private Instant createdAt;
+    private StationDTO origin;
+
+    private StationDTO destination;
 
     @NotNull
-    private Instant updatedAt;
+    private OperatorDTO operator;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getRouteName() {
-        return routeName;
+    public TransportType getTransportType() {
+        return transportType;
     }
 
-    public void setRouteName(String routeName) {
-        this.routeName = routeName;
+    public void setTransportType(TransportType transportType) {
+        this.transportType = transportType;
     }
 
-    public String getOrigin() {
-        return origin;
-    }
-
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
-
-    public String getDestination() {
-        return destination;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-
-    public Double getDistance() {
+    public BigDecimal getDistance() {
         return distance;
     }
 
-    public void setDistance(Double distance) {
+    public void setDistance(BigDecimal distance) {
         this.distance = distance;
     }
 
@@ -91,12 +66,12 @@ public class RouteDTO implements Serializable {
         this.estimatedDuration = estimatedDuration;
     }
 
-    public TransportType getTransportType() {
-        return transportType;
+    public BigDecimal getBasePrice() {
+        return basePrice;
     }
 
-    public void setTransportType(TransportType transportType) {
-        this.transportType = transportType;
+    public void setBasePrice(BigDecimal basePrice) {
+        this.basePrice = basePrice;
     }
 
     public Boolean getIsActive() {
@@ -107,20 +82,28 @@ public class RouteDTO implements Serializable {
         this.isActive = isActive;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
+    public StationDTO getOrigin() {
+        return origin;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
+    public void setOrigin(StationDTO origin) {
+        this.origin = origin;
     }
 
-    public Instant getUpdatedAt() {
-        return updatedAt;
+    public StationDTO getDestination() {
+        return destination;
     }
 
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setDestination(StationDTO destination) {
+        this.destination = destination;
+    }
+
+    public OperatorDTO getOperator() {
+        return operator;
+    }
+
+    public void setOperator(OperatorDTO operator) {
+        this.operator = operator;
     }
 
     @Override
@@ -148,16 +131,15 @@ public class RouteDTO implements Serializable {
     @Override
     public String toString() {
         return "RouteDTO{" +
-            "id='" + getId() + "'" +
-            ", routeName='" + getRouteName() + "'" +
-            ", origin='" + getOrigin() + "'" +
-            ", destination='" + getDestination() + "'" +
+            "id=" + getId() +
+            ", transportType='" + getTransportType() + "'" +
             ", distance=" + getDistance() +
             ", estimatedDuration=" + getEstimatedDuration() +
-            ", transportType='" + getTransportType() + "'" +
+            ", basePrice=" + getBasePrice() +
             ", isActive='" + getIsActive() + "'" +
-            ", createdAt='" + getCreatedAt() + "'" +
-            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", origin=" + getOrigin() +
+            ", destination=" + getDestination() +
+            ", operator=" + getOperator() +
             "}";
     }
 }

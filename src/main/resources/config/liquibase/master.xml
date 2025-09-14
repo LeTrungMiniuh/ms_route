@@ -12,10 +12,31 @@
     <property name="timeType" value="time(6)" dbms="mysql"/>
 
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20250831164112_added_entity_Route.xml" relativeToChangelogFile="false"/>
-    <include file="config/liquibase/changelog/20250831164212_added_entity_Schedule.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155223_added_entity_Province.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155323_added_entity_District.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155423_added_entity_Ward.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155523_added_entity_Address.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155623_added_entity_Operator.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155723_added_entity_Station.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155823_added_entity_Route.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155923_added_entity_Trip.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160023_added_entity_Vehicle.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160123_added_entity_VehicleImage.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160223_added_entity_VehicleReview.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160323_added_entity_Seat.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160423_added_entity_VehicleAmenity.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160523_added_entity_ReviewSummary.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
-    <include file="config/liquibase/changelog/20250831164212_added_entity_constraints_Schedule.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155323_added_entity_constraints_District.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155423_added_entity_constraints_Ward.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155523_added_entity_constraints_Address.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155823_added_entity_constraints_Route.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914155923_added_entity_constraints_Trip.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160023_added_entity_constraints_Vehicle.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160123_added_entity_constraints_VehicleImage.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160223_added_entity_constraints_VehicleReview.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160323_added_entity_constraints_Seat.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250914160423_added_entity_constraints_VehicleAmenity.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

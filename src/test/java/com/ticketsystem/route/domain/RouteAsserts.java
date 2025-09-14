@@ -1,5 +1,6 @@
 package com.ticketsystem.route.domain;
 
+import static com.ticketsystem.route.domain.AssertUtils.bigDecimalCompareTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RouteAsserts {
@@ -47,15 +48,15 @@ public class RouteAsserts {
     public static void assertRouteUpdatableFieldsEquals(Route expected, Route actual) {
         assertThat(actual)
             .as("Verify Route relevant properties")
-            .satisfies(a -> assertThat(a.getRouteName()).as("check routeName").isEqualTo(expected.getRouteName()))
-            .satisfies(a -> assertThat(a.getOrigin()).as("check origin").isEqualTo(expected.getOrigin()))
-            .satisfies(a -> assertThat(a.getDestination()).as("check destination").isEqualTo(expected.getDestination()))
-            .satisfies(a -> assertThat(a.getDistance()).as("check distance").isEqualTo(expected.getDistance()))
-            .satisfies(a -> assertThat(a.getEstimatedDuration()).as("check estimatedDuration").isEqualTo(expected.getEstimatedDuration()))
             .satisfies(a -> assertThat(a.getTransportType()).as("check transportType").isEqualTo(expected.getTransportType()))
-            .satisfies(a -> assertThat(a.getIsActive()).as("check isActive").isEqualTo(expected.getIsActive()))
-            .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()))
-            .satisfies(a -> assertThat(a.getUpdatedAt()).as("check updatedAt").isEqualTo(expected.getUpdatedAt()));
+            .satisfies(a ->
+                assertThat(a.getDistance()).as("check distance").usingComparator(bigDecimalCompareTo).isEqualTo(expected.getDistance())
+            )
+            .satisfies(a -> assertThat(a.getEstimatedDuration()).as("check estimatedDuration").isEqualTo(expected.getEstimatedDuration()))
+            .satisfies(a ->
+                assertThat(a.getBasePrice()).as("check basePrice").usingComparator(bigDecimalCompareTo).isEqualTo(expected.getBasePrice())
+            )
+            .satisfies(a -> assertThat(a.getIsActive()).as("check isActive").isEqualTo(expected.getIsActive()));
     }
 
     /**
@@ -65,6 +66,10 @@ public class RouteAsserts {
      * @param actual the actual entity
      */
     public static void assertRouteUpdatableRelationshipsEquals(Route expected, Route actual) {
-        // empty method
+        assertThat(actual)
+            .as("Verify Route relationships")
+            .satisfies(a -> assertThat(a.getOrigin()).as("check origin").isEqualTo(expected.getOrigin()))
+            .satisfies(a -> assertThat(a.getDestination()).as("check destination").isEqualTo(expected.getDestination()))
+            .satisfies(a -> assertThat(a.getOperator()).as("check operator").isEqualTo(expected.getOperator()));
     }
 }

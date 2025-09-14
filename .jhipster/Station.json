@@ -1,5 +1,7 @@
 {
-  "annotations": {},
+  "annotations": {
+    "changelogDate": "20250914155723"
+  },
   "applications": ["ms_route"],
   "dto": "mapstruct",
   "fields": [
@@ -18,6 +20,7 @@
       "fieldType": "String"
     },
     {
+      "documentation": "Cross-service ID: Address lives in ms_route; keep as UUID to avoid hard relation across apps",
       "fieldName": "addressId",
       "fieldType": "UUID",
       "fieldValidateRules": ["required"]

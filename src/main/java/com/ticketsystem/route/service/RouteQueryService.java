@@ -77,17 +77,16 @@ public class RouteQueryService extends QueryService<Route> {
             // This has to be called first, because the distinct method returns null
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
-                buildSpecification(criteria.getId(), Route_.id),
-                buildStringSpecification(criteria.getRouteName(), Route_.routeName),
-                buildStringSpecification(criteria.getOrigin(), Route_.origin),
-                buildStringSpecification(criteria.getDestination(), Route_.destination),
+                buildRangeSpecification(criteria.getId(), Route_.id),
+                buildSpecification(criteria.getTransportType(), Route_.transportType),
                 buildRangeSpecification(criteria.getDistance(), Route_.distance),
                 buildRangeSpecification(criteria.getEstimatedDuration(), Route_.estimatedDuration),
-                buildSpecification(criteria.getTransportType(), Route_.transportType),
+                buildRangeSpecification(criteria.getBasePrice(), Route_.basePrice),
                 buildSpecification(criteria.getIsActive(), Route_.isActive),
-                buildRangeSpecification(criteria.getCreatedAt(), Route_.createdAt),
-                buildRangeSpecification(criteria.getUpdatedAt(), Route_.updatedAt),
-                buildSpecification(criteria.getRouteNameId(), root -> root.join(Route_.routeNames, JoinType.LEFT).get(Schedule_.id))
+                buildSpecification(criteria.getTripsId(), root -> root.join(Route_.trips, JoinType.LEFT).get(Trip_.id)),
+                buildSpecification(criteria.getOriginId(), root -> root.join(Route_.origin, JoinType.LEFT).get(Station_.id)),
+                buildSpecification(criteria.getDestinationId(), root -> root.join(Route_.destination, JoinType.LEFT).get(Station_.id)),
+                buildSpecification(criteria.getOperatorId(), root -> root.join(Route_.operator, JoinType.LEFT).get(Operator_.id))
             );
         }
         return specification;

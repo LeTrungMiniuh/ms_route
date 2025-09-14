@@ -2,7 +2,6 @@ package com.ticketsystem.route.service;
 
 import com.ticketsystem.route.service.dto.RouteDTO;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -40,14 +39,14 @@ public interface RouteService {
      * @param id the id of the entity.
      * @return the entity.
      */
-    Optional<RouteDTO> findOne(UUID id);
+    Optional<RouteDTO> findOne(Long id);
 
     /**
      * Delete the "id" route.
      *
      * @param id the id of the entity.
      */
-    void delete(UUID id);
+    void delete(Long id);
 
     /**
      * Search for the route corresponding to the query.

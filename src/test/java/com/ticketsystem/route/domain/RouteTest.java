@@ -1,7 +1,9 @@
 package com.ticketsystem.route.domain;
 
+import static com.ticketsystem.route.domain.OperatorTestSamples.*;
 import static com.ticketsystem.route.domain.RouteTestSamples.*;
-import static com.ticketsystem.route.domain.ScheduleTestSamples.*;
+import static com.ticketsystem.route.domain.StationTestSamples.*;
+import static com.ticketsystem.route.domain.TripTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ticketsystem.route.web.rest.TestUtil;
@@ -26,24 +28,60 @@ class RouteTest {
     }
 
     @Test
-    void routeNameTest() {
+    void tripsTest() {
         Route route = getRouteRandomSampleGenerator();
-        Schedule scheduleBack = getScheduleRandomSampleGenerator();
+        Trip tripBack = getTripRandomSampleGenerator();
 
-        route.addRouteName(scheduleBack);
-        assertThat(route.getRouteNames()).containsOnly(scheduleBack);
-        assertThat(scheduleBack.getRoute()).isEqualTo(route);
+        route.addTrips(tripBack);
+        assertThat(route.getTrips()).containsOnly(tripBack);
+        assertThat(tripBack.getRoute()).isEqualTo(route);
 
-        route.removeRouteName(scheduleBack);
-        assertThat(route.getRouteNames()).doesNotContain(scheduleBack);
-        assertThat(scheduleBack.getRoute()).isNull();
+        route.removeTrips(tripBack);
+        assertThat(route.getTrips()).doesNotContain(tripBack);
+        assertThat(tripBack.getRoute()).isNull();
 
-        route.routeNames(new HashSet<>(Set.of(scheduleBack)));
-        assertThat(route.getRouteNames()).containsOnly(scheduleBack);
-        assertThat(scheduleBack.getRoute()).isEqualTo(route);
+        route.trips(new HashSet<>(Set.of(tripBack)));
+        assertThat(route.getTrips()).containsOnly(tripBack);
+        assertThat(tripBack.getRoute()).isEqualTo(route);
 
-        route.setRouteNames(new HashSet<>());
-        assertThat(route.getRouteNames()).doesNotContain(scheduleBack);
-        assertThat(scheduleBack.getRoute()).isNull();
+        route.setTrips(new HashSet<>());
+        assertThat(route.getTrips()).doesNotContain(tripBack);
+        assertThat(tripBack.getRoute()).isNull();
+    }
+
+    @Test
+    void originTest() {
+        Route route = getRouteRandomSampleGenerator();
+        Station stationBack = getStationRandomSampleGenerator();
+
+        route.setOrigin(stationBack);
+        assertThat(route.getOrigin()).isEqualTo(stationBack);
+
+        route.origin(null);
+        assertThat(route.getOrigin()).isNull();
+    }
+
+    @Test
+    void destinationTest() {
+        Route route = getRouteRandomSampleGenerator();
+        Station stationBack = getStationRandomSampleGenerator();
+
+        route.setDestination(stationBack);
+        assertThat(route.getDestination()).isEqualTo(stationBack);
+
+        route.destination(null);
+        assertThat(route.getDestination()).isNull();
+    }
+
+    @Test
+    void operatorTest() {
+        Route route = getRouteRandomSampleGenerator();
+        Operator operatorBack = getOperatorRandomSampleGenerator();
+
+        route.setOperator(operatorBack);
+        assertThat(route.getOperator()).isEqualTo(operatorBack);
+
+        route.operator(null);
+        assertThat(route.getOperator()).isNull();
     }
 }

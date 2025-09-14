@@ -7,7 +7,6 @@ import com.ticketsystem.route.service.RouteService;
 import com.ticketsystem.route.service.dto.RouteDTO;
 import com.ticketsystem.route.service.mapper.RouteMapper;
 import java.util.Optional;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -75,13 +74,13 @@ public class RouteServiceImpl implements RouteService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<RouteDTO> findOne(UUID id) {
+    public Optional<RouteDTO> findOne(Long id) {
         LOG.debug("Request to get Route : {}", id);
         return routeRepository.findById(id).map(routeMapper::toDto);
     }
 
     @Override
-    public void delete(UUID id) {
+    public void delete(Long id) {
         LOG.debug("Request to delete Route : {}", id);
         routeRepository.deleteById(id);
         routeSearchRepository.deleteFromIndexById(id);
