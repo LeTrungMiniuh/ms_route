@@ -151,10 +151,10 @@
             <artifactId>redisson</artifactId>
             <version>${redisson.version}</version>
         </dependency>
-        <dependency>
-            <groupId>javax.cache</groupId>
-            <artifactId>cache-api</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>javax.cache</groupId>-->
+<!--            <artifactId>cache-api</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>tech.jhipster</groupId>
             <artifactId>jhipster-framework</artifactId>
