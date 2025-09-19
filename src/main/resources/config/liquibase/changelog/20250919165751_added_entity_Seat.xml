@@ -17,10 +17,10 @@
             <column name="seat_no" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="row" type="integer">
+            <column name="seat_row" type="integer">
                 <constraints nullable="true" />
             </column>
-            <column name="col" type="integer">
+            <column name="seat_col" type="integer">
                 <constraints nullable="true" />
             </column>
             <column name="price_factor" type="decimal(21,2)">
@@ -69,8 +69,8 @@
                   usePreparedStatements="true">
             <column name="id" type="numeric"/>
             <column name="seat_no" type="string"/>
-            <column name="row" type="numeric"/>
-            <column name="col" type="numeric"/>
+            <column name="seat_row" type="numeric"/>
+            <column name="seat_col" type="numeric"/>
             <column name="price_factor" type="numeric"/>
             <column name="created_at" type="date"/>
             <column name="updated_at" type="date"/>
