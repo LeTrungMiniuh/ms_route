@@ -48,16 +48,18 @@ public class AddressAsserts {
     public static void assertAddressUpdatableFieldsEquals(Address expected, Address actual) {
         assertThat(actual)
             .as("Verify Address relevant properties")
-            .satisfies(a -> assertThat(a.getWardCode()).as("check wardCode").isEqualTo(expected.getWardCode()))
             .satisfies(a -> assertThat(a.getStreetAddress()).as("check streetAddress").isEqualTo(expected.getStreetAddress()))
-            .satisfies(a -> assertThat(a.getPostalCode()).as("check postalCode").isEqualTo(expected.getPostalCode()))
             .satisfies(a ->
                 assertThat(a.getLatitude()).as("check latitude").usingComparator(bigDecimalCompareTo).isEqualTo(expected.getLatitude())
             )
             .satisfies(a ->
                 assertThat(a.getLongitude()).as("check longitude").usingComparator(bigDecimalCompareTo).isEqualTo(expected.getLongitude())
             )
-            .satisfies(a -> assertThat(a.getLandmark()).as("check landmark").isEqualTo(expected.getLandmark()));
+            .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()))
+            .satisfies(a -> assertThat(a.getUpdatedAt()).as("check updatedAt").isEqualTo(expected.getUpdatedAt()))
+            .satisfies(a -> assertThat(a.getIsDeleted()).as("check isDeleted").isEqualTo(expected.getIsDeleted()))
+            .satisfies(a -> assertThat(a.getDeletedAt()).as("check deletedAt").isEqualTo(expected.getDeletedAt()))
+            .satisfies(a -> assertThat(a.getDeletedBy()).as("check deletedBy").isEqualTo(expected.getDeletedBy()));
     }
 
     /**

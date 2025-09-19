@@ -10,19 +10,14 @@ public class AddressTestSamples {
     private static final AtomicLong longCount = new AtomicLong(random.nextInt() + (2 * Integer.MAX_VALUE));
 
     public static Address getAddressSample1() {
-        return new Address().id(1L).wardCode("wardCode1").streetAddress("streetAddress1").postalCode("postalCode1").landmark("landmark1");
+        return new Address().id(1L).streetAddress("streetAddress1").deletedBy(UUID.fromString("23d8dc04-a48b-45d9-a01d-4b728f0ad4aa"));
     }
 
     public static Address getAddressSample2() {
-        return new Address().id(2L).wardCode("wardCode2").streetAddress("streetAddress2").postalCode("postalCode2").landmark("landmark2");
+        return new Address().id(2L).streetAddress("streetAddress2").deletedBy(UUID.fromString("ad79f240-3727-46c3-b89f-2cf6ebd74367"));
     }
 
     public static Address getAddressRandomSampleGenerator() {
-        return new Address()
-            .id(longCount.incrementAndGet())
-            .wardCode(UUID.randomUUID().toString())
-            .streetAddress(UUID.randomUUID().toString())
-            .postalCode(UUID.randomUUID().toString())
-            .landmark(UUID.randomUUID().toString());
+        return new Address().id(longCount.incrementAndGet()).streetAddress(UUID.randomUUID().toString()).deletedBy(UUID.randomUUID());
     }
 }

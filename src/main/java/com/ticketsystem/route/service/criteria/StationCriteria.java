@@ -24,19 +24,25 @@ public class StationCriteria implements Serializable, Criteria {
 
     private LongFilter id;
 
-    private StringFilter code;
-
     private StringFilter name;
 
-    private StringFilter nameEn;
+    private StringFilter phoneNumber;
 
-    private UUIDFilter addressId;
+    private StringFilter description;
 
-    private StringFilter facilities;
+    private BooleanFilter active;
 
-    private StringFilter operatingHours;
+    private InstantFilter createdAt;
 
-    private BooleanFilter isActive;
+    private InstantFilter updatedAt;
+
+    private BooleanFilter isDeleted;
+
+    private InstantFilter deletedAt;
+
+    private UUIDFilter deletedBy;
+
+    private LongFilter addressId;
 
     private Boolean distinct;
 
@@ -44,13 +50,16 @@ public class StationCriteria implements Serializable, Criteria {
 
     public StationCriteria(StationCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
-        this.code = other.optionalCode().map(StringFilter::copy).orElse(null);
         this.name = other.optionalName().map(StringFilter::copy).orElse(null);
-        this.nameEn = other.optionalNameEn().map(StringFilter::copy).orElse(null);
-        this.addressId = other.optionalAddressId().map(UUIDFilter::copy).orElse(null);
-        this.facilities = other.optionalFacilities().map(StringFilter::copy).orElse(null);
-        this.operatingHours = other.optionalOperatingHours().map(StringFilter::copy).orElse(null);
-        this.isActive = other.optionalIsActive().map(BooleanFilter::copy).orElse(null);
+        this.phoneNumber = other.optionalPhoneNumber().map(StringFilter::copy).orElse(null);
+        this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
+        this.active = other.optionalActive().map(BooleanFilter::copy).orElse(null);
+        this.createdAt = other.optionalCreatedAt().map(InstantFilter::copy).orElse(null);
+        this.updatedAt = other.optionalUpdatedAt().map(InstantFilter::copy).orElse(null);
+        this.isDeleted = other.optionalIsDeleted().map(BooleanFilter::copy).orElse(null);
+        this.deletedAt = other.optionalDeletedAt().map(InstantFilter::copy).orElse(null);
+        this.deletedBy = other.optionalDeletedBy().map(UUIDFilter::copy).orElse(null);
+        this.addressId = other.optionalAddressId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -78,25 +87,6 @@ public class StationCriteria implements Serializable, Criteria {
         this.id = id;
     }
 
-    public StringFilter getCode() {
-        return code;
-    }
-
-    public Optional<StringFilter> optionalCode() {
-        return Optional.ofNullable(code);
-    }
-
-    public StringFilter code() {
-        if (code == null) {
-            setCode(new StringFilter());
-        }
-        return code;
-    }
-
-    public void setCode(StringFilter code) {
-        this.code = code;
-    }
-
     public StringFilter getName() {
         return name;
     }
@@ -116,99 +106,175 @@ public class StationCriteria implements Serializable, Criteria {
         this.name = name;
     }
 
-    public StringFilter getNameEn() {
-        return nameEn;
+    public StringFilter getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public Optional<StringFilter> optionalNameEn() {
-        return Optional.ofNullable(nameEn);
+    public Optional<StringFilter> optionalPhoneNumber() {
+        return Optional.ofNullable(phoneNumber);
     }
 
-    public StringFilter nameEn() {
-        if (nameEn == null) {
-            setNameEn(new StringFilter());
+    public StringFilter phoneNumber() {
+        if (phoneNumber == null) {
+            setPhoneNumber(new StringFilter());
         }
-        return nameEn;
+        return phoneNumber;
     }
 
-    public void setNameEn(StringFilter nameEn) {
-        this.nameEn = nameEn;
+    public void setPhoneNumber(StringFilter phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
-    public UUIDFilter getAddressId() {
+    public StringFilter getDescription() {
+        return description;
+    }
+
+    public Optional<StringFilter> optionalDescription() {
+        return Optional.ofNullable(description);
+    }
+
+    public StringFilter description() {
+        if (description == null) {
+            setDescription(new StringFilter());
+        }
+        return description;
+    }
+
+    public void setDescription(StringFilter description) {
+        this.description = description;
+    }
+
+    public BooleanFilter getActive() {
+        return active;
+    }
+
+    public Optional<BooleanFilter> optionalActive() {
+        return Optional.ofNullable(active);
+    }
+
+    public BooleanFilter active() {
+        if (active == null) {
+            setActive(new BooleanFilter());
+        }
+        return active;
+    }
+
+    public void setActive(BooleanFilter active) {
+        this.active = active;
+    }
+
+    public InstantFilter getCreatedAt() {
+        return createdAt;
+    }
+
+    public Optional<InstantFilter> optionalCreatedAt() {
+        return Optional.ofNullable(createdAt);
+    }
+
+    public InstantFilter createdAt() {
+        if (createdAt == null) {
+            setCreatedAt(new InstantFilter());
+        }
+        return createdAt;
+    }
+
+    public void setCreatedAt(InstantFilter createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public InstantFilter getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Optional<InstantFilter> optionalUpdatedAt() {
+        return Optional.ofNullable(updatedAt);
+    }
+
+    public InstantFilter updatedAt() {
+        if (updatedAt == null) {
+            setUpdatedAt(new InstantFilter());
+        }
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(InstantFilter updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public BooleanFilter getIsDeleted() {
+        return isDeleted;
+    }
+
+    public Optional<BooleanFilter> optionalIsDeleted() {
+        return Optional.ofNullable(isDeleted);
+    }
+
+    public BooleanFilter isDeleted() {
+        if (isDeleted == null) {
+            setIsDeleted(new BooleanFilter());
+        }
+        return isDeleted;
+    }
+
+    public void setIsDeleted(BooleanFilter isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public InstantFilter getDeletedAt() {
+        return deletedAt;
+    }
+
+    public Optional<InstantFilter> optionalDeletedAt() {
+        return Optional.ofNullable(deletedAt);
+    }
+
+    public InstantFilter deletedAt() {
+        if (deletedAt == null) {
+            setDeletedAt(new InstantFilter());
+        }
+        return deletedAt;
+    }
+
+    public void setDeletedAt(InstantFilter deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUIDFilter getDeletedBy() {
+        return deletedBy;
+    }
+
+    public Optional<UUIDFilter> optionalDeletedBy() {
+        return Optional.ofNullable(deletedBy);
+    }
+
+    public UUIDFilter deletedBy() {
+        if (deletedBy == null) {
+            setDeletedBy(new UUIDFilter());
+        }
+        return deletedBy;
+    }
+
+    public void setDeletedBy(UUIDFilter deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public LongFilter getAddressId() {
         return addressId;
     }
 
-    public Optional<UUIDFilter> optionalAddressId() {
+    public Optional<LongFilter> optionalAddressId() {
         return Optional.ofNullable(addressId);
     }
 
-    public UUIDFilter addressId() {
+    public LongFilter addressId() {
         if (addressId == null) {
-            setAddressId(new UUIDFilter());
+            setAddressId(new LongFilter());
         }
         return addressId;
     }
 
-    public void setAddressId(UUIDFilter addressId) {
+    public void setAddressId(LongFilter addressId) {
         this.addressId = addressId;
-    }
-
-    public StringFilter getFacilities() {
-        return facilities;
-    }
-
-    public Optional<StringFilter> optionalFacilities() {
-        return Optional.ofNullable(facilities);
-    }
-
-    public StringFilter facilities() {
-        if (facilities == null) {
-            setFacilities(new StringFilter());
-        }
-        return facilities;
-    }
-
-    public void setFacilities(StringFilter facilities) {
-        this.facilities = facilities;
-    }
-
-    public StringFilter getOperatingHours() {
-        return operatingHours;
-    }
-
-    public Optional<StringFilter> optionalOperatingHours() {
-        return Optional.ofNullable(operatingHours);
-    }
-
-    public StringFilter operatingHours() {
-        if (operatingHours == null) {
-            setOperatingHours(new StringFilter());
-        }
-        return operatingHours;
-    }
-
-    public void setOperatingHours(StringFilter operatingHours) {
-        this.operatingHours = operatingHours;
-    }
-
-    public BooleanFilter getIsActive() {
-        return isActive;
-    }
-
-    public Optional<BooleanFilter> optionalIsActive() {
-        return Optional.ofNullable(isActive);
-    }
-
-    public BooleanFilter isActive() {
-        if (isActive == null) {
-            setIsActive(new BooleanFilter());
-        }
-        return isActive;
-    }
-
-    public void setIsActive(BooleanFilter isActive) {
-        this.isActive = isActive;
     }
 
     public Boolean getDistinct() {
@@ -241,20 +307,36 @@ public class StationCriteria implements Serializable, Criteria {
         final StationCriteria that = (StationCriteria) o;
         return (
             Objects.equals(id, that.id) &&
-            Objects.equals(code, that.code) &&
             Objects.equals(name, that.name) &&
-            Objects.equals(nameEn, that.nameEn) &&
+            Objects.equals(phoneNumber, that.phoneNumber) &&
+            Objects.equals(description, that.description) &&
+            Objects.equals(active, that.active) &&
+            Objects.equals(createdAt, that.createdAt) &&
+            Objects.equals(updatedAt, that.updatedAt) &&
+            Objects.equals(isDeleted, that.isDeleted) &&
+            Objects.equals(deletedAt, that.deletedAt) &&
+            Objects.equals(deletedBy, that.deletedBy) &&
             Objects.equals(addressId, that.addressId) &&
-            Objects.equals(facilities, that.facilities) &&
-            Objects.equals(operatingHours, that.operatingHours) &&
-            Objects.equals(isActive, that.isActive) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, code, name, nameEn, addressId, facilities, operatingHours, isActive, distinct);
+        return Objects.hash(
+            id,
+            name,
+            phoneNumber,
+            description,
+            active,
+            createdAt,
+            updatedAt,
+            isDeleted,
+            deletedAt,
+            deletedBy,
+            addressId,
+            distinct
+        );
     }
 
     // prettier-ignore
@@ -262,13 +344,16 @@ public class StationCriteria implements Serializable, Criteria {
     public String toString() {
         return "StationCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
-            optionalCode().map(f -> "code=" + f + ", ").orElse("") +
             optionalName().map(f -> "name=" + f + ", ").orElse("") +
-            optionalNameEn().map(f -> "nameEn=" + f + ", ").orElse("") +
+            optionalPhoneNumber().map(f -> "phoneNumber=" + f + ", ").orElse("") +
+            optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
+            optionalActive().map(f -> "active=" + f + ", ").orElse("") +
+            optionalCreatedAt().map(f -> "createdAt=" + f + ", ").orElse("") +
+            optionalUpdatedAt().map(f -> "updatedAt=" + f + ", ").orElse("") +
+            optionalIsDeleted().map(f -> "isDeleted=" + f + ", ").orElse("") +
+            optionalDeletedAt().map(f -> "deletedAt=" + f + ", ").orElse("") +
+            optionalDeletedBy().map(f -> "deletedBy=" + f + ", ").orElse("") +
             optionalAddressId().map(f -> "addressId=" + f + ", ").orElse("") +
-            optionalFacilities().map(f -> "facilities=" + f + ", ").orElse("") +
-            optionalOperatingHours().map(f -> "operatingHours=" + f + ", ").orElse("") +
-            optionalIsActive().map(f -> "isActive=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

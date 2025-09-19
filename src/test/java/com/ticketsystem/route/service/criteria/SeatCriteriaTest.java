@@ -76,12 +76,16 @@ class SeatCriteriaTest {
 
     private static void setAllFilters(SeatCriteria seatCriteria) {
         seatCriteria.id();
-        seatCriteria.seatNumber();
-        seatCriteria.seatType();
-        seatCriteria.deck();
-        seatCriteria.priceModifier();
-        seatCriteria.isAvailable();
-        seatCriteria.tripId();
+        seatCriteria.seatNo();
+        seatCriteria.row();
+        seatCriteria.col();
+        seatCriteria.priceFactor();
+        seatCriteria.createdAt();
+        seatCriteria.updatedAt();
+        seatCriteria.isDeleted();
+        seatCriteria.deletedAt();
+        seatCriteria.deletedBy();
+        seatCriteria.floorId();
         seatCriteria.distinct();
     }
 
@@ -89,12 +93,16 @@ class SeatCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
-                condition.apply(criteria.getSeatNumber()) &&
-                condition.apply(criteria.getSeatType()) &&
-                condition.apply(criteria.getDeck()) &&
-                condition.apply(criteria.getPriceModifier()) &&
-                condition.apply(criteria.getIsAvailable()) &&
-                condition.apply(criteria.getTripId()) &&
+                condition.apply(criteria.getSeatNo()) &&
+                condition.apply(criteria.getRow()) &&
+                condition.apply(criteria.getCol()) &&
+                condition.apply(criteria.getPriceFactor()) &&
+                condition.apply(criteria.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy()) &&
+                condition.apply(criteria.getFloorId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -104,12 +112,16 @@ class SeatCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
-                condition.apply(criteria.getSeatNumber(), copy.getSeatNumber()) &&
-                condition.apply(criteria.getSeatType(), copy.getSeatType()) &&
-                condition.apply(criteria.getDeck(), copy.getDeck()) &&
-                condition.apply(criteria.getPriceModifier(), copy.getPriceModifier()) &&
-                condition.apply(criteria.getIsAvailable(), copy.getIsAvailable()) &&
-                condition.apply(criteria.getTripId(), copy.getTripId()) &&
+                condition.apply(criteria.getSeatNo(), copy.getSeatNo()) &&
+                condition.apply(criteria.getRow(), copy.getRow()) &&
+                condition.apply(criteria.getCol(), copy.getCol()) &&
+                condition.apply(criteria.getPriceFactor(), copy.getPriceFactor()) &&
+                condition.apply(criteria.getCreatedAt(), copy.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt(), copy.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted(), copy.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt(), copy.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy(), copy.getDeletedBy()) &&
+                condition.apply(criteria.getFloorId(), copy.getFloorId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

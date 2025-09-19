@@ -76,13 +76,16 @@ class StationCriteriaTest {
 
     private static void setAllFilters(StationCriteria stationCriteria) {
         stationCriteria.id();
-        stationCriteria.code();
         stationCriteria.name();
-        stationCriteria.nameEn();
+        stationCriteria.phoneNumber();
+        stationCriteria.description();
+        stationCriteria.active();
+        stationCriteria.createdAt();
+        stationCriteria.updatedAt();
+        stationCriteria.isDeleted();
+        stationCriteria.deletedAt();
+        stationCriteria.deletedBy();
         stationCriteria.addressId();
-        stationCriteria.facilities();
-        stationCriteria.operatingHours();
-        stationCriteria.isActive();
         stationCriteria.distinct();
     }
 
@@ -90,13 +93,16 @@ class StationCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
-                condition.apply(criteria.getCode()) &&
                 condition.apply(criteria.getName()) &&
-                condition.apply(criteria.getNameEn()) &&
+                condition.apply(criteria.getPhoneNumber()) &&
+                condition.apply(criteria.getDescription()) &&
+                condition.apply(criteria.getActive()) &&
+                condition.apply(criteria.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy()) &&
                 condition.apply(criteria.getAddressId()) &&
-                condition.apply(criteria.getFacilities()) &&
-                condition.apply(criteria.getOperatingHours()) &&
-                condition.apply(criteria.getIsActive()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -106,13 +112,16 @@ class StationCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
-                condition.apply(criteria.getCode(), copy.getCode()) &&
                 condition.apply(criteria.getName(), copy.getName()) &&
-                condition.apply(criteria.getNameEn(), copy.getNameEn()) &&
+                condition.apply(criteria.getPhoneNumber(), copy.getPhoneNumber()) &&
+                condition.apply(criteria.getDescription(), copy.getDescription()) &&
+                condition.apply(criteria.getActive(), copy.getActive()) &&
+                condition.apply(criteria.getCreatedAt(), copy.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt(), copy.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted(), copy.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt(), copy.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy(), copy.getDeletedBy()) &&
                 condition.apply(criteria.getAddressId(), copy.getAddressId()) &&
-                condition.apply(criteria.getFacilities(), copy.getFacilities()) &&
-                condition.apply(criteria.getOperatingHours(), copy.getOperatingHours()) &&
-                condition.apply(criteria.getIsActive(), copy.getIsActive()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

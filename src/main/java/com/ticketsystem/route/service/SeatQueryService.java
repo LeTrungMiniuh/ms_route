@@ -72,12 +72,16 @@ public class SeatQueryService extends QueryService<Seat> {
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
                 buildRangeSpecification(criteria.getId(), Seat_.id),
-                buildStringSpecification(criteria.getSeatNumber(), Seat_.seatNumber),
-                buildSpecification(criteria.getSeatType(), Seat_.seatType),
-                buildStringSpecification(criteria.getDeck(), Seat_.deck),
-                buildRangeSpecification(criteria.getPriceModifier(), Seat_.priceModifier),
-                buildSpecification(criteria.getIsAvailable(), Seat_.isAvailable),
-                buildSpecification(criteria.getTripId(), root -> root.join(Seat_.trip, JoinType.LEFT).get(Trip_.id))
+                buildStringSpecification(criteria.getSeatNo(), Seat_.seatNo),
+                buildRangeSpecification(criteria.getRow(), Seat_.row),
+                buildRangeSpecification(criteria.getCol(), Seat_.col),
+                buildRangeSpecification(criteria.getPriceFactor(), Seat_.priceFactor),
+                buildRangeSpecification(criteria.getCreatedAt(), Seat_.createdAt),
+                buildRangeSpecification(criteria.getUpdatedAt(), Seat_.updatedAt),
+                buildSpecification(criteria.getIsDeleted(), Seat_.isDeleted),
+                buildRangeSpecification(criteria.getDeletedAt(), Seat_.deletedAt),
+                buildSpecification(criteria.getDeletedBy(), Seat_.deletedBy),
+                buildSpecification(criteria.getFloorId(), root -> root.join(Seat_.floor, JoinType.LEFT).get(Floor_.id))
             );
         }
         return specification;

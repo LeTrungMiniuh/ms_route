@@ -26,7 +26,7 @@
         <appender-ref ref="ASYNC"/>
     </root>
     -->
-    <logger name="javax.management.remote.rmi" level="ERROR"/>
+
     <logger name="com.ticketsystem.route" level="INFO"/>
     <logger name="io.undertow.request" level="ERROR"/>
     <logger name="angus.activation" level="WARN"/>

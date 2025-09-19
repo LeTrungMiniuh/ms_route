@@ -2,6 +2,7 @@ package com.ticketsystem.route.service.dto;
 
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
@@ -14,6 +15,8 @@ public class TripDTO implements Serializable {
 
     private Long id;
 
+    private String tripCode;
+
     @NotNull
     private Instant departureTime;
 
@@ -21,14 +24,22 @@ public class TripDTO implements Serializable {
     private Instant arrivalTime;
 
     @NotNull
-    private Integer availableSeats;
+    private BigDecimal baseFare;
 
     @NotNull
-    private Integer totalSeats;
+    private Instant createdAt;
 
-    private String status;
+    private Instant updatedAt;
 
-    private UUID driverId;
+    private Boolean isDeleted;
+
+    private Instant deletedAt;
+
+    private UUID deletedBy;
+
+    private DriverDTO driver;
+
+    private AttendantDTO attendant;
 
     @NotNull
     private RouteDTO route;
@@ -39,6 +50,14 @@ public class TripDTO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTripCode() {
+        return tripCode;
+    }
+
+    public void setTripCode(String tripCode) {
+        this.tripCode = tripCode;
     }
 
     public Instant getDepartureTime() {
@@ -57,36 +76,68 @@ public class TripDTO implements Serializable {
         this.arrivalTime = arrivalTime;
     }
 
-    public Integer getAvailableSeats() {
-        return availableSeats;
+    public BigDecimal getBaseFare() {
+        return baseFare;
     }
 
-    public void setAvailableSeats(Integer availableSeats) {
-        this.availableSeats = availableSeats;
+    public void setBaseFare(BigDecimal baseFare) {
+        this.baseFare = baseFare;
     }
 
-    public Integer getTotalSeats() {
-        return totalSeats;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setTotalSeats(Integer totalSeats) {
-        this.totalSeats = totalSeats;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public String getStatus() {
-        return status;
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public UUID getDriverId() {
-        return driverId;
+    public Boolean getIsDeleted() {
+        return isDeleted;
     }
 
-    public void setDriverId(UUID driverId) {
-        this.driverId = driverId;
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Instant getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public DriverDTO getDriver() {
+        return driver;
+    }
+
+    public void setDriver(DriverDTO driver) {
+        this.driver = driver;
+    }
+
+    public AttendantDTO getAttendant() {
+        return attendant;
+    }
+
+    public void setAttendant(AttendantDTO attendant) {
+        this.attendant = attendant;
     }
 
     public RouteDTO getRoute() {
@@ -123,12 +174,17 @@ public class TripDTO implements Serializable {
     public String toString() {
         return "TripDTO{" +
             "id=" + getId() +
+            ", tripCode='" + getTripCode() + "'" +
             ", departureTime='" + getDepartureTime() + "'" +
             ", arrivalTime='" + getArrivalTime() + "'" +
-            ", availableSeats=" + getAvailableSeats() +
-            ", totalSeats=" + getTotalSeats() +
-            ", status='" + getStatus() + "'" +
-            ", driverId='" + getDriverId() + "'" +
+            ", baseFare=" + getBaseFare() +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
+            ", driver=" + getDriver() +
+            ", attendant=" + getAttendant() +
             ", route=" + getRoute() +
             "}";
     }

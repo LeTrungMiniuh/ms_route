@@ -1,5 +1,6 @@
 package com.ticketsystem.route.service.criteria;
 
+import com.ticketsystem.route.domain.enumeration.VehicleType;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,43 +21,48 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class VehicleCriteria implements Serializable, Criteria {
 
+    /**
+     * Class for filtering VehicleType
+     */
+    public static class VehicleTypeFilter extends Filter<VehicleType> {
+
+        public VehicleTypeFilter() {}
+
+        public VehicleTypeFilter(VehicleTypeFilter filter) {
+            super(filter);
+        }
+
+        @Override
+        public VehicleTypeFilter copy() {
+            return new VehicleTypeFilter(this);
+        }
+    }
+
     private static final long serialVersionUID = 1L;
 
     private LongFilter id;
 
+    private VehicleTypeFilter type;
+
+    private BigDecimalFilter typeFactor;
+
     private StringFilter plateNumber;
 
-    private StringFilter model;
+    private StringFilter brand;
 
-    private IntegerFilter capacity;
+    private StringFilter description;
 
-    private StringFilter seatLayout;
+    private InstantFilter createdAt;
 
-    private StringFilter amenities;
+    private InstantFilter updatedAt;
 
-    private StringFilter imageCoverUrl;
+    private BooleanFilter isDeleted;
 
-    private DoubleFilter averageRating;
+    private InstantFilter deletedAt;
 
-    private IntegerFilter totalReviews;
+    private UUIDFilter deletedBy;
 
-    private BooleanFilter isActive;
-
-    private IntegerFilter yearManufactured;
-
-    private LocalDateFilter lastMaintenanceDate;
-
-    private LongFilter summaryId;
-
-    private LongFilter imagesId;
-
-    private LongFilter reviewsId;
-
-    private LongFilter amenityItemsId;
-
-    private LongFilter homeStationId;
-
-    private LongFilter operatorId;
+    private LongFilter seatMapId;
 
     private Boolean distinct;
 
@@ -64,23 +70,17 @@ public class VehicleCriteria implements Serializable, Criteria {
 
     public VehicleCriteria(VehicleCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.type = other.optionalType().map(VehicleTypeFilter::copy).orElse(null);
+        this.typeFactor = other.optionalTypeFactor().map(BigDecimalFilter::copy).orElse(null);
         this.plateNumber = other.optionalPlateNumber().map(StringFilter::copy).orElse(null);
-        this.model = other.optionalModel().map(StringFilter::copy).orElse(null);
-        this.capacity = other.optionalCapacity().map(IntegerFilter::copy).orElse(null);
-        this.seatLayout = other.optionalSeatLayout().map(StringFilter::copy).orElse(null);
-        this.amenities = other.optionalAmenities().map(StringFilter::copy).orElse(null);
-        this.imageCoverUrl = other.optionalImageCoverUrl().map(StringFilter::copy).orElse(null);
-        this.averageRating = other.optionalAverageRating().map(DoubleFilter::copy).orElse(null);
-        this.totalReviews = other.optionalTotalReviews().map(IntegerFilter::copy).orElse(null);
-        this.isActive = other.optionalIsActive().map(BooleanFilter::copy).orElse(null);
-        this.yearManufactured = other.optionalYearManufactured().map(IntegerFilter::copy).orElse(null);
-        this.lastMaintenanceDate = other.optionalLastMaintenanceDate().map(LocalDateFilter::copy).orElse(null);
-        this.summaryId = other.optionalSummaryId().map(LongFilter::copy).orElse(null);
-        this.imagesId = other.optionalImagesId().map(LongFilter::copy).orElse(null);
-        this.reviewsId = other.optionalReviewsId().map(LongFilter::copy).orElse(null);
-        this.amenityItemsId = other.optionalAmenityItemsId().map(LongFilter::copy).orElse(null);
-        this.homeStationId = other.optionalHomeStationId().map(LongFilter::copy).orElse(null);
-        this.operatorId = other.optionalOperatorId().map(LongFilter::copy).orElse(null);
+        this.brand = other.optionalBrand().map(StringFilter::copy).orElse(null);
+        this.description = other.optionalDescription().map(StringFilter::copy).orElse(null);
+        this.createdAt = other.optionalCreatedAt().map(InstantFilter::copy).orElse(null);
+        this.updatedAt = other.optionalUpdatedAt().map(InstantFilter::copy).orElse(null);
+        this.isDeleted = other.optionalIsDeleted().map(BooleanFilter::copy).orElse(null);
+        this.deletedAt = other.optionalDeletedAt().map(InstantFilter::copy).orElse(null);
+        this.deletedBy = other.optionalDeletedBy().map(UUIDFilter::copy).orElse(null);
+        this.seatMapId = other.optionalSeatMapId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -108,6 +108,44 @@ public class VehicleCriteria implements Serializable, Criteria {
         this.id = id;
     }
 
+    public VehicleTypeFilter getType() {
+        return type;
+    }
+
+    public Optional<VehicleTypeFilter> optionalType() {
+        return Optional.ofNullable(type);
+    }
+
+    public VehicleTypeFilter type() {
+        if (type == null) {
+            setType(new VehicleTypeFilter());
+        }
+        return type;
+    }
+
+    public void setType(VehicleTypeFilter type) {
+        this.type = type;
+    }
+
+    public BigDecimalFilter getTypeFactor() {
+        return typeFactor;
+    }
+
+    public Optional<BigDecimalFilter> optionalTypeFactor() {
+        return Optional.ofNullable(typeFactor);
+    }
+
+    public BigDecimalFilter typeFactor() {
+        if (typeFactor == null) {
+            setTypeFactor(new BigDecimalFilter());
+        }
+        return typeFactor;
+    }
+
+    public void setTypeFactor(BigDecimalFilter typeFactor) {
+        this.typeFactor = typeFactor;
+    }
+
     public StringFilter getPlateNumber() {
         return plateNumber;
     }
@@ -127,308 +165,156 @@ public class VehicleCriteria implements Serializable, Criteria {
         this.plateNumber = plateNumber;
     }
 
-    public StringFilter getModel() {
-        return model;
+    public StringFilter getBrand() {
+        return brand;
     }
 
-    public Optional<StringFilter> optionalModel() {
-        return Optional.ofNullable(model);
+    public Optional<StringFilter> optionalBrand() {
+        return Optional.ofNullable(brand);
     }
 
-    public StringFilter model() {
-        if (model == null) {
-            setModel(new StringFilter());
+    public StringFilter brand() {
+        if (brand == null) {
+            setBrand(new StringFilter());
         }
-        return model;
+        return brand;
     }
 
-    public void setModel(StringFilter model) {
-        this.model = model;
+    public void setBrand(StringFilter brand) {
+        this.brand = brand;
     }
 
-    public IntegerFilter getCapacity() {
-        return capacity;
+    public StringFilter getDescription() {
+        return description;
     }
 
-    public Optional<IntegerFilter> optionalCapacity() {
-        return Optional.ofNullable(capacity);
+    public Optional<StringFilter> optionalDescription() {
+        return Optional.ofNullable(description);
     }
 
-    public IntegerFilter capacity() {
-        if (capacity == null) {
-            setCapacity(new IntegerFilter());
+    public StringFilter description() {
+        if (description == null) {
+            setDescription(new StringFilter());
         }
-        return capacity;
+        return description;
     }
 
-    public void setCapacity(IntegerFilter capacity) {
-        this.capacity = capacity;
+    public void setDescription(StringFilter description) {
+        this.description = description;
     }
 
-    public StringFilter getSeatLayout() {
-        return seatLayout;
+    public InstantFilter getCreatedAt() {
+        return createdAt;
     }
 
-    public Optional<StringFilter> optionalSeatLayout() {
-        return Optional.ofNullable(seatLayout);
+    public Optional<InstantFilter> optionalCreatedAt() {
+        return Optional.ofNullable(createdAt);
     }
 
-    public StringFilter seatLayout() {
-        if (seatLayout == null) {
-            setSeatLayout(new StringFilter());
+    public InstantFilter createdAt() {
+        if (createdAt == null) {
+            setCreatedAt(new InstantFilter());
         }
-        return seatLayout;
+        return createdAt;
     }
 
-    public void setSeatLayout(StringFilter seatLayout) {
-        this.seatLayout = seatLayout;
+    public void setCreatedAt(InstantFilter createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public StringFilter getAmenities() {
-        return amenities;
+    public InstantFilter getUpdatedAt() {
+        return updatedAt;
     }
 
-    public Optional<StringFilter> optionalAmenities() {
-        return Optional.ofNullable(amenities);
+    public Optional<InstantFilter> optionalUpdatedAt() {
+        return Optional.ofNullable(updatedAt);
     }
 
-    public StringFilter amenities() {
-        if (amenities == null) {
-            setAmenities(new StringFilter());
+    public InstantFilter updatedAt() {
+        if (updatedAt == null) {
+            setUpdatedAt(new InstantFilter());
         }
-        return amenities;
+        return updatedAt;
     }
 
-    public void setAmenities(StringFilter amenities) {
-        this.amenities = amenities;
+    public void setUpdatedAt(InstantFilter updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public StringFilter getImageCoverUrl() {
-        return imageCoverUrl;
+    public BooleanFilter getIsDeleted() {
+        return isDeleted;
     }
 
-    public Optional<StringFilter> optionalImageCoverUrl() {
-        return Optional.ofNullable(imageCoverUrl);
+    public Optional<BooleanFilter> optionalIsDeleted() {
+        return Optional.ofNullable(isDeleted);
     }
 
-    public StringFilter imageCoverUrl() {
-        if (imageCoverUrl == null) {
-            setImageCoverUrl(new StringFilter());
+    public BooleanFilter isDeleted() {
+        if (isDeleted == null) {
+            setIsDeleted(new BooleanFilter());
         }
-        return imageCoverUrl;
+        return isDeleted;
     }
 
-    public void setImageCoverUrl(StringFilter imageCoverUrl) {
-        this.imageCoverUrl = imageCoverUrl;
+    public void setIsDeleted(BooleanFilter isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
-    public DoubleFilter getAverageRating() {
-        return averageRating;
+    public InstantFilter getDeletedAt() {
+        return deletedAt;
     }
 
-    public Optional<DoubleFilter> optionalAverageRating() {
-        return Optional.ofNullable(averageRating);
+    public Optional<InstantFilter> optionalDeletedAt() {
+        return Optional.ofNullable(deletedAt);
     }
 
-    public DoubleFilter averageRating() {
-        if (averageRating == null) {
-            setAverageRating(new DoubleFilter());
+    public InstantFilter deletedAt() {
+        if (deletedAt == null) {
+            setDeletedAt(new InstantFilter());
         }
-        return averageRating;
+        return deletedAt;
     }
 
-    public void setAverageRating(DoubleFilter averageRating) {
-        this.averageRating = averageRating;
+    public void setDeletedAt(InstantFilter deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
-    public IntegerFilter getTotalReviews() {
-        return totalReviews;
+    public UUIDFilter getDeletedBy() {
+        return deletedBy;
     }
 
-    public Optional<IntegerFilter> optionalTotalReviews() {
-        return Optional.ofNullable(totalReviews);
+    public Optional<UUIDFilter> optionalDeletedBy() {
+        return Optional.ofNullable(deletedBy);
     }
 
-    public IntegerFilter totalReviews() {
-        if (totalReviews == null) {
-            setTotalReviews(new IntegerFilter());
+    public UUIDFilter deletedBy() {
+        if (deletedBy == null) {
+            setDeletedBy(new UUIDFilter());
         }
-        return totalReviews;
+        return deletedBy;
     }
 
-    public void setTotalReviews(IntegerFilter totalReviews) {
-        this.totalReviews = totalReviews;
+    public void setDeletedBy(UUIDFilter deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
-    public BooleanFilter getIsActive() {
-        return isActive;
+    public LongFilter getSeatMapId() {
+        return seatMapId;
     }
 
-    public Optional<BooleanFilter> optionalIsActive() {
-        return Optional.ofNullable(isActive);
+    public Optional<LongFilter> optionalSeatMapId() {
+        return Optional.ofNullable(seatMapId);
     }
 
-    public BooleanFilter isActive() {
-        if (isActive == null) {
-            setIsActive(new BooleanFilter());
+    public LongFilter seatMapId() {
+        if (seatMapId == null) {
+            setSeatMapId(new LongFilter());
         }
-        return isActive;
+        return seatMapId;
     }
 
-    public void setIsActive(BooleanFilter isActive) {
-        this.isActive = isActive;
-    }
-
-    public IntegerFilter getYearManufactured() {
-        return yearManufactured;
-    }
-
-    public Optional<IntegerFilter> optionalYearManufactured() {
-        return Optional.ofNullable(yearManufactured);
-    }
-
-    public IntegerFilter yearManufactured() {
-        if (yearManufactured == null) {
-            setYearManufactured(new IntegerFilter());
-        }
-        return yearManufactured;
-    }
-
-    public void setYearManufactured(IntegerFilter yearManufactured) {
-        this.yearManufactured = yearManufactured;
-    }
-
-    public LocalDateFilter getLastMaintenanceDate() {
-        return lastMaintenanceDate;
-    }
-
-    public Optional<LocalDateFilter> optionalLastMaintenanceDate() {
-        return Optional.ofNullable(lastMaintenanceDate);
-    }
-
-    public LocalDateFilter lastMaintenanceDate() {
-        if (lastMaintenanceDate == null) {
-            setLastMaintenanceDate(new LocalDateFilter());
-        }
-        return lastMaintenanceDate;
-    }
-
-    public void setLastMaintenanceDate(LocalDateFilter lastMaintenanceDate) {
-        this.lastMaintenanceDate = lastMaintenanceDate;
-    }
-
-    public LongFilter getSummaryId() {
-        return summaryId;
-    }
-
-    public Optional<LongFilter> optionalSummaryId() {
-        return Optional.ofNullable(summaryId);
-    }
-
-    public LongFilter summaryId() {
-        if (summaryId == null) {
-            setSummaryId(new LongFilter());
-        }
-        return summaryId;
-    }
-
-    public void setSummaryId(LongFilter summaryId) {
-        this.summaryId = summaryId;
-    }
-
-    public LongFilter getImagesId() {
-        return imagesId;
-    }
-
-    public Optional<LongFilter> optionalImagesId() {
-        return Optional.ofNullable(imagesId);
-    }
-
-    public LongFilter imagesId() {
-        if (imagesId == null) {
-            setImagesId(new LongFilter());
-        }
-        return imagesId;
-    }
-
-    public void setImagesId(LongFilter imagesId) {
-        this.imagesId = imagesId;
-    }
-
-    public LongFilter getReviewsId() {
-        return reviewsId;
-    }
-
-    public Optional<LongFilter> optionalReviewsId() {
-        return Optional.ofNullable(reviewsId);
-    }
-
-    public LongFilter reviewsId() {
-        if (reviewsId == null) {
-            setReviewsId(new LongFilter());
-        }
-        return reviewsId;
-    }
-
-    public void setReviewsId(LongFilter reviewsId) {
-        this.reviewsId = reviewsId;
-    }
-
-    public LongFilter getAmenityItemsId() {
-        return amenityItemsId;
-    }
-
-    public Optional<LongFilter> optionalAmenityItemsId() {
-        return Optional.ofNullable(amenityItemsId);
-    }
-
-    public LongFilter amenityItemsId() {
-        if (amenityItemsId == null) {
-            setAmenityItemsId(new LongFilter());
-        }
-        return amenityItemsId;
-    }
-
-    public void setAmenityItemsId(LongFilter amenityItemsId) {
-        this.amenityItemsId = amenityItemsId;
-    }
-
-    public LongFilter getHomeStationId() {
-        return homeStationId;
-    }
-
-    public Optional<LongFilter> optionalHomeStationId() {
-        return Optional.ofNullable(homeStationId);
-    }
-
-    public LongFilter homeStationId() {
-        if (homeStationId == null) {
-            setHomeStationId(new LongFilter());
-        }
-        return homeStationId;
-    }
-
-    public void setHomeStationId(LongFilter homeStationId) {
-        this.homeStationId = homeStationId;
-    }
-
-    public LongFilter getOperatorId() {
-        return operatorId;
-    }
-
-    public Optional<LongFilter> optionalOperatorId() {
-        return Optional.ofNullable(operatorId);
-    }
-
-    public LongFilter operatorId() {
-        if (operatorId == null) {
-            setOperatorId(new LongFilter());
-        }
-        return operatorId;
-    }
-
-    public void setOperatorId(LongFilter operatorId) {
-        this.operatorId = operatorId;
+    public void setSeatMapId(LongFilter seatMapId) {
+        this.seatMapId = seatMapId;
     }
 
     public Boolean getDistinct() {
@@ -461,23 +347,17 @@ public class VehicleCriteria implements Serializable, Criteria {
         final VehicleCriteria that = (VehicleCriteria) o;
         return (
             Objects.equals(id, that.id) &&
+            Objects.equals(type, that.type) &&
+            Objects.equals(typeFactor, that.typeFactor) &&
             Objects.equals(plateNumber, that.plateNumber) &&
-            Objects.equals(model, that.model) &&
-            Objects.equals(capacity, that.capacity) &&
-            Objects.equals(seatLayout, that.seatLayout) &&
-            Objects.equals(amenities, that.amenities) &&
-            Objects.equals(imageCoverUrl, that.imageCoverUrl) &&
-            Objects.equals(averageRating, that.averageRating) &&
-            Objects.equals(totalReviews, that.totalReviews) &&
-            Objects.equals(isActive, that.isActive) &&
-            Objects.equals(yearManufactured, that.yearManufactured) &&
-            Objects.equals(lastMaintenanceDate, that.lastMaintenanceDate) &&
-            Objects.equals(summaryId, that.summaryId) &&
-            Objects.equals(imagesId, that.imagesId) &&
-            Objects.equals(reviewsId, that.reviewsId) &&
-            Objects.equals(amenityItemsId, that.amenityItemsId) &&
-            Objects.equals(homeStationId, that.homeStationId) &&
-            Objects.equals(operatorId, that.operatorId) &&
+            Objects.equals(brand, that.brand) &&
+            Objects.equals(description, that.description) &&
+            Objects.equals(createdAt, that.createdAt) &&
+            Objects.equals(updatedAt, that.updatedAt) &&
+            Objects.equals(isDeleted, that.isDeleted) &&
+            Objects.equals(deletedAt, that.deletedAt) &&
+            Objects.equals(deletedBy, that.deletedBy) &&
+            Objects.equals(seatMapId, that.seatMapId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
@@ -486,23 +366,17 @@ public class VehicleCriteria implements Serializable, Criteria {
     public int hashCode() {
         return Objects.hash(
             id,
+            type,
+            typeFactor,
             plateNumber,
-            model,
-            capacity,
-            seatLayout,
-            amenities,
-            imageCoverUrl,
-            averageRating,
-            totalReviews,
-            isActive,
-            yearManufactured,
-            lastMaintenanceDate,
-            summaryId,
-            imagesId,
-            reviewsId,
-            amenityItemsId,
-            homeStationId,
-            operatorId,
+            brand,
+            description,
+            createdAt,
+            updatedAt,
+            isDeleted,
+            deletedAt,
+            deletedBy,
+            seatMapId,
             distinct
         );
     }
@@ -512,23 +386,17 @@ public class VehicleCriteria implements Serializable, Criteria {
     public String toString() {
         return "VehicleCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalType().map(f -> "type=" + f + ", ").orElse("") +
+            optionalTypeFactor().map(f -> "typeFactor=" + f + ", ").orElse("") +
             optionalPlateNumber().map(f -> "plateNumber=" + f + ", ").orElse("") +
-            optionalModel().map(f -> "model=" + f + ", ").orElse("") +
-            optionalCapacity().map(f -> "capacity=" + f + ", ").orElse("") +
-            optionalSeatLayout().map(f -> "seatLayout=" + f + ", ").orElse("") +
-            optionalAmenities().map(f -> "amenities=" + f + ", ").orElse("") +
-            optionalImageCoverUrl().map(f -> "imageCoverUrl=" + f + ", ").orElse("") +
-            optionalAverageRating().map(f -> "averageRating=" + f + ", ").orElse("") +
-            optionalTotalReviews().map(f -> "totalReviews=" + f + ", ").orElse("") +
-            optionalIsActive().map(f -> "isActive=" + f + ", ").orElse("") +
-            optionalYearManufactured().map(f -> "yearManufactured=" + f + ", ").orElse("") +
-            optionalLastMaintenanceDate().map(f -> "lastMaintenanceDate=" + f + ", ").orElse("") +
-            optionalSummaryId().map(f -> "summaryId=" + f + ", ").orElse("") +
-            optionalImagesId().map(f -> "imagesId=" + f + ", ").orElse("") +
-            optionalReviewsId().map(f -> "reviewsId=" + f + ", ").orElse("") +
-            optionalAmenityItemsId().map(f -> "amenityItemsId=" + f + ", ").orElse("") +
-            optionalHomeStationId().map(f -> "homeStationId=" + f + ", ").orElse("") +
-            optionalOperatorId().map(f -> "operatorId=" + f + ", ").orElse("") +
+            optionalBrand().map(f -> "brand=" + f + ", ").orElse("") +
+            optionalDescription().map(f -> "description=" + f + ", ").orElse("") +
+            optionalCreatedAt().map(f -> "createdAt=" + f + ", ").orElse("") +
+            optionalUpdatedAt().map(f -> "updatedAt=" + f + ", ").orElse("") +
+            optionalIsDeleted().map(f -> "isDeleted=" + f + ", ").orElse("") +
+            optionalDeletedAt().map(f -> "deletedAt=" + f + ", ").orElse("") +
+            optionalDeletedBy().map(f -> "deletedBy=" + f + ", ").orElse("") +
+            optionalSeatMapId().map(f -> "seatMapId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

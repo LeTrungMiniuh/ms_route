@@ -11,15 +11,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketsystem.route.IntegrationTest;
+import com.ticketsystem.route.domain.Floor;
 import com.ticketsystem.route.domain.Seat;
-import com.ticketsystem.route.domain.Trip;
-import com.ticketsystem.route.domain.enumeration.SeatType;
 import com.ticketsystem.route.repository.SeatRepository;
 import com.ticketsystem.route.service.dto.SeatDTO;
 import com.ticketsystem.route.service.mapper.SeatMapper;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,21 +41,35 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class SeatResourceIT {
 
-    private static final String DEFAULT_SEAT_NUMBER = "AAAAAAAAAA";
-    private static final String UPDATED_SEAT_NUMBER = "BBBBBBBBBB";
+    private static final String DEFAULT_SEAT_NO = "AAAAAAAAAA";
+    private static final String UPDATED_SEAT_NO = "BBBBBBBBBB";
 
-    private static final SeatType DEFAULT_SEAT_TYPE = SeatType.BERTH_LOWER;
-    private static final SeatType UPDATED_SEAT_TYPE = SeatType.BERTH_UPPER;
+    private static final Integer DEFAULT_ROW = 1;
+    private static final Integer UPDATED_ROW = 2;
+    private static final Integer SMALLER_ROW = 1 - 1;
 
-    private static final String DEFAULT_DECK = "AAAAAAAAAA";
-    private static final String UPDATED_DECK = "BBBBBBBBBB";
+    private static final Integer DEFAULT_COL = 1;
+    private static final Integer UPDATED_COL = 2;
+    private static final Integer SMALLER_COL = 1 - 1;
 
-    private static final BigDecimal DEFAULT_PRICE_MODIFIER = new BigDecimal(1);
-    private static final BigDecimal UPDATED_PRICE_MODIFIER = new BigDecimal(2);
-    private static final BigDecimal SMALLER_PRICE_MODIFIER = new BigDecimal(1 - 1);
+    private static final BigDecimal DEFAULT_PRICE_FACTOR = new BigDecimal(1);
+    private static final BigDecimal UPDATED_PRICE_FACTOR = new BigDecimal(2);
+    private static final BigDecimal SMALLER_PRICE_FACTOR = new BigDecimal(1 - 1);
 
-    private static final Boolean DEFAULT_IS_AVAILABLE = false;
-    private static final Boolean UPDATED_IS_AVAILABLE = true;
+    private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Boolean DEFAULT_IS_DELETED = false;
+    private static final Boolean UPDATED_IS_DELETED = true;
+
+    private static final Instant DEFAULT_DELETED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DELETED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final UUID DEFAULT_DELETED_BY = UUID.randomUUID();
+    private static final UUID UPDATED_DELETED_BY = UUID.randomUUID();
 
     private static final String ENTITY_API_URL = "/api/seats";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -88,21 +104,25 @@ class SeatResourceIT {
      */
     public static Seat createEntity(EntityManager em) {
         Seat seat = new Seat()
-            .seatNumber(DEFAULT_SEAT_NUMBER)
-            .seatType(DEFAULT_SEAT_TYPE)
-            .deck(DEFAULT_DECK)
-            .priceModifier(DEFAULT_PRICE_MODIFIER)
-            .isAvailable(DEFAULT_IS_AVAILABLE);
+            .seatNo(DEFAULT_SEAT_NO)
+            .row(DEFAULT_ROW)
+            .col(DEFAULT_COL)
+            .priceFactor(DEFAULT_PRICE_FACTOR)
+            .createdAt(DEFAULT_CREATED_AT)
+            .updatedAt(DEFAULT_UPDATED_AT)
+            .isDeleted(DEFAULT_IS_DELETED)
+            .deletedAt(DEFAULT_DELETED_AT)
+            .deletedBy(DEFAULT_DELETED_BY);
         // Add required entity
-        Trip trip;
-        if (TestUtil.findAll(em, Trip.class).isEmpty()) {
-            trip = TripResourceIT.createEntity(em);
-            em.persist(trip);
+        Floor floor;
+        if (TestUtil.findAll(em, Floor.class).isEmpty()) {
+            floor = FloorResourceIT.createEntity(em);
+            em.persist(floor);
             em.flush();
         } else {
-            trip = TestUtil.findAll(em, Trip.class).get(0);
+            floor = TestUtil.findAll(em, Floor.class).get(0);
         }
-        seat.setTrip(trip);
+        seat.setFloor(floor);
         return seat;
     }
 
@@ -114,21 +134,25 @@ class SeatResourceIT {
      */
     public static Seat createUpdatedEntity(EntityManager em) {
         Seat updatedSeat = new Seat()
-            .seatNumber(UPDATED_SEAT_NUMBER)
-            .seatType(UPDATED_SEAT_TYPE)
-            .deck(UPDATED_DECK)
-            .priceModifier(UPDATED_PRICE_MODIFIER)
-            .isAvailable(UPDATED_IS_AVAILABLE);
+            .seatNo(UPDATED_SEAT_NO)
+            .row(UPDATED_ROW)
+            .col(UPDATED_COL)
+            .priceFactor(UPDATED_PRICE_FACTOR)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         // Add required entity
-        Trip trip;
-        if (TestUtil.findAll(em, Trip.class).isEmpty()) {
-            trip = TripResourceIT.createUpdatedEntity(em);
-            em.persist(trip);
+        Floor floor;
+        if (TestUtil.findAll(em, Floor.class).isEmpty()) {
+            floor = FloorResourceIT.createUpdatedEntity(em);
+            em.persist(floor);
             em.flush();
         } else {
-            trip = TestUtil.findAll(em, Trip.class).get(0);
+            floor = TestUtil.findAll(em, Floor.class).get(0);
         }
-        updatedSeat.setTrip(trip);
+        updatedSeat.setFloor(floor);
         return updatedSeat;
     }
 
@@ -189,10 +213,10 @@ class SeatResourceIT {
 
     @Test
     @Transactional
-    void checkSeatNumberIsRequired() throws Exception {
+    void checkSeatNoIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        seat.setSeatNumber(null);
+        seat.setSeatNo(null);
 
         // Create the Seat, which fails.
         SeatDTO seatDTO = seatMapper.toDto(seat);
@@ -206,27 +230,10 @@ class SeatResourceIT {
 
     @Test
     @Transactional
-    void checkSeatTypeIsRequired() throws Exception {
+    void checkCreatedAtIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        seat.setSeatType(null);
-
-        // Create the Seat, which fails.
-        SeatDTO seatDTO = seatMapper.toDto(seat);
-
-        restSeatMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(seatDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    void checkIsAvailableIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        seat.setIsAvailable(null);
+        seat.setCreatedAt(null);
 
         // Create the Seat, which fails.
         SeatDTO seatDTO = seatMapper.toDto(seat);
@@ -250,11 +257,15 @@ class SeatResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(seat.getId().intValue())))
-            .andExpect(jsonPath("$.[*].seatNumber").value(hasItem(DEFAULT_SEAT_NUMBER)))
-            .andExpect(jsonPath("$.[*].seatType").value(hasItem(DEFAULT_SEAT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].deck").value(hasItem(DEFAULT_DECK)))
-            .andExpect(jsonPath("$.[*].priceModifier").value(hasItem(sameNumber(DEFAULT_PRICE_MODIFIER))))
-            .andExpect(jsonPath("$.[*].isAvailable").value(hasItem(DEFAULT_IS_AVAILABLE)));
+            .andExpect(jsonPath("$.[*].seatNo").value(hasItem(DEFAULT_SEAT_NO)))
+            .andExpect(jsonPath("$.[*].row").value(hasItem(DEFAULT_ROW)))
+            .andExpect(jsonPath("$.[*].col").value(hasItem(DEFAULT_COL)))
+            .andExpect(jsonPath("$.[*].priceFactor").value(hasItem(sameNumber(DEFAULT_PRICE_FACTOR))))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
     }
 
     @Test
@@ -269,11 +280,15 @@ class SeatResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(seat.getId().intValue()))
-            .andExpect(jsonPath("$.seatNumber").value(DEFAULT_SEAT_NUMBER))
-            .andExpect(jsonPath("$.seatType").value(DEFAULT_SEAT_TYPE.toString()))
-            .andExpect(jsonPath("$.deck").value(DEFAULT_DECK))
-            .andExpect(jsonPath("$.priceModifier").value(sameNumber(DEFAULT_PRICE_MODIFIER)))
-            .andExpect(jsonPath("$.isAvailable").value(DEFAULT_IS_AVAILABLE));
+            .andExpect(jsonPath("$.seatNo").value(DEFAULT_SEAT_NO))
+            .andExpect(jsonPath("$.row").value(DEFAULT_ROW))
+            .andExpect(jsonPath("$.col").value(DEFAULT_COL))
+            .andExpect(jsonPath("$.priceFactor").value(sameNumber(DEFAULT_PRICE_FACTOR)))
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
+            .andExpect(jsonPath("$.isDeleted").value(DEFAULT_IS_DELETED))
+            .andExpect(jsonPath("$.deletedAt").value(DEFAULT_DELETED_AT.toString()))
+            .andExpect(jsonPath("$.deletedBy").value(DEFAULT_DELETED_BY.toString()));
     }
 
     @Test
@@ -293,266 +308,440 @@ class SeatResourceIT {
 
     @Test
     @Transactional
-    void getAllSeatsBySeatNumberIsEqualToSomething() throws Exception {
+    void getAllSeatsBySeatNoIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where seatNumber equals to
-        defaultSeatFiltering("seatNumber.equals=" + DEFAULT_SEAT_NUMBER, "seatNumber.equals=" + UPDATED_SEAT_NUMBER);
+        // Get all the seatList where seatNo equals to
+        defaultSeatFiltering("seatNo.equals=" + DEFAULT_SEAT_NO, "seatNo.equals=" + UPDATED_SEAT_NO);
     }
 
     @Test
     @Transactional
-    void getAllSeatsBySeatNumberIsInShouldWork() throws Exception {
+    void getAllSeatsBySeatNoIsInShouldWork() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where seatNumber in
-        defaultSeatFiltering("seatNumber.in=" + DEFAULT_SEAT_NUMBER + "," + UPDATED_SEAT_NUMBER, "seatNumber.in=" + UPDATED_SEAT_NUMBER);
+        // Get all the seatList where seatNo in
+        defaultSeatFiltering("seatNo.in=" + DEFAULT_SEAT_NO + "," + UPDATED_SEAT_NO, "seatNo.in=" + UPDATED_SEAT_NO);
     }
 
     @Test
     @Transactional
-    void getAllSeatsBySeatNumberIsNullOrNotNull() throws Exception {
+    void getAllSeatsBySeatNoIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where seatNumber is not null
-        defaultSeatFiltering("seatNumber.specified=true", "seatNumber.specified=false");
+        // Get all the seatList where seatNo is not null
+        defaultSeatFiltering("seatNo.specified=true", "seatNo.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllSeatsBySeatNumberContainsSomething() throws Exception {
+    void getAllSeatsBySeatNoContainsSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where seatNumber contains
-        defaultSeatFiltering("seatNumber.contains=" + DEFAULT_SEAT_NUMBER, "seatNumber.contains=" + UPDATED_SEAT_NUMBER);
+        // Get all the seatList where seatNo contains
+        defaultSeatFiltering("seatNo.contains=" + DEFAULT_SEAT_NO, "seatNo.contains=" + UPDATED_SEAT_NO);
     }
 
     @Test
     @Transactional
-    void getAllSeatsBySeatNumberNotContainsSomething() throws Exception {
+    void getAllSeatsBySeatNoNotContainsSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where seatNumber does not contain
-        defaultSeatFiltering("seatNumber.doesNotContain=" + UPDATED_SEAT_NUMBER, "seatNumber.doesNotContain=" + DEFAULT_SEAT_NUMBER);
+        // Get all the seatList where seatNo does not contain
+        defaultSeatFiltering("seatNo.doesNotContain=" + UPDATED_SEAT_NO, "seatNo.doesNotContain=" + DEFAULT_SEAT_NO);
     }
 
     @Test
     @Transactional
-    void getAllSeatsBySeatTypeIsEqualToSomething() throws Exception {
+    void getAllSeatsByRowIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where seatType equals to
-        defaultSeatFiltering("seatType.equals=" + DEFAULT_SEAT_TYPE, "seatType.equals=" + UPDATED_SEAT_TYPE);
+        // Get all the seatList where row equals to
+        defaultSeatFiltering("row.equals=" + DEFAULT_ROW, "row.equals=" + UPDATED_ROW);
     }
 
     @Test
     @Transactional
-    void getAllSeatsBySeatTypeIsInShouldWork() throws Exception {
+    void getAllSeatsByRowIsInShouldWork() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where seatType in
-        defaultSeatFiltering("seatType.in=" + DEFAULT_SEAT_TYPE + "," + UPDATED_SEAT_TYPE, "seatType.in=" + UPDATED_SEAT_TYPE);
+        // Get all the seatList where row in
+        defaultSeatFiltering("row.in=" + DEFAULT_ROW + "," + UPDATED_ROW, "row.in=" + UPDATED_ROW);
     }
 
     @Test
     @Transactional
-    void getAllSeatsBySeatTypeIsNullOrNotNull() throws Exception {
+    void getAllSeatsByRowIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where seatType is not null
-        defaultSeatFiltering("seatType.specified=true", "seatType.specified=false");
+        // Get all the seatList where row is not null
+        defaultSeatFiltering("row.specified=true", "row.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllSeatsByDeckIsEqualToSomething() throws Exception {
+    void getAllSeatsByRowIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where deck equals to
-        defaultSeatFiltering("deck.equals=" + DEFAULT_DECK, "deck.equals=" + UPDATED_DECK);
+        // Get all the seatList where row is greater than or equal to
+        defaultSeatFiltering("row.greaterThanOrEqual=" + DEFAULT_ROW, "row.greaterThanOrEqual=" + UPDATED_ROW);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByDeckIsInShouldWork() throws Exception {
+    void getAllSeatsByRowIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where deck in
-        defaultSeatFiltering("deck.in=" + DEFAULT_DECK + "," + UPDATED_DECK, "deck.in=" + UPDATED_DECK);
+        // Get all the seatList where row is less than or equal to
+        defaultSeatFiltering("row.lessThanOrEqual=" + DEFAULT_ROW, "row.lessThanOrEqual=" + SMALLER_ROW);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByDeckIsNullOrNotNull() throws Exception {
+    void getAllSeatsByRowIsLessThanSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where deck is not null
-        defaultSeatFiltering("deck.specified=true", "deck.specified=false");
+        // Get all the seatList where row is less than
+        defaultSeatFiltering("row.lessThan=" + UPDATED_ROW, "row.lessThan=" + DEFAULT_ROW);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByDeckContainsSomething() throws Exception {
+    void getAllSeatsByRowIsGreaterThanSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where deck contains
-        defaultSeatFiltering("deck.contains=" + DEFAULT_DECK, "deck.contains=" + UPDATED_DECK);
+        // Get all the seatList where row is greater than
+        defaultSeatFiltering("row.greaterThan=" + SMALLER_ROW, "row.greaterThan=" + DEFAULT_ROW);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByDeckNotContainsSomething() throws Exception {
+    void getAllSeatsByColIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where deck does not contain
-        defaultSeatFiltering("deck.doesNotContain=" + UPDATED_DECK, "deck.doesNotContain=" + DEFAULT_DECK);
+        // Get all the seatList where col equals to
+        defaultSeatFiltering("col.equals=" + DEFAULT_COL, "col.equals=" + UPDATED_COL);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByPriceModifierIsEqualToSomething() throws Exception {
+    void getAllSeatsByColIsInShouldWork() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where priceModifier equals to
-        defaultSeatFiltering("priceModifier.equals=" + DEFAULT_PRICE_MODIFIER, "priceModifier.equals=" + UPDATED_PRICE_MODIFIER);
+        // Get all the seatList where col in
+        defaultSeatFiltering("col.in=" + DEFAULT_COL + "," + UPDATED_COL, "col.in=" + UPDATED_COL);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByPriceModifierIsInShouldWork() throws Exception {
+    void getAllSeatsByColIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where priceModifier in
+        // Get all the seatList where col is not null
+        defaultSeatFiltering("col.specified=true", "col.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByColIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where col is greater than or equal to
+        defaultSeatFiltering("col.greaterThanOrEqual=" + DEFAULT_COL, "col.greaterThanOrEqual=" + UPDATED_COL);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByColIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where col is less than or equal to
+        defaultSeatFiltering("col.lessThanOrEqual=" + DEFAULT_COL, "col.lessThanOrEqual=" + SMALLER_COL);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByColIsLessThanSomething() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where col is less than
+        defaultSeatFiltering("col.lessThan=" + UPDATED_COL, "col.lessThan=" + DEFAULT_COL);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByColIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where col is greater than
+        defaultSeatFiltering("col.greaterThan=" + SMALLER_COL, "col.greaterThan=" + DEFAULT_COL);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByPriceFactorIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where priceFactor equals to
+        defaultSeatFiltering("priceFactor.equals=" + DEFAULT_PRICE_FACTOR, "priceFactor.equals=" + UPDATED_PRICE_FACTOR);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByPriceFactorIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where priceFactor in
         defaultSeatFiltering(
-            "priceModifier.in=" + DEFAULT_PRICE_MODIFIER + "," + UPDATED_PRICE_MODIFIER,
-            "priceModifier.in=" + UPDATED_PRICE_MODIFIER
+            "priceFactor.in=" + DEFAULT_PRICE_FACTOR + "," + UPDATED_PRICE_FACTOR,
+            "priceFactor.in=" + UPDATED_PRICE_FACTOR
         );
     }
 
     @Test
     @Transactional
-    void getAllSeatsByPriceModifierIsNullOrNotNull() throws Exception {
+    void getAllSeatsByPriceFactorIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where priceModifier is not null
-        defaultSeatFiltering("priceModifier.specified=true", "priceModifier.specified=false");
+        // Get all the seatList where priceFactor is not null
+        defaultSeatFiltering("priceFactor.specified=true", "priceFactor.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllSeatsByPriceModifierIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllSeatsByPriceFactorIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where priceModifier is greater than or equal to
+        // Get all the seatList where priceFactor is greater than or equal to
         defaultSeatFiltering(
-            "priceModifier.greaterThanOrEqual=" + DEFAULT_PRICE_MODIFIER,
-            "priceModifier.greaterThanOrEqual=" + UPDATED_PRICE_MODIFIER
+            "priceFactor.greaterThanOrEqual=" + DEFAULT_PRICE_FACTOR,
+            "priceFactor.greaterThanOrEqual=" + UPDATED_PRICE_FACTOR
         );
     }
 
     @Test
     @Transactional
-    void getAllSeatsByPriceModifierIsLessThanOrEqualToSomething() throws Exception {
+    void getAllSeatsByPriceFactorIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where priceModifier is less than or equal to
-        defaultSeatFiltering(
-            "priceModifier.lessThanOrEqual=" + DEFAULT_PRICE_MODIFIER,
-            "priceModifier.lessThanOrEqual=" + SMALLER_PRICE_MODIFIER
-        );
+        // Get all the seatList where priceFactor is less than or equal to
+        defaultSeatFiltering("priceFactor.lessThanOrEqual=" + DEFAULT_PRICE_FACTOR, "priceFactor.lessThanOrEqual=" + SMALLER_PRICE_FACTOR);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByPriceModifierIsLessThanSomething() throws Exception {
+    void getAllSeatsByPriceFactorIsLessThanSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where priceModifier is less than
-        defaultSeatFiltering("priceModifier.lessThan=" + UPDATED_PRICE_MODIFIER, "priceModifier.lessThan=" + DEFAULT_PRICE_MODIFIER);
+        // Get all the seatList where priceFactor is less than
+        defaultSeatFiltering("priceFactor.lessThan=" + UPDATED_PRICE_FACTOR, "priceFactor.lessThan=" + DEFAULT_PRICE_FACTOR);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByPriceModifierIsGreaterThanSomething() throws Exception {
+    void getAllSeatsByPriceFactorIsGreaterThanSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where priceModifier is greater than
-        defaultSeatFiltering("priceModifier.greaterThan=" + SMALLER_PRICE_MODIFIER, "priceModifier.greaterThan=" + DEFAULT_PRICE_MODIFIER);
+        // Get all the seatList where priceFactor is greater than
+        defaultSeatFiltering("priceFactor.greaterThan=" + SMALLER_PRICE_FACTOR, "priceFactor.greaterThan=" + DEFAULT_PRICE_FACTOR);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByIsAvailableIsEqualToSomething() throws Exception {
+    void getAllSeatsByCreatedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where isAvailable equals to
-        defaultSeatFiltering("isAvailable.equals=" + DEFAULT_IS_AVAILABLE, "isAvailable.equals=" + UPDATED_IS_AVAILABLE);
+        // Get all the seatList where createdAt equals to
+        defaultSeatFiltering("createdAt.equals=" + DEFAULT_CREATED_AT, "createdAt.equals=" + UPDATED_CREATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByIsAvailableIsInShouldWork() throws Exception {
+    void getAllSeatsByCreatedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where isAvailable in
-        defaultSeatFiltering(
-            "isAvailable.in=" + DEFAULT_IS_AVAILABLE + "," + UPDATED_IS_AVAILABLE,
-            "isAvailable.in=" + UPDATED_IS_AVAILABLE
-        );
+        // Get all the seatList where createdAt in
+        defaultSeatFiltering("createdAt.in=" + DEFAULT_CREATED_AT + "," + UPDATED_CREATED_AT, "createdAt.in=" + UPDATED_CREATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllSeatsByIsAvailableIsNullOrNotNull() throws Exception {
+    void getAllSeatsByCreatedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedSeat = seatRepository.saveAndFlush(seat);
 
-        // Get all the seatList where isAvailable is not null
-        defaultSeatFiltering("isAvailable.specified=true", "isAvailable.specified=false");
+        // Get all the seatList where createdAt is not null
+        defaultSeatFiltering("createdAt.specified=true", "createdAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllSeatsByTripIsEqualToSomething() throws Exception {
-        Trip trip;
-        if (TestUtil.findAll(em, Trip.class).isEmpty()) {
+    void getAllSeatsByUpdatedAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where updatedAt equals to
+        defaultSeatFiltering("updatedAt.equals=" + DEFAULT_UPDATED_AT, "updatedAt.equals=" + UPDATED_UPDATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByUpdatedAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where updatedAt in
+        defaultSeatFiltering("updatedAt.in=" + DEFAULT_UPDATED_AT + "," + UPDATED_UPDATED_AT, "updatedAt.in=" + UPDATED_UPDATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByUpdatedAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where updatedAt is not null
+        defaultSeatFiltering("updatedAt.specified=true", "updatedAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByIsDeletedIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where isDeleted equals to
+        defaultSeatFiltering("isDeleted.equals=" + DEFAULT_IS_DELETED, "isDeleted.equals=" + UPDATED_IS_DELETED);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByIsDeletedIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where isDeleted in
+        defaultSeatFiltering("isDeleted.in=" + DEFAULT_IS_DELETED + "," + UPDATED_IS_DELETED, "isDeleted.in=" + UPDATED_IS_DELETED);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByIsDeletedIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where isDeleted is not null
+        defaultSeatFiltering("isDeleted.specified=true", "isDeleted.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByDeletedAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where deletedAt equals to
+        defaultSeatFiltering("deletedAt.equals=" + DEFAULT_DELETED_AT, "deletedAt.equals=" + UPDATED_DELETED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByDeletedAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where deletedAt in
+        defaultSeatFiltering("deletedAt.in=" + DEFAULT_DELETED_AT + "," + UPDATED_DELETED_AT, "deletedAt.in=" + UPDATED_DELETED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByDeletedAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where deletedAt is not null
+        defaultSeatFiltering("deletedAt.specified=true", "deletedAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByDeletedByIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where deletedBy equals to
+        defaultSeatFiltering("deletedBy.equals=" + DEFAULT_DELETED_BY, "deletedBy.equals=" + UPDATED_DELETED_BY);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByDeletedByIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where deletedBy in
+        defaultSeatFiltering("deletedBy.in=" + DEFAULT_DELETED_BY + "," + UPDATED_DELETED_BY, "deletedBy.in=" + UPDATED_DELETED_BY);
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByDeletedByIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedSeat = seatRepository.saveAndFlush(seat);
+
+        // Get all the seatList where deletedBy is not null
+        defaultSeatFiltering("deletedBy.specified=true", "deletedBy.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllSeatsByFloorIsEqualToSomething() throws Exception {
+        Floor floor;
+        if (TestUtil.findAll(em, Floor.class).isEmpty()) {
             seatRepository.saveAndFlush(seat);
-            trip = TripResourceIT.createEntity(em);
+            floor = FloorResourceIT.createEntity(em);
         } else {
-            trip = TestUtil.findAll(em, Trip.class).get(0);
+            floor = TestUtil.findAll(em, Floor.class).get(0);
         }
-        em.persist(trip);
+        em.persist(floor);
         em.flush();
-        seat.setTrip(trip);
+        seat.setFloor(floor);
         seatRepository.saveAndFlush(seat);
-        Long tripId = trip.getId();
-        // Get all the seatList where trip equals to tripId
-        defaultSeatShouldBeFound("tripId.equals=" + tripId);
+        Long floorId = floor.getId();
+        // Get all the seatList where floor equals to floorId
+        defaultSeatShouldBeFound("floorId.equals=" + floorId);
 
-        // Get all the seatList where trip equals to (tripId + 1)
-        defaultSeatShouldNotBeFound("tripId.equals=" + (tripId + 1));
+        // Get all the seatList where floor equals to (floorId + 1)
+        defaultSeatShouldNotBeFound("floorId.equals=" + (floorId + 1));
     }
 
     private void defaultSeatFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
@@ -569,11 +758,15 @@ class SeatResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(seat.getId().intValue())))
-            .andExpect(jsonPath("$.[*].seatNumber").value(hasItem(DEFAULT_SEAT_NUMBER)))
-            .andExpect(jsonPath("$.[*].seatType").value(hasItem(DEFAULT_SEAT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].deck").value(hasItem(DEFAULT_DECK)))
-            .andExpect(jsonPath("$.[*].priceModifier").value(hasItem(sameNumber(DEFAULT_PRICE_MODIFIER))))
-            .andExpect(jsonPath("$.[*].isAvailable").value(hasItem(DEFAULT_IS_AVAILABLE)));
+            .andExpect(jsonPath("$.[*].seatNo").value(hasItem(DEFAULT_SEAT_NO)))
+            .andExpect(jsonPath("$.[*].row").value(hasItem(DEFAULT_ROW)))
+            .andExpect(jsonPath("$.[*].col").value(hasItem(DEFAULT_COL)))
+            .andExpect(jsonPath("$.[*].priceFactor").value(hasItem(sameNumber(DEFAULT_PRICE_FACTOR))))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
 
         // Check, that the count call also returns 1
         restSeatMockMvc
@@ -622,11 +815,15 @@ class SeatResourceIT {
         // Disconnect from session so that the updates on updatedSeat are not directly saved in db
         em.detach(updatedSeat);
         updatedSeat
-            .seatNumber(UPDATED_SEAT_NUMBER)
-            .seatType(UPDATED_SEAT_TYPE)
-            .deck(UPDATED_DECK)
-            .priceModifier(UPDATED_PRICE_MODIFIER)
-            .isAvailable(UPDATED_IS_AVAILABLE);
+            .seatNo(UPDATED_SEAT_NO)
+            .row(UPDATED_ROW)
+            .col(UPDATED_COL)
+            .priceFactor(UPDATED_PRICE_FACTOR)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         SeatDTO seatDTO = seatMapper.toDto(updatedSeat);
 
         restSeatMockMvc
@@ -719,7 +916,7 @@ class SeatResourceIT {
         Seat partialUpdatedSeat = new Seat();
         partialUpdatedSeat.setId(seat.getId());
 
-        partialUpdatedSeat.isAvailable(UPDATED_IS_AVAILABLE);
+        partialUpdatedSeat.createdAt(UPDATED_CREATED_AT).deletedAt(UPDATED_DELETED_AT);
 
         restSeatMockMvc
             .perform(
@@ -749,11 +946,15 @@ class SeatResourceIT {
         partialUpdatedSeat.setId(seat.getId());
 
         partialUpdatedSeat
-            .seatNumber(UPDATED_SEAT_NUMBER)
-            .seatType(UPDATED_SEAT_TYPE)
-            .deck(UPDATED_DECK)
-            .priceModifier(UPDATED_PRICE_MODIFIER)
-            .isAvailable(UPDATED_IS_AVAILABLE);
+            .seatNo(UPDATED_SEAT_NO)
+            .row(UPDATED_ROW)
+            .col(UPDATED_COL)
+            .priceFactor(UPDATED_PRICE_FACTOR)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
 
         restSeatMockMvc
             .perform(

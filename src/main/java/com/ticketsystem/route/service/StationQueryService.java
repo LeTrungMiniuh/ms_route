@@ -7,6 +7,7 @@ import com.ticketsystem.route.repository.search.StationSearchRepository;
 import com.ticketsystem.route.service.criteria.StationCriteria;
 import com.ticketsystem.route.service.dto.StationDTO;
 import com.ticketsystem.route.service.mapper.StationMapper;
+import jakarta.persistence.criteria.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -81,13 +82,16 @@ public class StationQueryService extends QueryService<Station> {
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
                 buildRangeSpecification(criteria.getId(), Station_.id),
-                buildStringSpecification(criteria.getCode(), Station_.code),
                 buildStringSpecification(criteria.getName(), Station_.name),
-                buildStringSpecification(criteria.getNameEn(), Station_.nameEn),
-                buildSpecification(criteria.getAddressId(), Station_.addressId),
-                buildStringSpecification(criteria.getFacilities(), Station_.facilities),
-                buildStringSpecification(criteria.getOperatingHours(), Station_.operatingHours),
-                buildSpecification(criteria.getIsActive(), Station_.isActive)
+                buildStringSpecification(criteria.getPhoneNumber(), Station_.phoneNumber),
+                buildStringSpecification(criteria.getDescription(), Station_.description),
+                buildSpecification(criteria.getActive(), Station_.active),
+                buildRangeSpecification(criteria.getCreatedAt(), Station_.createdAt),
+                buildRangeSpecification(criteria.getUpdatedAt(), Station_.updatedAt),
+                buildSpecification(criteria.getIsDeleted(), Station_.isDeleted),
+                buildRangeSpecification(criteria.getDeletedAt(), Station_.deletedAt),
+                buildSpecification(criteria.getDeletedBy(), Station_.deletedBy),
+                buildSpecification(criteria.getAddressId(), root -> root.join(Station_.address, JoinType.LEFT).get(Address_.id))
             );
         }
         return specification;

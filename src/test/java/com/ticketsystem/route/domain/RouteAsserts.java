@@ -48,15 +48,18 @@ public class RouteAsserts {
     public static void assertRouteUpdatableFieldsEquals(Route expected, Route actual) {
         assertThat(actual)
             .as("Verify Route relevant properties")
-            .satisfies(a -> assertThat(a.getTransportType()).as("check transportType").isEqualTo(expected.getTransportType()))
+            .satisfies(a -> assertThat(a.getRouteCode()).as("check routeCode").isEqualTo(expected.getRouteCode()))
             .satisfies(a ->
-                assertThat(a.getDistance()).as("check distance").usingComparator(bigDecimalCompareTo).isEqualTo(expected.getDistance())
+                assertThat(a.getDistanceKm())
+                    .as("check distanceKm")
+                    .usingComparator(bigDecimalCompareTo)
+                    .isEqualTo(expected.getDistanceKm())
             )
-            .satisfies(a -> assertThat(a.getEstimatedDuration()).as("check estimatedDuration").isEqualTo(expected.getEstimatedDuration()))
-            .satisfies(a ->
-                assertThat(a.getBasePrice()).as("check basePrice").usingComparator(bigDecimalCompareTo).isEqualTo(expected.getBasePrice())
-            )
-            .satisfies(a -> assertThat(a.getIsActive()).as("check isActive").isEqualTo(expected.getIsActive()));
+            .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()))
+            .satisfies(a -> assertThat(a.getUpdatedAt()).as("check updatedAt").isEqualTo(expected.getUpdatedAt()))
+            .satisfies(a -> assertThat(a.getIsDeleted()).as("check isDeleted").isEqualTo(expected.getIsDeleted()))
+            .satisfies(a -> assertThat(a.getDeletedAt()).as("check deletedAt").isEqualTo(expected.getDeletedAt()))
+            .satisfies(a -> assertThat(a.getDeletedBy()).as("check deletedBy").isEqualTo(expected.getDeletedBy()));
     }
 
     /**
@@ -69,7 +72,6 @@ public class RouteAsserts {
         assertThat(actual)
             .as("Verify Route relationships")
             .satisfies(a -> assertThat(a.getOrigin()).as("check origin").isEqualTo(expected.getOrigin()))
-            .satisfies(a -> assertThat(a.getDestination()).as("check destination").isEqualTo(expected.getDestination()))
-            .satisfies(a -> assertThat(a.getOperator()).as("check operator").isEqualTo(expected.getOperator()));
+            .satisfies(a -> assertThat(a.getDestination()).as("check destination").isEqualTo(expected.getDestination()));
     }
 }

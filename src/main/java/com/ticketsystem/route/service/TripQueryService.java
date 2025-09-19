@@ -74,13 +74,17 @@ public class TripQueryService extends QueryService<Trip> {
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
                 buildRangeSpecification(criteria.getId(), Trip_.id),
+                buildStringSpecification(criteria.getTripCode(), Trip_.tripCode),
                 buildRangeSpecification(criteria.getDepartureTime(), Trip_.departureTime),
                 buildRangeSpecification(criteria.getArrivalTime(), Trip_.arrivalTime),
-                buildRangeSpecification(criteria.getAvailableSeats(), Trip_.availableSeats),
-                buildRangeSpecification(criteria.getTotalSeats(), Trip_.totalSeats),
-                buildStringSpecification(criteria.getStatus(), Trip_.status),
-                buildSpecification(criteria.getDriverId(), Trip_.driverId),
-                buildSpecification(criteria.getSeatsId(), root -> root.join(Trip_.seats, JoinType.LEFT).get(Seat_.id)),
+                buildRangeSpecification(criteria.getBaseFare(), Trip_.baseFare),
+                buildRangeSpecification(criteria.getCreatedAt(), Trip_.createdAt),
+                buildRangeSpecification(criteria.getUpdatedAt(), Trip_.updatedAt),
+                buildSpecification(criteria.getIsDeleted(), Trip_.isDeleted),
+                buildRangeSpecification(criteria.getDeletedAt(), Trip_.deletedAt),
+                buildSpecification(criteria.getDeletedBy(), Trip_.deletedBy),
+                buildSpecification(criteria.getDriverId(), root -> root.join(Trip_.driver, JoinType.LEFT).get(Driver_.id)),
+                buildSpecification(criteria.getAttendantId(), root -> root.join(Trip_.attendant, JoinType.LEFT).get(Attendant_.id)),
                 buildSpecification(criteria.getRouteId(), root -> root.join(Trip_.route, JoinType.LEFT).get(Route_.id))
             );
         }

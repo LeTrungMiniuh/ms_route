@@ -1,5 +1,6 @@
 package com.ticketsystem.route.domain;
 
+import static com.ticketsystem.route.domain.AddressTestSamples.*;
 import static com.ticketsystem.route.domain.StationTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,5 +21,17 @@ class StationTest {
 
         station2 = getStationSample2();
         assertThat(station1).isNotEqualTo(station2);
+    }
+
+    @Test
+    void addressTest() {
+        Station station = getStationRandomSampleGenerator();
+        Address addressBack = getAddressRandomSampleGenerator();
+
+        station.setAddress(addressBack);
+        assertThat(station.getAddress()).isEqualTo(addressBack);
+
+        station.address(null);
+        assertThat(station.getAddress()).isNull();
     }
 }

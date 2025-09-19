@@ -1,5 +1,6 @@
 package com.ticketsystem.route.domain;
 
+import static com.ticketsystem.route.domain.AssertUtils.bigDecimalCompareTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TripAsserts {
@@ -47,12 +48,17 @@ public class TripAsserts {
     public static void assertTripUpdatableFieldsEquals(Trip expected, Trip actual) {
         assertThat(actual)
             .as("Verify Trip relevant properties")
+            .satisfies(a -> assertThat(a.getTripCode()).as("check tripCode").isEqualTo(expected.getTripCode()))
             .satisfies(a -> assertThat(a.getDepartureTime()).as("check departureTime").isEqualTo(expected.getDepartureTime()))
             .satisfies(a -> assertThat(a.getArrivalTime()).as("check arrivalTime").isEqualTo(expected.getArrivalTime()))
-            .satisfies(a -> assertThat(a.getAvailableSeats()).as("check availableSeats").isEqualTo(expected.getAvailableSeats()))
-            .satisfies(a -> assertThat(a.getTotalSeats()).as("check totalSeats").isEqualTo(expected.getTotalSeats()))
-            .satisfies(a -> assertThat(a.getStatus()).as("check status").isEqualTo(expected.getStatus()))
-            .satisfies(a -> assertThat(a.getDriverId()).as("check driverId").isEqualTo(expected.getDriverId()));
+            .satisfies(a ->
+                assertThat(a.getBaseFare()).as("check baseFare").usingComparator(bigDecimalCompareTo).isEqualTo(expected.getBaseFare())
+            )
+            .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()))
+            .satisfies(a -> assertThat(a.getUpdatedAt()).as("check updatedAt").isEqualTo(expected.getUpdatedAt()))
+            .satisfies(a -> assertThat(a.getIsDeleted()).as("check isDeleted").isEqualTo(expected.getIsDeleted()))
+            .satisfies(a -> assertThat(a.getDeletedAt()).as("check deletedAt").isEqualTo(expected.getDeletedAt()))
+            .satisfies(a -> assertThat(a.getDeletedBy()).as("check deletedBy").isEqualTo(expected.getDeletedBy()));
     }
 
     /**
@@ -64,6 +70,8 @@ public class TripAsserts {
     public static void assertTripUpdatableRelationshipsEquals(Trip expected, Trip actual) {
         assertThat(actual)
             .as("Verify Trip relationships")
+            .satisfies(a -> assertThat(a.getDriver()).as("check driver").isEqualTo(expected.getDriver()))
+            .satisfies(a -> assertThat(a.getAttendant()).as("check attendant").isEqualTo(expected.getAttendant()))
             .satisfies(a -> assertThat(a.getRoute()).as("check route").isEqualTo(expected.getRoute()));
     }
 }

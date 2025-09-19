@@ -76,23 +76,17 @@ class VehicleCriteriaTest {
 
     private static void setAllFilters(VehicleCriteria vehicleCriteria) {
         vehicleCriteria.id();
+        vehicleCriteria.type();
+        vehicleCriteria.typeFactor();
         vehicleCriteria.plateNumber();
-        vehicleCriteria.model();
-        vehicleCriteria.capacity();
-        vehicleCriteria.seatLayout();
-        vehicleCriteria.amenities();
-        vehicleCriteria.imageCoverUrl();
-        vehicleCriteria.averageRating();
-        vehicleCriteria.totalReviews();
-        vehicleCriteria.isActive();
-        vehicleCriteria.yearManufactured();
-        vehicleCriteria.lastMaintenanceDate();
-        vehicleCriteria.summaryId();
-        vehicleCriteria.imagesId();
-        vehicleCriteria.reviewsId();
-        vehicleCriteria.amenityItemsId();
-        vehicleCriteria.homeStationId();
-        vehicleCriteria.operatorId();
+        vehicleCriteria.brand();
+        vehicleCriteria.description();
+        vehicleCriteria.createdAt();
+        vehicleCriteria.updatedAt();
+        vehicleCriteria.isDeleted();
+        vehicleCriteria.deletedAt();
+        vehicleCriteria.deletedBy();
+        vehicleCriteria.seatMapId();
         vehicleCriteria.distinct();
     }
 
@@ -100,23 +94,17 @@ class VehicleCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
+                condition.apply(criteria.getType()) &&
+                condition.apply(criteria.getTypeFactor()) &&
                 condition.apply(criteria.getPlateNumber()) &&
-                condition.apply(criteria.getModel()) &&
-                condition.apply(criteria.getCapacity()) &&
-                condition.apply(criteria.getSeatLayout()) &&
-                condition.apply(criteria.getAmenities()) &&
-                condition.apply(criteria.getImageCoverUrl()) &&
-                condition.apply(criteria.getAverageRating()) &&
-                condition.apply(criteria.getTotalReviews()) &&
-                condition.apply(criteria.getIsActive()) &&
-                condition.apply(criteria.getYearManufactured()) &&
-                condition.apply(criteria.getLastMaintenanceDate()) &&
-                condition.apply(criteria.getSummaryId()) &&
-                condition.apply(criteria.getImagesId()) &&
-                condition.apply(criteria.getReviewsId()) &&
-                condition.apply(criteria.getAmenityItemsId()) &&
-                condition.apply(criteria.getHomeStationId()) &&
-                condition.apply(criteria.getOperatorId()) &&
+                condition.apply(criteria.getBrand()) &&
+                condition.apply(criteria.getDescription()) &&
+                condition.apply(criteria.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy()) &&
+                condition.apply(criteria.getSeatMapId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
         );
@@ -126,23 +114,17 @@ class VehicleCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
+                condition.apply(criteria.getType(), copy.getType()) &&
+                condition.apply(criteria.getTypeFactor(), copy.getTypeFactor()) &&
                 condition.apply(criteria.getPlateNumber(), copy.getPlateNumber()) &&
-                condition.apply(criteria.getModel(), copy.getModel()) &&
-                condition.apply(criteria.getCapacity(), copy.getCapacity()) &&
-                condition.apply(criteria.getSeatLayout(), copy.getSeatLayout()) &&
-                condition.apply(criteria.getAmenities(), copy.getAmenities()) &&
-                condition.apply(criteria.getImageCoverUrl(), copy.getImageCoverUrl()) &&
-                condition.apply(criteria.getAverageRating(), copy.getAverageRating()) &&
-                condition.apply(criteria.getTotalReviews(), copy.getTotalReviews()) &&
-                condition.apply(criteria.getIsActive(), copy.getIsActive()) &&
-                condition.apply(criteria.getYearManufactured(), copy.getYearManufactured()) &&
-                condition.apply(criteria.getLastMaintenanceDate(), copy.getLastMaintenanceDate()) &&
-                condition.apply(criteria.getSummaryId(), copy.getSummaryId()) &&
-                condition.apply(criteria.getImagesId(), copy.getImagesId()) &&
-                condition.apply(criteria.getReviewsId(), copy.getReviewsId()) &&
-                condition.apply(criteria.getAmenityItemsId(), copy.getAmenityItemsId()) &&
-                condition.apply(criteria.getHomeStationId(), copy.getHomeStationId()) &&
-                condition.apply(criteria.getOperatorId(), copy.getOperatorId()) &&
+                condition.apply(criteria.getBrand(), copy.getBrand()) &&
+                condition.apply(criteria.getDescription(), copy.getDescription()) &&
+                condition.apply(criteria.getCreatedAt(), copy.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt(), copy.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted(), copy.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt(), copy.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy(), copy.getDeletedBy()) &&
+                condition.apply(criteria.getSeatMapId(), copy.getSeatMapId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"
         );

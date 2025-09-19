@@ -76,12 +76,14 @@ class AddressCriteriaTest {
 
     private static void setAllFilters(AddressCriteria addressCriteria) {
         addressCriteria.id();
-        addressCriteria.wardCode();
         addressCriteria.streetAddress();
-        addressCriteria.postalCode();
         addressCriteria.latitude();
         addressCriteria.longitude();
-        addressCriteria.landmark();
+        addressCriteria.createdAt();
+        addressCriteria.updatedAt();
+        addressCriteria.isDeleted();
+        addressCriteria.deletedAt();
+        addressCriteria.deletedBy();
         addressCriteria.wardId();
         addressCriteria.distinct();
     }
@@ -90,12 +92,14 @@ class AddressCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
-                condition.apply(criteria.getWardCode()) &&
                 condition.apply(criteria.getStreetAddress()) &&
-                condition.apply(criteria.getPostalCode()) &&
                 condition.apply(criteria.getLatitude()) &&
                 condition.apply(criteria.getLongitude()) &&
-                condition.apply(criteria.getLandmark()) &&
+                condition.apply(criteria.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy()) &&
                 condition.apply(criteria.getWardId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
@@ -106,12 +110,14 @@ class AddressCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
-                condition.apply(criteria.getWardCode(), copy.getWardCode()) &&
                 condition.apply(criteria.getStreetAddress(), copy.getStreetAddress()) &&
-                condition.apply(criteria.getPostalCode(), copy.getPostalCode()) &&
                 condition.apply(criteria.getLatitude(), copy.getLatitude()) &&
                 condition.apply(criteria.getLongitude(), copy.getLongitude()) &&
-                condition.apply(criteria.getLandmark(), copy.getLandmark()) &&
+                condition.apply(criteria.getCreatedAt(), copy.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt(), copy.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted(), copy.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt(), copy.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy(), copy.getDeletedBy()) &&
                 condition.apply(criteria.getWardId(), copy.getWardId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"

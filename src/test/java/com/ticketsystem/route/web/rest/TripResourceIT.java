@@ -2,6 +2,7 @@ package com.ticketsystem.route.web.rest;
 
 import static com.ticketsystem.route.domain.TripAsserts.*;
 import static com.ticketsystem.route.web.rest.TestUtil.createUpdateProxyForBean;
+import static com.ticketsystem.route.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -10,12 +11,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketsystem.route.IntegrationTest;
+import com.ticketsystem.route.domain.Attendant;
+import com.ticketsystem.route.domain.Driver;
 import com.ticketsystem.route.domain.Route;
 import com.ticketsystem.route.domain.Trip;
 import com.ticketsystem.route.repository.TripRepository;
 import com.ticketsystem.route.service.dto.TripDTO;
 import com.ticketsystem.route.service.mapper.TripMapper;
 import jakarta.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Random;
@@ -39,25 +43,33 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class TripResourceIT {
 
+    private static final String DEFAULT_TRIP_CODE = "AAAAAAAAAA";
+    private static final String UPDATED_TRIP_CODE = "BBBBBBBBBB";
+
     private static final Instant DEFAULT_DEPARTURE_TIME = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_DEPARTURE_TIME = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
     private static final Instant DEFAULT_ARRIVAL_TIME = Instant.ofEpochMilli(0L);
     private static final Instant UPDATED_ARRIVAL_TIME = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final Integer DEFAULT_AVAILABLE_SEATS = 1;
-    private static final Integer UPDATED_AVAILABLE_SEATS = 2;
-    private static final Integer SMALLER_AVAILABLE_SEATS = 1 - 1;
+    private static final BigDecimal DEFAULT_BASE_FARE = new BigDecimal(1);
+    private static final BigDecimal UPDATED_BASE_FARE = new BigDecimal(2);
+    private static final BigDecimal SMALLER_BASE_FARE = new BigDecimal(1 - 1);
 
-    private static final Integer DEFAULT_TOTAL_SEATS = 1;
-    private static final Integer UPDATED_TOTAL_SEATS = 2;
-    private static final Integer SMALLER_TOTAL_SEATS = 1 - 1;
+    private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final String DEFAULT_STATUS = "AAAAAAAAAA";
-    private static final String UPDATED_STATUS = "BBBBBBBBBB";
+    private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final UUID DEFAULT_DRIVER_ID = UUID.randomUUID();
-    private static final UUID UPDATED_DRIVER_ID = UUID.randomUUID();
+    private static final Boolean DEFAULT_IS_DELETED = false;
+    private static final Boolean UPDATED_IS_DELETED = true;
+
+    private static final Instant DEFAULT_DELETED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DELETED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final UUID DEFAULT_DELETED_BY = UUID.randomUUID();
+    private static final UUID UPDATED_DELETED_BY = UUID.randomUUID();
 
     private static final String ENTITY_API_URL = "/api/trips";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -92,12 +104,15 @@ class TripResourceIT {
      */
     public static Trip createEntity(EntityManager em) {
         Trip trip = new Trip()
+            .tripCode(DEFAULT_TRIP_CODE)
             .departureTime(DEFAULT_DEPARTURE_TIME)
             .arrivalTime(DEFAULT_ARRIVAL_TIME)
-            .availableSeats(DEFAULT_AVAILABLE_SEATS)
-            .totalSeats(DEFAULT_TOTAL_SEATS)
-            .status(DEFAULT_STATUS)
-            .driverId(DEFAULT_DRIVER_ID);
+            .baseFare(DEFAULT_BASE_FARE)
+            .createdAt(DEFAULT_CREATED_AT)
+            .updatedAt(DEFAULT_UPDATED_AT)
+            .isDeleted(DEFAULT_IS_DELETED)
+            .deletedAt(DEFAULT_DELETED_AT)
+            .deletedBy(DEFAULT_DELETED_BY);
         // Add required entity
         Route route;
         if (TestUtil.findAll(em, Route.class).isEmpty()) {
@@ -119,12 +134,15 @@ class TripResourceIT {
      */
     public static Trip createUpdatedEntity(EntityManager em) {
         Trip updatedTrip = new Trip()
+            .tripCode(UPDATED_TRIP_CODE)
             .departureTime(UPDATED_DEPARTURE_TIME)
             .arrivalTime(UPDATED_ARRIVAL_TIME)
-            .availableSeats(UPDATED_AVAILABLE_SEATS)
-            .totalSeats(UPDATED_TOTAL_SEATS)
-            .status(UPDATED_STATUS)
-            .driverId(UPDATED_DRIVER_ID);
+            .baseFare(UPDATED_BASE_FARE)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         // Add required entity
         Route route;
         if (TestUtil.findAll(em, Route.class).isEmpty()) {
@@ -229,10 +247,10 @@ class TripResourceIT {
 
     @Test
     @Transactional
-    void checkAvailableSeatsIsRequired() throws Exception {
+    void checkBaseFareIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        trip.setAvailableSeats(null);
+        trip.setBaseFare(null);
 
         // Create the Trip, which fails.
         TripDTO tripDTO = tripMapper.toDto(trip);
@@ -246,10 +264,10 @@ class TripResourceIT {
 
     @Test
     @Transactional
-    void checkTotalSeatsIsRequired() throws Exception {
+    void checkCreatedAtIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        trip.setTotalSeats(null);
+        trip.setCreatedAt(null);
 
         // Create the Trip, which fails.
         TripDTO tripDTO = tripMapper.toDto(trip);
@@ -273,12 +291,15 @@ class TripResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(trip.getId().intValue())))
+            .andExpect(jsonPath("$.[*].tripCode").value(hasItem(DEFAULT_TRIP_CODE)))
             .andExpect(jsonPath("$.[*].departureTime").value(hasItem(DEFAULT_DEPARTURE_TIME.toString())))
             .andExpect(jsonPath("$.[*].arrivalTime").value(hasItem(DEFAULT_ARRIVAL_TIME.toString())))
-            .andExpect(jsonPath("$.[*].availableSeats").value(hasItem(DEFAULT_AVAILABLE_SEATS)))
-            .andExpect(jsonPath("$.[*].totalSeats").value(hasItem(DEFAULT_TOTAL_SEATS)))
-            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS)))
-            .andExpect(jsonPath("$.[*].driverId").value(hasItem(DEFAULT_DRIVER_ID.toString())));
+            .andExpect(jsonPath("$.[*].baseFare").value(hasItem(sameNumber(DEFAULT_BASE_FARE))))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
     }
 
     @Test
@@ -293,12 +314,15 @@ class TripResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(trip.getId().intValue()))
+            .andExpect(jsonPath("$.tripCode").value(DEFAULT_TRIP_CODE))
             .andExpect(jsonPath("$.departureTime").value(DEFAULT_DEPARTURE_TIME.toString()))
             .andExpect(jsonPath("$.arrivalTime").value(DEFAULT_ARRIVAL_TIME.toString()))
-            .andExpect(jsonPath("$.availableSeats").value(DEFAULT_AVAILABLE_SEATS))
-            .andExpect(jsonPath("$.totalSeats").value(DEFAULT_TOTAL_SEATS))
-            .andExpect(jsonPath("$.status").value(DEFAULT_STATUS))
-            .andExpect(jsonPath("$.driverId").value(DEFAULT_DRIVER_ID.toString()));
+            .andExpect(jsonPath("$.baseFare").value(sameNumber(DEFAULT_BASE_FARE)))
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
+            .andExpect(jsonPath("$.isDeleted").value(DEFAULT_IS_DELETED))
+            .andExpect(jsonPath("$.deletedAt").value(DEFAULT_DELETED_AT.toString()))
+            .andExpect(jsonPath("$.deletedBy").value(DEFAULT_DELETED_BY.toString()));
     }
 
     @Test
@@ -314,6 +338,56 @@ class TripResourceIT {
         defaultTripFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
         defaultTripFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllTripsByTripCodeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedTrip = tripRepository.saveAndFlush(trip);
+
+        // Get all the tripList where tripCode equals to
+        defaultTripFiltering("tripCode.equals=" + DEFAULT_TRIP_CODE, "tripCode.equals=" + UPDATED_TRIP_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllTripsByTripCodeIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedTrip = tripRepository.saveAndFlush(trip);
+
+        // Get all the tripList where tripCode in
+        defaultTripFiltering("tripCode.in=" + DEFAULT_TRIP_CODE + "," + UPDATED_TRIP_CODE, "tripCode.in=" + UPDATED_TRIP_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllTripsByTripCodeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedTrip = tripRepository.saveAndFlush(trip);
+
+        // Get all the tripList where tripCode is not null
+        defaultTripFiltering("tripCode.specified=true", "tripCode.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllTripsByTripCodeContainsSomething() throws Exception {
+        // Initialize the database
+        insertedTrip = tripRepository.saveAndFlush(trip);
+
+        // Get all the tripList where tripCode contains
+        defaultTripFiltering("tripCode.contains=" + DEFAULT_TRIP_CODE, "tripCode.contains=" + UPDATED_TRIP_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllTripsByTripCodeNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedTrip = tripRepository.saveAndFlush(trip);
+
+        // Get all the tripList where tripCode does not contain
+        defaultTripFiltering("tripCode.doesNotContain=" + UPDATED_TRIP_CODE, "tripCode.doesNotContain=" + DEFAULT_TRIP_CODE);
     }
 
     @Test
@@ -384,237 +458,266 @@ class TripResourceIT {
 
     @Test
     @Transactional
-    void getAllTripsByAvailableSeatsIsEqualToSomething() throws Exception {
+    void getAllTripsByBaseFareIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where availableSeats equals to
-        defaultTripFiltering("availableSeats.equals=" + DEFAULT_AVAILABLE_SEATS, "availableSeats.equals=" + UPDATED_AVAILABLE_SEATS);
+        // Get all the tripList where baseFare equals to
+        defaultTripFiltering("baseFare.equals=" + DEFAULT_BASE_FARE, "baseFare.equals=" + UPDATED_BASE_FARE);
     }
 
     @Test
     @Transactional
-    void getAllTripsByAvailableSeatsIsInShouldWork() throws Exception {
+    void getAllTripsByBaseFareIsInShouldWork() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where availableSeats in
-        defaultTripFiltering(
-            "availableSeats.in=" + DEFAULT_AVAILABLE_SEATS + "," + UPDATED_AVAILABLE_SEATS,
-            "availableSeats.in=" + UPDATED_AVAILABLE_SEATS
-        );
+        // Get all the tripList where baseFare in
+        defaultTripFiltering("baseFare.in=" + DEFAULT_BASE_FARE + "," + UPDATED_BASE_FARE, "baseFare.in=" + UPDATED_BASE_FARE);
     }
 
     @Test
     @Transactional
-    void getAllTripsByAvailableSeatsIsNullOrNotNull() throws Exception {
+    void getAllTripsByBaseFareIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where availableSeats is not null
-        defaultTripFiltering("availableSeats.specified=true", "availableSeats.specified=false");
+        // Get all the tripList where baseFare is not null
+        defaultTripFiltering("baseFare.specified=true", "baseFare.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllTripsByAvailableSeatsIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllTripsByBaseFareIsGreaterThanOrEqualToSomething() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where availableSeats is greater than or equal to
-        defaultTripFiltering(
-            "availableSeats.greaterThanOrEqual=" + DEFAULT_AVAILABLE_SEATS,
-            "availableSeats.greaterThanOrEqual=" + UPDATED_AVAILABLE_SEATS
-        );
+        // Get all the tripList where baseFare is greater than or equal to
+        defaultTripFiltering("baseFare.greaterThanOrEqual=" + DEFAULT_BASE_FARE, "baseFare.greaterThanOrEqual=" + UPDATED_BASE_FARE);
     }
 
     @Test
     @Transactional
-    void getAllTripsByAvailableSeatsIsLessThanOrEqualToSomething() throws Exception {
+    void getAllTripsByBaseFareIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where availableSeats is less than or equal to
-        defaultTripFiltering(
-            "availableSeats.lessThanOrEqual=" + DEFAULT_AVAILABLE_SEATS,
-            "availableSeats.lessThanOrEqual=" + SMALLER_AVAILABLE_SEATS
-        );
+        // Get all the tripList where baseFare is less than or equal to
+        defaultTripFiltering("baseFare.lessThanOrEqual=" + DEFAULT_BASE_FARE, "baseFare.lessThanOrEqual=" + SMALLER_BASE_FARE);
     }
 
     @Test
     @Transactional
-    void getAllTripsByAvailableSeatsIsLessThanSomething() throws Exception {
+    void getAllTripsByBaseFareIsLessThanSomething() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where availableSeats is less than
-        defaultTripFiltering("availableSeats.lessThan=" + UPDATED_AVAILABLE_SEATS, "availableSeats.lessThan=" + DEFAULT_AVAILABLE_SEATS);
+        // Get all the tripList where baseFare is less than
+        defaultTripFiltering("baseFare.lessThan=" + UPDATED_BASE_FARE, "baseFare.lessThan=" + DEFAULT_BASE_FARE);
     }
 
     @Test
     @Transactional
-    void getAllTripsByAvailableSeatsIsGreaterThanSomething() throws Exception {
+    void getAllTripsByBaseFareIsGreaterThanSomething() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where availableSeats is greater than
-        defaultTripFiltering(
-            "availableSeats.greaterThan=" + SMALLER_AVAILABLE_SEATS,
-            "availableSeats.greaterThan=" + DEFAULT_AVAILABLE_SEATS
-        );
+        // Get all the tripList where baseFare is greater than
+        defaultTripFiltering("baseFare.greaterThan=" + SMALLER_BASE_FARE, "baseFare.greaterThan=" + DEFAULT_BASE_FARE);
     }
 
     @Test
     @Transactional
-    void getAllTripsByTotalSeatsIsEqualToSomething() throws Exception {
+    void getAllTripsByCreatedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where totalSeats equals to
-        defaultTripFiltering("totalSeats.equals=" + DEFAULT_TOTAL_SEATS, "totalSeats.equals=" + UPDATED_TOTAL_SEATS);
+        // Get all the tripList where createdAt equals to
+        defaultTripFiltering("createdAt.equals=" + DEFAULT_CREATED_AT, "createdAt.equals=" + UPDATED_CREATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllTripsByTotalSeatsIsInShouldWork() throws Exception {
+    void getAllTripsByCreatedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where totalSeats in
-        defaultTripFiltering("totalSeats.in=" + DEFAULT_TOTAL_SEATS + "," + UPDATED_TOTAL_SEATS, "totalSeats.in=" + UPDATED_TOTAL_SEATS);
+        // Get all the tripList where createdAt in
+        defaultTripFiltering("createdAt.in=" + DEFAULT_CREATED_AT + "," + UPDATED_CREATED_AT, "createdAt.in=" + UPDATED_CREATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllTripsByTotalSeatsIsNullOrNotNull() throws Exception {
+    void getAllTripsByCreatedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where totalSeats is not null
-        defaultTripFiltering("totalSeats.specified=true", "totalSeats.specified=false");
+        // Get all the tripList where createdAt is not null
+        defaultTripFiltering("createdAt.specified=true", "createdAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllTripsByTotalSeatsIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllTripsByUpdatedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where totalSeats is greater than or equal to
-        defaultTripFiltering(
-            "totalSeats.greaterThanOrEqual=" + DEFAULT_TOTAL_SEATS,
-            "totalSeats.greaterThanOrEqual=" + UPDATED_TOTAL_SEATS
-        );
+        // Get all the tripList where updatedAt equals to
+        defaultTripFiltering("updatedAt.equals=" + DEFAULT_UPDATED_AT, "updatedAt.equals=" + UPDATED_UPDATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllTripsByTotalSeatsIsLessThanOrEqualToSomething() throws Exception {
+    void getAllTripsByUpdatedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where totalSeats is less than or equal to
-        defaultTripFiltering("totalSeats.lessThanOrEqual=" + DEFAULT_TOTAL_SEATS, "totalSeats.lessThanOrEqual=" + SMALLER_TOTAL_SEATS);
+        // Get all the tripList where updatedAt in
+        defaultTripFiltering("updatedAt.in=" + DEFAULT_UPDATED_AT + "," + UPDATED_UPDATED_AT, "updatedAt.in=" + UPDATED_UPDATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllTripsByTotalSeatsIsLessThanSomething() throws Exception {
+    void getAllTripsByUpdatedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where totalSeats is less than
-        defaultTripFiltering("totalSeats.lessThan=" + UPDATED_TOTAL_SEATS, "totalSeats.lessThan=" + DEFAULT_TOTAL_SEATS);
+        // Get all the tripList where updatedAt is not null
+        defaultTripFiltering("updatedAt.specified=true", "updatedAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllTripsByTotalSeatsIsGreaterThanSomething() throws Exception {
+    void getAllTripsByIsDeletedIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where totalSeats is greater than
-        defaultTripFiltering("totalSeats.greaterThan=" + SMALLER_TOTAL_SEATS, "totalSeats.greaterThan=" + DEFAULT_TOTAL_SEATS);
+        // Get all the tripList where isDeleted equals to
+        defaultTripFiltering("isDeleted.equals=" + DEFAULT_IS_DELETED, "isDeleted.equals=" + UPDATED_IS_DELETED);
     }
 
     @Test
     @Transactional
-    void getAllTripsByStatusIsEqualToSomething() throws Exception {
+    void getAllTripsByIsDeletedIsInShouldWork() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where status equals to
-        defaultTripFiltering("status.equals=" + DEFAULT_STATUS, "status.equals=" + UPDATED_STATUS);
+        // Get all the tripList where isDeleted in
+        defaultTripFiltering("isDeleted.in=" + DEFAULT_IS_DELETED + "," + UPDATED_IS_DELETED, "isDeleted.in=" + UPDATED_IS_DELETED);
     }
 
     @Test
     @Transactional
-    void getAllTripsByStatusIsInShouldWork() throws Exception {
+    void getAllTripsByIsDeletedIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where status in
-        defaultTripFiltering("status.in=" + DEFAULT_STATUS + "," + UPDATED_STATUS, "status.in=" + UPDATED_STATUS);
+        // Get all the tripList where isDeleted is not null
+        defaultTripFiltering("isDeleted.specified=true", "isDeleted.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllTripsByStatusIsNullOrNotNull() throws Exception {
+    void getAllTripsByDeletedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where status is not null
-        defaultTripFiltering("status.specified=true", "status.specified=false");
+        // Get all the tripList where deletedAt equals to
+        defaultTripFiltering("deletedAt.equals=" + DEFAULT_DELETED_AT, "deletedAt.equals=" + UPDATED_DELETED_AT);
     }
 
     @Test
     @Transactional
-    void getAllTripsByStatusContainsSomething() throws Exception {
+    void getAllTripsByDeletedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where status contains
-        defaultTripFiltering("status.contains=" + DEFAULT_STATUS, "status.contains=" + UPDATED_STATUS);
+        // Get all the tripList where deletedAt in
+        defaultTripFiltering("deletedAt.in=" + DEFAULT_DELETED_AT + "," + UPDATED_DELETED_AT, "deletedAt.in=" + UPDATED_DELETED_AT);
     }
 
     @Test
     @Transactional
-    void getAllTripsByStatusNotContainsSomething() throws Exception {
+    void getAllTripsByDeletedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where status does not contain
-        defaultTripFiltering("status.doesNotContain=" + UPDATED_STATUS, "status.doesNotContain=" + DEFAULT_STATUS);
+        // Get all the tripList where deletedAt is not null
+        defaultTripFiltering("deletedAt.specified=true", "deletedAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllTripsByDriverIdIsEqualToSomething() throws Exception {
+    void getAllTripsByDeletedByIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where driverId equals to
-        defaultTripFiltering("driverId.equals=" + DEFAULT_DRIVER_ID, "driverId.equals=" + UPDATED_DRIVER_ID);
+        // Get all the tripList where deletedBy equals to
+        defaultTripFiltering("deletedBy.equals=" + DEFAULT_DELETED_BY, "deletedBy.equals=" + UPDATED_DELETED_BY);
     }
 
     @Test
     @Transactional
-    void getAllTripsByDriverIdIsInShouldWork() throws Exception {
+    void getAllTripsByDeletedByIsInShouldWork() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where driverId in
-        defaultTripFiltering("driverId.in=" + DEFAULT_DRIVER_ID + "," + UPDATED_DRIVER_ID, "driverId.in=" + UPDATED_DRIVER_ID);
+        // Get all the tripList where deletedBy in
+        defaultTripFiltering("deletedBy.in=" + DEFAULT_DELETED_BY + "," + UPDATED_DELETED_BY, "deletedBy.in=" + UPDATED_DELETED_BY);
     }
 
     @Test
     @Transactional
-    void getAllTripsByDriverIdIsNullOrNotNull() throws Exception {
+    void getAllTripsByDeletedByIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedTrip = tripRepository.saveAndFlush(trip);
 
-        // Get all the tripList where driverId is not null
-        defaultTripFiltering("driverId.specified=true", "driverId.specified=false");
+        // Get all the tripList where deletedBy is not null
+        defaultTripFiltering("deletedBy.specified=true", "deletedBy.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllTripsByDriverIsEqualToSomething() throws Exception {
+        Driver driver;
+        if (TestUtil.findAll(em, Driver.class).isEmpty()) {
+            tripRepository.saveAndFlush(trip);
+            driver = DriverResourceIT.createEntity(em);
+        } else {
+            driver = TestUtil.findAll(em, Driver.class).get(0);
+        }
+        em.persist(driver);
+        em.flush();
+        trip.setDriver(driver);
+        tripRepository.saveAndFlush(trip);
+        Long driverId = driver.getId();
+        // Get all the tripList where driver equals to driverId
+        defaultTripShouldBeFound("driverId.equals=" + driverId);
+
+        // Get all the tripList where driver equals to (driverId + 1)
+        defaultTripShouldNotBeFound("driverId.equals=" + (driverId + 1));
+    }
+
+    @Test
+    @Transactional
+    void getAllTripsByAttendantIsEqualToSomething() throws Exception {
+        Attendant attendant;
+        if (TestUtil.findAll(em, Attendant.class).isEmpty()) {
+            tripRepository.saveAndFlush(trip);
+            attendant = AttendantResourceIT.createEntity();
+        } else {
+            attendant = TestUtil.findAll(em, Attendant.class).get(0);
+        }
+        em.persist(attendant);
+        em.flush();
+        trip.setAttendant(attendant);
+        tripRepository.saveAndFlush(trip);
+        Long attendantId = attendant.getId();
+        // Get all the tripList where attendant equals to attendantId
+        defaultTripShouldBeFound("attendantId.equals=" + attendantId);
+
+        // Get all the tripList where attendant equals to (attendantId + 1)
+        defaultTripShouldNotBeFound("attendantId.equals=" + (attendantId + 1));
     }
 
     @Test
@@ -653,12 +756,15 @@ class TripResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(trip.getId().intValue())))
+            .andExpect(jsonPath("$.[*].tripCode").value(hasItem(DEFAULT_TRIP_CODE)))
             .andExpect(jsonPath("$.[*].departureTime").value(hasItem(DEFAULT_DEPARTURE_TIME.toString())))
             .andExpect(jsonPath("$.[*].arrivalTime").value(hasItem(DEFAULT_ARRIVAL_TIME.toString())))
-            .andExpect(jsonPath("$.[*].availableSeats").value(hasItem(DEFAULT_AVAILABLE_SEATS)))
-            .andExpect(jsonPath("$.[*].totalSeats").value(hasItem(DEFAULT_TOTAL_SEATS)))
-            .andExpect(jsonPath("$.[*].status").value(hasItem(DEFAULT_STATUS)))
-            .andExpect(jsonPath("$.[*].driverId").value(hasItem(DEFAULT_DRIVER_ID.toString())));
+            .andExpect(jsonPath("$.[*].baseFare").value(hasItem(sameNumber(DEFAULT_BASE_FARE))))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
 
         // Check, that the count call also returns 1
         restTripMockMvc
@@ -707,12 +813,15 @@ class TripResourceIT {
         // Disconnect from session so that the updates on updatedTrip are not directly saved in db
         em.detach(updatedTrip);
         updatedTrip
+            .tripCode(UPDATED_TRIP_CODE)
             .departureTime(UPDATED_DEPARTURE_TIME)
             .arrivalTime(UPDATED_ARRIVAL_TIME)
-            .availableSeats(UPDATED_AVAILABLE_SEATS)
-            .totalSeats(UPDATED_TOTAL_SEATS)
-            .status(UPDATED_STATUS)
-            .driverId(UPDATED_DRIVER_ID);
+            .baseFare(UPDATED_BASE_FARE)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         TripDTO tripDTO = tripMapper.toDto(updatedTrip);
 
         restTripMockMvc
@@ -805,6 +914,8 @@ class TripResourceIT {
         Trip partialUpdatedTrip = new Trip();
         partialUpdatedTrip.setId(trip.getId());
 
+        partialUpdatedTrip.isDeleted(UPDATED_IS_DELETED).deletedBy(UPDATED_DELETED_BY);
+
         restTripMockMvc
             .perform(
                 patch(ENTITY_API_URL_ID, partialUpdatedTrip.getId())
@@ -833,12 +944,15 @@ class TripResourceIT {
         partialUpdatedTrip.setId(trip.getId());
 
         partialUpdatedTrip
+            .tripCode(UPDATED_TRIP_CODE)
             .departureTime(UPDATED_DEPARTURE_TIME)
             .arrivalTime(UPDATED_ARRIVAL_TIME)
-            .availableSeats(UPDATED_AVAILABLE_SEATS)
-            .totalSeats(UPDATED_TOTAL_SEATS)
-            .status(UPDATED_STATUS)
-            .driverId(UPDATED_DRIVER_ID);
+            .baseFare(UPDATED_BASE_FARE)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
 
         restTripMockMvc
             .perform(

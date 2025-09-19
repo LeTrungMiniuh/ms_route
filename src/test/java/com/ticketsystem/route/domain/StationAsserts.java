@@ -47,13 +47,15 @@ public class StationAsserts {
     public static void assertStationUpdatableFieldsEquals(Station expected, Station actual) {
         assertThat(actual)
             .as("Verify Station relevant properties")
-            .satisfies(a -> assertThat(a.getCode()).as("check code").isEqualTo(expected.getCode()))
             .satisfies(a -> assertThat(a.getName()).as("check name").isEqualTo(expected.getName()))
-            .satisfies(a -> assertThat(a.getNameEn()).as("check nameEn").isEqualTo(expected.getNameEn()))
-            .satisfies(a -> assertThat(a.getAddressId()).as("check addressId").isEqualTo(expected.getAddressId()))
-            .satisfies(a -> assertThat(a.getFacilities()).as("check facilities").isEqualTo(expected.getFacilities()))
-            .satisfies(a -> assertThat(a.getOperatingHours()).as("check operatingHours").isEqualTo(expected.getOperatingHours()))
-            .satisfies(a -> assertThat(a.getIsActive()).as("check isActive").isEqualTo(expected.getIsActive()));
+            .satisfies(a -> assertThat(a.getPhoneNumber()).as("check phoneNumber").isEqualTo(expected.getPhoneNumber()))
+            .satisfies(a -> assertThat(a.getDescription()).as("check description").isEqualTo(expected.getDescription()))
+            .satisfies(a -> assertThat(a.getActive()).as("check active").isEqualTo(expected.getActive()))
+            .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()))
+            .satisfies(a -> assertThat(a.getUpdatedAt()).as("check updatedAt").isEqualTo(expected.getUpdatedAt()))
+            .satisfies(a -> assertThat(a.getIsDeleted()).as("check isDeleted").isEqualTo(expected.getIsDeleted()))
+            .satisfies(a -> assertThat(a.getDeletedAt()).as("check deletedAt").isEqualTo(expected.getDeletedAt()))
+            .satisfies(a -> assertThat(a.getDeletedBy()).as("check deletedBy").isEqualTo(expected.getDeletedBy()));
     }
 
     /**
@@ -63,6 +65,8 @@ public class StationAsserts {
      * @param actual the actual entity
      */
     public static void assertStationUpdatableRelationshipsEquals(Station expected, Station actual) {
-        // empty method
+        assertThat(actual)
+            .as("Verify Station relationships")
+            .satisfies(a -> assertThat(a.getAddress()).as("check address").isEqualTo(expected.getAddress()));
     }
 }

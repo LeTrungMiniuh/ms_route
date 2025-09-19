@@ -12,12 +12,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketsystem.route.IntegrationTest;
+import com.ticketsystem.route.domain.Address;
 import com.ticketsystem.route.domain.Station;
 import com.ticketsystem.route.repository.StationRepository;
 import com.ticketsystem.route.repository.search.StationSearchRepository;
 import com.ticketsystem.route.service.dto.StationDTO;
 import com.ticketsystem.route.service.mapper.StationMapper;
 import jakarta.persistence.EntityManager;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -43,26 +46,32 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class StationResourceIT {
 
-    private static final String DEFAULT_CODE = "AAAAAAAAAA";
-    private static final String UPDATED_CODE = "BBBBBBBBBB";
-
     private static final String DEFAULT_NAME = "AAAAAAAAAA";
     private static final String UPDATED_NAME = "BBBBBBBBBB";
 
-    private static final String DEFAULT_NAME_EN = "AAAAAAAAAA";
-    private static final String UPDATED_NAME_EN = "BBBBBBBBBB";
+    private static final String DEFAULT_PHONE_NUMBER = "AAAAAAAAAA";
+    private static final String UPDATED_PHONE_NUMBER = "BBBBBBBBBB";
 
-    private static final UUID DEFAULT_ADDRESS_ID = UUID.randomUUID();
-    private static final UUID UPDATED_ADDRESS_ID = UUID.randomUUID();
+    private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
+    private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
-    private static final String DEFAULT_FACILITIES = "AAAAAAAAAA";
-    private static final String UPDATED_FACILITIES = "BBBBBBBBBB";
+    private static final Boolean DEFAULT_ACTIVE = false;
+    private static final Boolean UPDATED_ACTIVE = true;
 
-    private static final String DEFAULT_OPERATING_HOURS = "AAAAAAAAAA";
-    private static final String UPDATED_OPERATING_HOURS = "BBBBBBBBBB";
+    private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final Boolean DEFAULT_IS_ACTIVE = false;
-    private static final Boolean UPDATED_IS_ACTIVE = true;
+    private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Boolean DEFAULT_IS_DELETED = false;
+    private static final Boolean UPDATED_IS_DELETED = true;
+
+    private static final Instant DEFAULT_DELETED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DELETED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final UUID DEFAULT_DELETED_BY = UUID.randomUUID();
+    private static final UUID UPDATED_DELETED_BY = UUID.randomUUID();
 
     private static final String ENTITY_API_URL = "/api/stations";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -99,15 +108,28 @@ class StationResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Station createEntity() {
-        return new Station()
-            .code(DEFAULT_CODE)
+    public static Station createEntity(EntityManager em) {
+        Station station = new Station()
             .name(DEFAULT_NAME)
-            .nameEn(DEFAULT_NAME_EN)
-            .addressId(DEFAULT_ADDRESS_ID)
-            .facilities(DEFAULT_FACILITIES)
-            .operatingHours(DEFAULT_OPERATING_HOURS)
-            .isActive(DEFAULT_IS_ACTIVE);
+            .phoneNumber(DEFAULT_PHONE_NUMBER)
+            .description(DEFAULT_DESCRIPTION)
+            .active(DEFAULT_ACTIVE)
+            .createdAt(DEFAULT_CREATED_AT)
+            .updatedAt(DEFAULT_UPDATED_AT)
+            .isDeleted(DEFAULT_IS_DELETED)
+            .deletedAt(DEFAULT_DELETED_AT)
+            .deletedBy(DEFAULT_DELETED_BY);
+        // Add required entity
+        Address address;
+        if (TestUtil.findAll(em, Address.class).isEmpty()) {
+            address = AddressResourceIT.createEntity(em);
+            em.persist(address);
+            em.flush();
+        } else {
+            address = TestUtil.findAll(em, Address.class).get(0);
+        }
+        station.setAddress(address);
+        return station;
     }
 
     /**
@@ -116,20 +138,33 @@ class StationResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static Station createUpdatedEntity() {
-        return new Station()
-            .code(UPDATED_CODE)
+    public static Station createUpdatedEntity(EntityManager em) {
+        Station updatedStation = new Station()
             .name(UPDATED_NAME)
-            .nameEn(UPDATED_NAME_EN)
-            .addressId(UPDATED_ADDRESS_ID)
-            .facilities(UPDATED_FACILITIES)
-            .operatingHours(UPDATED_OPERATING_HOURS)
-            .isActive(UPDATED_IS_ACTIVE);
+            .phoneNumber(UPDATED_PHONE_NUMBER)
+            .description(UPDATED_DESCRIPTION)
+            .active(UPDATED_ACTIVE)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
+        // Add required entity
+        Address address;
+        if (TestUtil.findAll(em, Address.class).isEmpty()) {
+            address = AddressResourceIT.createUpdatedEntity(em);
+            em.persist(address);
+            em.flush();
+        } else {
+            address = TestUtil.findAll(em, Address.class).get(0);
+        }
+        updatedStation.setAddress(address);
+        return updatedStation;
     }
 
     @BeforeEach
     void initTest() {
-        station = createEntity();
+        station = createEntity(em);
     }
 
     @AfterEach
@@ -198,27 +233,6 @@ class StationResourceIT {
 
     @Test
     @Transactional
-    void checkCodeIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(stationSearchRepository.findAll());
-        // set the field null
-        station.setCode(null);
-
-        // Create the Station, which fails.
-        StationDTO stationDTO = stationMapper.toDto(station);
-
-        restStationMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(stationDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(stationSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
-    }
-
-    @Test
-    @Transactional
     void checkNameIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(stationSearchRepository.findAll());
@@ -240,11 +254,11 @@ class StationResourceIT {
 
     @Test
     @Transactional
-    void checkAddressIdIsRequired() throws Exception {
+    void checkActiveIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(stationSearchRepository.findAll());
         // set the field null
-        station.setAddressId(null);
+        station.setActive(null);
 
         // Create the Station, which fails.
         StationDTO stationDTO = stationMapper.toDto(station);
@@ -261,11 +275,11 @@ class StationResourceIT {
 
     @Test
     @Transactional
-    void checkIsActiveIsRequired() throws Exception {
+    void checkCreatedAtIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(stationSearchRepository.findAll());
         // set the field null
-        station.setIsActive(null);
+        station.setCreatedAt(null);
 
         // Create the Station, which fails.
         StationDTO stationDTO = stationMapper.toDto(station);
@@ -292,13 +306,15 @@ class StationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(station.getId().intValue())))
-            .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].nameEn").value(hasItem(DEFAULT_NAME_EN)))
-            .andExpect(jsonPath("$.[*].addressId").value(hasItem(DEFAULT_ADDRESS_ID.toString())))
-            .andExpect(jsonPath("$.[*].facilities").value(hasItem(DEFAULT_FACILITIES)))
-            .andExpect(jsonPath("$.[*].operatingHours").value(hasItem(DEFAULT_OPERATING_HOURS)))
-            .andExpect(jsonPath("$.[*].isActive").value(hasItem(DEFAULT_IS_ACTIVE)));
+            .andExpect(jsonPath("$.[*].phoneNumber").value(hasItem(DEFAULT_PHONE_NUMBER)))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].active").value(hasItem(DEFAULT_ACTIVE)))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
     }
 
     @Test
@@ -313,13 +329,15 @@ class StationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(station.getId().intValue()))
-            .andExpect(jsonPath("$.code").value(DEFAULT_CODE))
             .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
-            .andExpect(jsonPath("$.nameEn").value(DEFAULT_NAME_EN))
-            .andExpect(jsonPath("$.addressId").value(DEFAULT_ADDRESS_ID.toString()))
-            .andExpect(jsonPath("$.facilities").value(DEFAULT_FACILITIES))
-            .andExpect(jsonPath("$.operatingHours").value(DEFAULT_OPERATING_HOURS))
-            .andExpect(jsonPath("$.isActive").value(DEFAULT_IS_ACTIVE));
+            .andExpect(jsonPath("$.phoneNumber").value(DEFAULT_PHONE_NUMBER))
+            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
+            .andExpect(jsonPath("$.active").value(DEFAULT_ACTIVE))
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
+            .andExpect(jsonPath("$.isDeleted").value(DEFAULT_IS_DELETED))
+            .andExpect(jsonPath("$.deletedAt").value(DEFAULT_DELETED_AT.toString()))
+            .andExpect(jsonPath("$.deletedBy").value(DEFAULT_DELETED_BY.toString()));
     }
 
     @Test
@@ -335,56 +353,6 @@ class StationResourceIT {
         defaultStationFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
         defaultStationFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByCodeIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where code equals to
-        defaultStationFiltering("code.equals=" + DEFAULT_CODE, "code.equals=" + UPDATED_CODE);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByCodeIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where code in
-        defaultStationFiltering("code.in=" + DEFAULT_CODE + "," + UPDATED_CODE, "code.in=" + UPDATED_CODE);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByCodeIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where code is not null
-        defaultStationFiltering("code.specified=true", "code.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByCodeContainsSomething() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where code contains
-        defaultStationFiltering("code.contains=" + DEFAULT_CODE, "code.contains=" + UPDATED_CODE);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByCodeNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where code does not contain
-        defaultStationFiltering("code.doesNotContain=" + UPDATED_CODE, "code.doesNotContain=" + DEFAULT_CODE);
     }
 
     @Test
@@ -439,218 +407,310 @@ class StationResourceIT {
 
     @Test
     @Transactional
-    void getAllStationsByNameEnIsEqualToSomething() throws Exception {
+    void getAllStationsByPhoneNumberIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedStation = stationRepository.saveAndFlush(station);
 
-        // Get all the stationList where nameEn equals to
-        defaultStationFiltering("nameEn.equals=" + DEFAULT_NAME_EN, "nameEn.equals=" + UPDATED_NAME_EN);
+        // Get all the stationList where phoneNumber equals to
+        defaultStationFiltering("phoneNumber.equals=" + DEFAULT_PHONE_NUMBER, "phoneNumber.equals=" + UPDATED_PHONE_NUMBER);
     }
 
     @Test
     @Transactional
-    void getAllStationsByNameEnIsInShouldWork() throws Exception {
+    void getAllStationsByPhoneNumberIsInShouldWork() throws Exception {
         // Initialize the database
         insertedStation = stationRepository.saveAndFlush(station);
 
-        // Get all the stationList where nameEn in
-        defaultStationFiltering("nameEn.in=" + DEFAULT_NAME_EN + "," + UPDATED_NAME_EN, "nameEn.in=" + UPDATED_NAME_EN);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByNameEnIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where nameEn is not null
-        defaultStationFiltering("nameEn.specified=true", "nameEn.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByNameEnContainsSomething() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where nameEn contains
-        defaultStationFiltering("nameEn.contains=" + DEFAULT_NAME_EN, "nameEn.contains=" + UPDATED_NAME_EN);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByNameEnNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where nameEn does not contain
-        defaultStationFiltering("nameEn.doesNotContain=" + UPDATED_NAME_EN, "nameEn.doesNotContain=" + DEFAULT_NAME_EN);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByAddressIdIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where addressId equals to
-        defaultStationFiltering("addressId.equals=" + DEFAULT_ADDRESS_ID, "addressId.equals=" + UPDATED_ADDRESS_ID);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByAddressIdIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where addressId in
-        defaultStationFiltering("addressId.in=" + DEFAULT_ADDRESS_ID + "," + UPDATED_ADDRESS_ID, "addressId.in=" + UPDATED_ADDRESS_ID);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByAddressIdIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where addressId is not null
-        defaultStationFiltering("addressId.specified=true", "addressId.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByFacilitiesIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where facilities equals to
-        defaultStationFiltering("facilities.equals=" + DEFAULT_FACILITIES, "facilities.equals=" + UPDATED_FACILITIES);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByFacilitiesIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where facilities in
-        defaultStationFiltering("facilities.in=" + DEFAULT_FACILITIES + "," + UPDATED_FACILITIES, "facilities.in=" + UPDATED_FACILITIES);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByFacilitiesIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where facilities is not null
-        defaultStationFiltering("facilities.specified=true", "facilities.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByFacilitiesContainsSomething() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where facilities contains
-        defaultStationFiltering("facilities.contains=" + DEFAULT_FACILITIES, "facilities.contains=" + UPDATED_FACILITIES);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByFacilitiesNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where facilities does not contain
-        defaultStationFiltering("facilities.doesNotContain=" + UPDATED_FACILITIES, "facilities.doesNotContain=" + DEFAULT_FACILITIES);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByOperatingHoursIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where operatingHours equals to
-        defaultStationFiltering("operatingHours.equals=" + DEFAULT_OPERATING_HOURS, "operatingHours.equals=" + UPDATED_OPERATING_HOURS);
-    }
-
-    @Test
-    @Transactional
-    void getAllStationsByOperatingHoursIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedStation = stationRepository.saveAndFlush(station);
-
-        // Get all the stationList where operatingHours in
+        // Get all the stationList where phoneNumber in
         defaultStationFiltering(
-            "operatingHours.in=" + DEFAULT_OPERATING_HOURS + "," + UPDATED_OPERATING_HOURS,
-            "operatingHours.in=" + UPDATED_OPERATING_HOURS
+            "phoneNumber.in=" + DEFAULT_PHONE_NUMBER + "," + UPDATED_PHONE_NUMBER,
+            "phoneNumber.in=" + UPDATED_PHONE_NUMBER
         );
     }
 
     @Test
     @Transactional
-    void getAllStationsByOperatingHoursIsNullOrNotNull() throws Exception {
+    void getAllStationsByPhoneNumberIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedStation = stationRepository.saveAndFlush(station);
 
-        // Get all the stationList where operatingHours is not null
-        defaultStationFiltering("operatingHours.specified=true", "operatingHours.specified=false");
+        // Get all the stationList where phoneNumber is not null
+        defaultStationFiltering("phoneNumber.specified=true", "phoneNumber.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllStationsByOperatingHoursContainsSomething() throws Exception {
+    void getAllStationsByPhoneNumberContainsSomething() throws Exception {
         // Initialize the database
         insertedStation = stationRepository.saveAndFlush(station);
 
-        // Get all the stationList where operatingHours contains
-        defaultStationFiltering("operatingHours.contains=" + DEFAULT_OPERATING_HOURS, "operatingHours.contains=" + UPDATED_OPERATING_HOURS);
+        // Get all the stationList where phoneNumber contains
+        defaultStationFiltering("phoneNumber.contains=" + DEFAULT_PHONE_NUMBER, "phoneNumber.contains=" + UPDATED_PHONE_NUMBER);
     }
 
     @Test
     @Transactional
-    void getAllStationsByOperatingHoursNotContainsSomething() throws Exception {
+    void getAllStationsByPhoneNumberNotContainsSomething() throws Exception {
         // Initialize the database
         insertedStation = stationRepository.saveAndFlush(station);
 
-        // Get all the stationList where operatingHours does not contain
+        // Get all the stationList where phoneNumber does not contain
+        defaultStationFiltering("phoneNumber.doesNotContain=" + UPDATED_PHONE_NUMBER, "phoneNumber.doesNotContain=" + DEFAULT_PHONE_NUMBER);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByDescriptionIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where description equals to
+        defaultStationFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByDescriptionIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where description in
         defaultStationFiltering(
-            "operatingHours.doesNotContain=" + UPDATED_OPERATING_HOURS,
-            "operatingHours.doesNotContain=" + DEFAULT_OPERATING_HOURS
+            "description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION,
+            "description.in=" + UPDATED_DESCRIPTION
         );
     }
 
     @Test
     @Transactional
-    void getAllStationsByIsActiveIsEqualToSomething() throws Exception {
+    void getAllStationsByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedStation = stationRepository.saveAndFlush(station);
 
-        // Get all the stationList where isActive equals to
-        defaultStationFiltering("isActive.equals=" + DEFAULT_IS_ACTIVE, "isActive.equals=" + UPDATED_IS_ACTIVE);
+        // Get all the stationList where description is not null
+        defaultStationFiltering("description.specified=true", "description.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllStationsByIsActiveIsInShouldWork() throws Exception {
+    void getAllStationsByDescriptionContainsSomething() throws Exception {
         // Initialize the database
         insertedStation = stationRepository.saveAndFlush(station);
 
-        // Get all the stationList where isActive in
-        defaultStationFiltering("isActive.in=" + DEFAULT_IS_ACTIVE + "," + UPDATED_IS_ACTIVE, "isActive.in=" + UPDATED_IS_ACTIVE);
+        // Get all the stationList where description contains
+        defaultStationFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
     }
 
     @Test
     @Transactional
-    void getAllStationsByIsActiveIsNullOrNotNull() throws Exception {
+    void getAllStationsByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
         insertedStation = stationRepository.saveAndFlush(station);
 
-        // Get all the stationList where isActive is not null
-        defaultStationFiltering("isActive.specified=true", "isActive.specified=false");
+        // Get all the stationList where description does not contain
+        defaultStationFiltering("description.doesNotContain=" + UPDATED_DESCRIPTION, "description.doesNotContain=" + DEFAULT_DESCRIPTION);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByActiveIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where active equals to
+        defaultStationFiltering("active.equals=" + DEFAULT_ACTIVE, "active.equals=" + UPDATED_ACTIVE);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByActiveIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where active in
+        defaultStationFiltering("active.in=" + DEFAULT_ACTIVE + "," + UPDATED_ACTIVE, "active.in=" + UPDATED_ACTIVE);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByActiveIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where active is not null
+        defaultStationFiltering("active.specified=true", "active.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByCreatedAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where createdAt equals to
+        defaultStationFiltering("createdAt.equals=" + DEFAULT_CREATED_AT, "createdAt.equals=" + UPDATED_CREATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByCreatedAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where createdAt in
+        defaultStationFiltering("createdAt.in=" + DEFAULT_CREATED_AT + "," + UPDATED_CREATED_AT, "createdAt.in=" + UPDATED_CREATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByCreatedAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where createdAt is not null
+        defaultStationFiltering("createdAt.specified=true", "createdAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByUpdatedAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where updatedAt equals to
+        defaultStationFiltering("updatedAt.equals=" + DEFAULT_UPDATED_AT, "updatedAt.equals=" + UPDATED_UPDATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByUpdatedAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where updatedAt in
+        defaultStationFiltering("updatedAt.in=" + DEFAULT_UPDATED_AT + "," + UPDATED_UPDATED_AT, "updatedAt.in=" + UPDATED_UPDATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByUpdatedAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where updatedAt is not null
+        defaultStationFiltering("updatedAt.specified=true", "updatedAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByIsDeletedIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where isDeleted equals to
+        defaultStationFiltering("isDeleted.equals=" + DEFAULT_IS_DELETED, "isDeleted.equals=" + UPDATED_IS_DELETED);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByIsDeletedIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where isDeleted in
+        defaultStationFiltering("isDeleted.in=" + DEFAULT_IS_DELETED + "," + UPDATED_IS_DELETED, "isDeleted.in=" + UPDATED_IS_DELETED);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByIsDeletedIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where isDeleted is not null
+        defaultStationFiltering("isDeleted.specified=true", "isDeleted.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByDeletedAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where deletedAt equals to
+        defaultStationFiltering("deletedAt.equals=" + DEFAULT_DELETED_AT, "deletedAt.equals=" + UPDATED_DELETED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByDeletedAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where deletedAt in
+        defaultStationFiltering("deletedAt.in=" + DEFAULT_DELETED_AT + "," + UPDATED_DELETED_AT, "deletedAt.in=" + UPDATED_DELETED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByDeletedAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where deletedAt is not null
+        defaultStationFiltering("deletedAt.specified=true", "deletedAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByDeletedByIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where deletedBy equals to
+        defaultStationFiltering("deletedBy.equals=" + DEFAULT_DELETED_BY, "deletedBy.equals=" + UPDATED_DELETED_BY);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByDeletedByIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where deletedBy in
+        defaultStationFiltering("deletedBy.in=" + DEFAULT_DELETED_BY + "," + UPDATED_DELETED_BY, "deletedBy.in=" + UPDATED_DELETED_BY);
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByDeletedByIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedStation = stationRepository.saveAndFlush(station);
+
+        // Get all the stationList where deletedBy is not null
+        defaultStationFiltering("deletedBy.specified=true", "deletedBy.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllStationsByAddressIsEqualToSomething() throws Exception {
+        Address address;
+        if (TestUtil.findAll(em, Address.class).isEmpty()) {
+            stationRepository.saveAndFlush(station);
+            address = AddressResourceIT.createEntity(em);
+        } else {
+            address = TestUtil.findAll(em, Address.class).get(0);
+        }
+        em.persist(address);
+        em.flush();
+        station.setAddress(address);
+        stationRepository.saveAndFlush(station);
+        Long addressId = address.getId();
+        // Get all the stationList where address equals to addressId
+        defaultStationShouldBeFound("addressId.equals=" + addressId);
+
+        // Get all the stationList where address equals to (addressId + 1)
+        defaultStationShouldNotBeFound("addressId.equals=" + (addressId + 1));
     }
 
     private void defaultStationFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
@@ -667,13 +727,15 @@ class StationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(station.getId().intValue())))
-            .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].nameEn").value(hasItem(DEFAULT_NAME_EN)))
-            .andExpect(jsonPath("$.[*].addressId").value(hasItem(DEFAULT_ADDRESS_ID.toString())))
-            .andExpect(jsonPath("$.[*].facilities").value(hasItem(DEFAULT_FACILITIES)))
-            .andExpect(jsonPath("$.[*].operatingHours").value(hasItem(DEFAULT_OPERATING_HOURS)))
-            .andExpect(jsonPath("$.[*].isActive").value(hasItem(DEFAULT_IS_ACTIVE)));
+            .andExpect(jsonPath("$.[*].phoneNumber").value(hasItem(DEFAULT_PHONE_NUMBER)))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].active").value(hasItem(DEFAULT_ACTIVE)))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
 
         // Check, that the count call also returns 1
         restStationMockMvc
@@ -724,13 +786,15 @@ class StationResourceIT {
         // Disconnect from session so that the updates on updatedStation are not directly saved in db
         em.detach(updatedStation);
         updatedStation
-            .code(UPDATED_CODE)
             .name(UPDATED_NAME)
-            .nameEn(UPDATED_NAME_EN)
-            .addressId(UPDATED_ADDRESS_ID)
-            .facilities(UPDATED_FACILITIES)
-            .operatingHours(UPDATED_OPERATING_HOURS)
-            .isActive(UPDATED_IS_ACTIVE);
+            .phoneNumber(UPDATED_PHONE_NUMBER)
+            .description(UPDATED_DESCRIPTION)
+            .active(UPDATED_ACTIVE)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         StationDTO stationDTO = stationMapper.toDto(updatedStation);
 
         restStationMockMvc
@@ -843,7 +907,12 @@ class StationResourceIT {
         Station partialUpdatedStation = new Station();
         partialUpdatedStation.setId(station.getId());
 
-        partialUpdatedStation.code(UPDATED_CODE).addressId(UPDATED_ADDRESS_ID).facilities(UPDATED_FACILITIES).isActive(UPDATED_IS_ACTIVE);
+        partialUpdatedStation
+            .name(UPDATED_NAME)
+            .active(UPDATED_ACTIVE)
+            .createdAt(UPDATED_CREATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT);
 
         restStationMockMvc
             .perform(
@@ -873,13 +942,15 @@ class StationResourceIT {
         partialUpdatedStation.setId(station.getId());
 
         partialUpdatedStation
-            .code(UPDATED_CODE)
             .name(UPDATED_NAME)
-            .nameEn(UPDATED_NAME_EN)
-            .addressId(UPDATED_ADDRESS_ID)
-            .facilities(UPDATED_FACILITIES)
-            .operatingHours(UPDATED_OPERATING_HOURS)
-            .isActive(UPDATED_IS_ACTIVE);
+            .phoneNumber(UPDATED_PHONE_NUMBER)
+            .description(UPDATED_DESCRIPTION)
+            .active(UPDATED_ACTIVE)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
 
         restStationMockMvc
             .perform(
@@ -1007,13 +1078,15 @@ class StationResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(station.getId().intValue())))
-            .andExpect(jsonPath("$.[*].code").value(hasItem(DEFAULT_CODE)))
             .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].nameEn").value(hasItem(DEFAULT_NAME_EN)))
-            .andExpect(jsonPath("$.[*].addressId").value(hasItem(DEFAULT_ADDRESS_ID.toString())))
-            .andExpect(jsonPath("$.[*].facilities").value(hasItem(DEFAULT_FACILITIES)))
-            .andExpect(jsonPath("$.[*].operatingHours").value(hasItem(DEFAULT_OPERATING_HOURS)))
-            .andExpect(jsonPath("$.[*].isActive").value(hasItem(DEFAULT_IS_ACTIVE)));
+            .andExpect(jsonPath("$.[*].phoneNumber").value(hasItem(DEFAULT_PHONE_NUMBER)))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].active").value(hasItem(DEFAULT_ACTIVE)))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
     }
 
     protected long getRepositoryCount() {

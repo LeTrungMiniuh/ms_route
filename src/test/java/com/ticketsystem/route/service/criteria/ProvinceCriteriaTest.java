@@ -76,10 +76,19 @@ class ProvinceCriteriaTest {
 
     private static void setAllFilters(ProvinceCriteria provinceCriteria) {
         provinceCriteria.id();
-        provinceCriteria.code();
+        provinceCriteria.provinceCode();
         provinceCriteria.name();
         provinceCriteria.nameEn();
-        provinceCriteria.region();
+        provinceCriteria.fullName();
+        provinceCriteria.fullNameEn();
+        provinceCriteria.codeName();
+        provinceCriteria.administrativeUnitId();
+        provinceCriteria.administrativeRegionId();
+        provinceCriteria.createdAt();
+        provinceCriteria.updatedAt();
+        provinceCriteria.isDeleted();
+        provinceCriteria.deletedAt();
+        provinceCriteria.deletedBy();
         provinceCriteria.districtsId();
         provinceCriteria.distinct();
     }
@@ -88,10 +97,19 @@ class ProvinceCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
-                condition.apply(criteria.getCode()) &&
+                condition.apply(criteria.getProvinceCode()) &&
                 condition.apply(criteria.getName()) &&
                 condition.apply(criteria.getNameEn()) &&
-                condition.apply(criteria.getRegion()) &&
+                condition.apply(criteria.getFullName()) &&
+                condition.apply(criteria.getFullNameEn()) &&
+                condition.apply(criteria.getCodeName()) &&
+                condition.apply(criteria.getAdministrativeUnitId()) &&
+                condition.apply(criteria.getAdministrativeRegionId()) &&
+                condition.apply(criteria.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy()) &&
                 condition.apply(criteria.getDistrictsId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
@@ -102,10 +120,19 @@ class ProvinceCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
-                condition.apply(criteria.getCode(), copy.getCode()) &&
+                condition.apply(criteria.getProvinceCode(), copy.getProvinceCode()) &&
                 condition.apply(criteria.getName(), copy.getName()) &&
                 condition.apply(criteria.getNameEn(), copy.getNameEn()) &&
-                condition.apply(criteria.getRegion(), copy.getRegion()) &&
+                condition.apply(criteria.getFullName(), copy.getFullName()) &&
+                condition.apply(criteria.getFullNameEn(), copy.getFullNameEn()) &&
+                condition.apply(criteria.getCodeName(), copy.getCodeName()) &&
+                condition.apply(criteria.getAdministrativeUnitId(), copy.getAdministrativeUnitId()) &&
+                condition.apply(criteria.getAdministrativeRegionId(), copy.getAdministrativeRegionId()) &&
+                condition.apply(criteria.getCreatedAt(), copy.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt(), copy.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted(), copy.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt(), copy.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy(), copy.getDeletedBy()) &&
                 condition.apply(criteria.getDistrictsId(), copy.getDistrictsId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"

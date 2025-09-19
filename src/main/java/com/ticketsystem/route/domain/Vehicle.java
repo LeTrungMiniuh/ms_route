@@ -1,14 +1,16 @@
 package com.ticketsystem.route.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.ticketsystem.route.domain.enumeration.VehicleType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * A Vehicle.
@@ -27,68 +29,43 @@ public class Vehicle implements Serializable {
     private Long id;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private VehicleType type;
+
+    @Column(name = "type_factor", precision = 21, scale = 2)
+    private BigDecimal typeFactor;
+
+    @NotNull
     @Column(name = "plate_number", nullable = false, unique = true)
     private String plateNumber;
 
-    @Column(name = "model")
-    private String model;
+    @Column(name = "brand")
+    private String brand;
+
+    @Column(name = "description")
+    private String description;
 
     @NotNull
-    @Column(name = "capacity", nullable = false)
-    private Integer capacity;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
 
-    @Column(name = "seat_layout")
-    private String seatLayout;
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
-    @Column(name = "amenities")
-    private String amenities;
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
-    @Column(name = "image_cover_url")
-    private String imageCoverUrl;
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
-    @Column(name = "average_rating")
-    private Double averageRating;
-
-    @Column(name = "total_reviews")
-    private Integer totalReviews;
-
-    @NotNull
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
-
-    @Column(name = "year_manufactured")
-    private Integer yearManufactured;
-
-    @Column(name = "last_maintenance_date")
-    private LocalDate lastMaintenanceDate;
-
-    @JsonIgnoreProperties(value = { "vehicle" }, allowSetters = true)
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(unique = true)
-    private ReviewSummary summary;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "vehicle")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "vehicle" }, allowSetters = true)
-    private Set<VehicleImage> images = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "vehicle")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "vehicle" }, allowSetters = true)
-    private Set<VehicleReview> reviews = new HashSet<>();
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "vehicle")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "vehicle" }, allowSetters = true)
-    private Set<VehicleAmenity> amenityItems = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station homeStation;
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "deleted_by", length = 36)
+    private UUID deletedBy;
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "vehicles", "routes" }, allowSetters = true)
-    private Operator operator;
+    private SeatMap seatMap;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -105,6 +82,32 @@ public class Vehicle implements Serializable {
         this.id = id;
     }
 
+    public VehicleType getType() {
+        return this.type;
+    }
+
+    public Vehicle type(VehicleType type) {
+        this.setType(type);
+        return this;
+    }
+
+    public void setType(VehicleType type) {
+        this.type = type;
+    }
+
+    public BigDecimal getTypeFactor() {
+        return this.typeFactor;
+    }
+
+    public Vehicle typeFactor(BigDecimal typeFactor) {
+        this.setTypeFactor(typeFactor);
+        return this;
+    }
+
+    public void setTypeFactor(BigDecimal typeFactor) {
+        this.typeFactor = typeFactor;
+    }
+
     public String getPlateNumber() {
         return this.plateNumber;
     }
@@ -118,265 +121,107 @@ public class Vehicle implements Serializable {
         this.plateNumber = plateNumber;
     }
 
-    public String getModel() {
-        return this.model;
+    public String getBrand() {
+        return this.brand;
     }
 
-    public Vehicle model(String model) {
-        this.setModel(model);
+    public Vehicle brand(String brand) {
+        this.setBrand(brand);
         return this;
     }
 
-    public void setModel(String model) {
-        this.model = model;
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 
-    public Integer getCapacity() {
-        return this.capacity;
+    public String getDescription() {
+        return this.description;
     }
 
-    public Vehicle capacity(Integer capacity) {
-        this.setCapacity(capacity);
+    public Vehicle description(String description) {
+        this.setDescription(description);
         return this;
     }
 
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getSeatLayout() {
-        return this.seatLayout;
+    public Instant getCreatedAt() {
+        return this.createdAt;
     }
 
-    public Vehicle seatLayout(String seatLayout) {
-        this.setSeatLayout(seatLayout);
+    public Vehicle createdAt(Instant createdAt) {
+        this.setCreatedAt(createdAt);
         return this;
     }
 
-    public void setSeatLayout(String seatLayout) {
-        this.seatLayout = seatLayout;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public String getAmenities() {
-        return this.amenities;
+    public Instant getUpdatedAt() {
+        return this.updatedAt;
     }
 
-    public Vehicle amenities(String amenities) {
-        this.setAmenities(amenities);
+    public Vehicle updatedAt(Instant updatedAt) {
+        this.setUpdatedAt(updatedAt);
         return this;
     }
 
-    public void setAmenities(String amenities) {
-        this.amenities = amenities;
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public String getImageCoverUrl() {
-        return this.imageCoverUrl;
+    public Boolean getIsDeleted() {
+        return this.isDeleted;
     }
 
-    public Vehicle imageCoverUrl(String imageCoverUrl) {
-        this.setImageCoverUrl(imageCoverUrl);
+    public Vehicle isDeleted(Boolean isDeleted) {
+        this.setIsDeleted(isDeleted);
         return this;
     }
 
-    public void setImageCoverUrl(String imageCoverUrl) {
-        this.imageCoverUrl = imageCoverUrl;
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
-    public Double getAverageRating() {
-        return this.averageRating;
+    public Instant getDeletedAt() {
+        return this.deletedAt;
     }
 
-    public Vehicle averageRating(Double averageRating) {
-        this.setAverageRating(averageRating);
+    public Vehicle deletedAt(Instant deletedAt) {
+        this.setDeletedAt(deletedAt);
         return this;
     }
 
-    public void setAverageRating(Double averageRating) {
-        this.averageRating = averageRating;
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
-    public Integer getTotalReviews() {
-        return this.totalReviews;
+    public UUID getDeletedBy() {
+        return this.deletedBy;
     }
 
-    public Vehicle totalReviews(Integer totalReviews) {
-        this.setTotalReviews(totalReviews);
+    public Vehicle deletedBy(UUID deletedBy) {
+        this.setDeletedBy(deletedBy);
         return this;
     }
 
-    public void setTotalReviews(Integer totalReviews) {
-        this.totalReviews = totalReviews;
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
-    public Boolean getIsActive() {
-        return this.isActive;
+    public SeatMap getSeatMap() {
+        return this.seatMap;
     }
 
-    public Vehicle isActive(Boolean isActive) {
-        this.setIsActive(isActive);
-        return this;
+    public void setSeatMap(SeatMap seatMap) {
+        this.seatMap = seatMap;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public Integer getYearManufactured() {
-        return this.yearManufactured;
-    }
-
-    public Vehicle yearManufactured(Integer yearManufactured) {
-        this.setYearManufactured(yearManufactured);
-        return this;
-    }
-
-    public void setYearManufactured(Integer yearManufactured) {
-        this.yearManufactured = yearManufactured;
-    }
-
-    public LocalDate getLastMaintenanceDate() {
-        return this.lastMaintenanceDate;
-    }
-
-    public Vehicle lastMaintenanceDate(LocalDate lastMaintenanceDate) {
-        this.setLastMaintenanceDate(lastMaintenanceDate);
-        return this;
-    }
-
-    public void setLastMaintenanceDate(LocalDate lastMaintenanceDate) {
-        this.lastMaintenanceDate = lastMaintenanceDate;
-    }
-
-    public ReviewSummary getSummary() {
-        return this.summary;
-    }
-
-    public void setSummary(ReviewSummary reviewSummary) {
-        this.summary = reviewSummary;
-    }
-
-    public Vehicle summary(ReviewSummary reviewSummary) {
-        this.setSummary(reviewSummary);
-        return this;
-    }
-
-    public Set<VehicleImage> getImages() {
-        return this.images;
-    }
-
-    public void setImages(Set<VehicleImage> vehicleImages) {
-        if (this.images != null) {
-            this.images.forEach(i -> i.setVehicle(null));
-        }
-        if (vehicleImages != null) {
-            vehicleImages.forEach(i -> i.setVehicle(this));
-        }
-        this.images = vehicleImages;
-    }
-
-    public Vehicle images(Set<VehicleImage> vehicleImages) {
-        this.setImages(vehicleImages);
-        return this;
-    }
-
-    public Vehicle addImages(VehicleImage vehicleImage) {
-        this.images.add(vehicleImage);
-        vehicleImage.setVehicle(this);
-        return this;
-    }
-
-    public Vehicle removeImages(VehicleImage vehicleImage) {
-        this.images.remove(vehicleImage);
-        vehicleImage.setVehicle(null);
-        return this;
-    }
-
-    public Set<VehicleReview> getReviews() {
-        return this.reviews;
-    }
-
-    public void setReviews(Set<VehicleReview> vehicleReviews) {
-        if (this.reviews != null) {
-            this.reviews.forEach(i -> i.setVehicle(null));
-        }
-        if (vehicleReviews != null) {
-            vehicleReviews.forEach(i -> i.setVehicle(this));
-        }
-        this.reviews = vehicleReviews;
-    }
-
-    public Vehicle reviews(Set<VehicleReview> vehicleReviews) {
-        this.setReviews(vehicleReviews);
-        return this;
-    }
-
-    public Vehicle addReviews(VehicleReview vehicleReview) {
-        this.reviews.add(vehicleReview);
-        vehicleReview.setVehicle(this);
-        return this;
-    }
-
-    public Vehicle removeReviews(VehicleReview vehicleReview) {
-        this.reviews.remove(vehicleReview);
-        vehicleReview.setVehicle(null);
-        return this;
-    }
-
-    public Set<VehicleAmenity> getAmenityItems() {
-        return this.amenityItems;
-    }
-
-    public void setAmenityItems(Set<VehicleAmenity> vehicleAmenities) {
-        if (this.amenityItems != null) {
-            this.amenityItems.forEach(i -> i.setVehicle(null));
-        }
-        if (vehicleAmenities != null) {
-            vehicleAmenities.forEach(i -> i.setVehicle(this));
-        }
-        this.amenityItems = vehicleAmenities;
-    }
-
-    public Vehicle amenityItems(Set<VehicleAmenity> vehicleAmenities) {
-        this.setAmenityItems(vehicleAmenities);
-        return this;
-    }
-
-    public Vehicle addAmenityItems(VehicleAmenity vehicleAmenity) {
-        this.amenityItems.add(vehicleAmenity);
-        vehicleAmenity.setVehicle(this);
-        return this;
-    }
-
-    public Vehicle removeAmenityItems(VehicleAmenity vehicleAmenity) {
-        this.amenityItems.remove(vehicleAmenity);
-        vehicleAmenity.setVehicle(null);
-        return this;
-    }
-
-    public Station getHomeStation() {
-        return this.homeStation;
-    }
-
-    public void setHomeStation(Station station) {
-        this.homeStation = station;
-    }
-
-    public Vehicle homeStation(Station station) {
-        this.setHomeStation(station);
-        return this;
-    }
-
-    public Operator getOperator() {
-        return this.operator;
-    }
-
-    public void setOperator(Operator operator) {
-        this.operator = operator;
-    }
-
-    public Vehicle operator(Operator operator) {
-        this.setOperator(operator);
+    public Vehicle seatMap(SeatMap seatMap) {
+        this.setSeatMap(seatMap);
         return this;
     }
 
@@ -404,17 +249,16 @@ public class Vehicle implements Serializable {
     public String toString() {
         return "Vehicle{" +
             "id=" + getId() +
+            ", type='" + getType() + "'" +
+            ", typeFactor=" + getTypeFactor() +
             ", plateNumber='" + getPlateNumber() + "'" +
-            ", model='" + getModel() + "'" +
-            ", capacity=" + getCapacity() +
-            ", seatLayout='" + getSeatLayout() + "'" +
-            ", amenities='" + getAmenities() + "'" +
-            ", imageCoverUrl='" + getImageCoverUrl() + "'" +
-            ", averageRating=" + getAverageRating() +
-            ", totalReviews=" + getTotalReviews() +
-            ", isActive='" + getIsActive() + "'" +
-            ", yearManufactured=" + getYearManufactured() +
-            ", lastMaintenanceDate='" + getLastMaintenanceDate() + "'" +
+            ", brand='" + getBrand() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             "}";
     }
 }

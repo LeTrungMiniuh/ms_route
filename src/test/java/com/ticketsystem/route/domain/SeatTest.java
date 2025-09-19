@@ -1,7 +1,7 @@
 package com.ticketsystem.route.domain;
 
+import static com.ticketsystem.route.domain.FloorTestSamples.*;
 import static com.ticketsystem.route.domain.SeatTestSamples.*;
-import static com.ticketsystem.route.domain.TripTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ticketsystem.route.web.rest.TestUtil;
@@ -24,14 +24,14 @@ class SeatTest {
     }
 
     @Test
-    void tripTest() {
+    void floorTest() {
         Seat seat = getSeatRandomSampleGenerator();
-        Trip tripBack = getTripRandomSampleGenerator();
+        Floor floorBack = getFloorRandomSampleGenerator();
 
-        seat.setTrip(tripBack);
-        assertThat(seat.getTrip()).isEqualTo(tripBack);
+        seat.setFloor(floorBack);
+        assertThat(seat.getFloor()).isEqualTo(floorBack);
 
-        seat.trip(null);
-        assertThat(seat.getTrip()).isNull();
+        seat.floor(null);
+        assertThat(seat.getFloor()).isNull();
     }
 }

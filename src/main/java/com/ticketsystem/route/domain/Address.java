@@ -5,8 +5,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * A Address.
@@ -25,15 +29,8 @@ public class Address implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "ward_code", nullable = false)
-    private String wardCode;
-
-    @NotNull
     @Column(name = "street_address", nullable = false)
     private String streetAddress;
-
-    @Column(name = "postal_code")
-    private String postalCode;
 
     @Column(name = "latitude", precision = 21, scale = 2)
     private BigDecimal latitude;
@@ -41,8 +38,22 @@ public class Address implements Serializable {
     @Column(name = "longitude", precision = 21, scale = 2)
     private BigDecimal longitude;
 
-    @Column(name = "landmark")
-    private String landmark;
+    @NotNull
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "deleted_by", length = 36)
+    private UUID deletedBy;
 
     @ManyToOne(optional = false)
     @NotNull
@@ -64,19 +75,6 @@ public class Address implements Serializable {
         this.id = id;
     }
 
-    public String getWardCode() {
-        return this.wardCode;
-    }
-
-    public Address wardCode(String wardCode) {
-        this.setWardCode(wardCode);
-        return this;
-    }
-
-    public void setWardCode(String wardCode) {
-        this.wardCode = wardCode;
-    }
-
     public String getStreetAddress() {
         return this.streetAddress;
     }
@@ -88,19 +86,6 @@ public class Address implements Serializable {
 
     public void setStreetAddress(String streetAddress) {
         this.streetAddress = streetAddress;
-    }
-
-    public String getPostalCode() {
-        return this.postalCode;
-    }
-
-    public Address postalCode(String postalCode) {
-        this.setPostalCode(postalCode);
-        return this;
-    }
-
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
     }
 
     public BigDecimal getLatitude() {
@@ -129,17 +114,69 @@ public class Address implements Serializable {
         this.longitude = longitude;
     }
 
-    public String getLandmark() {
-        return this.landmark;
+    public Instant getCreatedAt() {
+        return this.createdAt;
     }
 
-    public Address landmark(String landmark) {
-        this.setLandmark(landmark);
+    public Address createdAt(Instant createdAt) {
+        this.setCreatedAt(createdAt);
         return this;
     }
 
-    public void setLandmark(String landmark) {
-        this.landmark = landmark;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    public Address updatedAt(Instant updatedAt) {
+        this.setUpdatedAt(updatedAt);
+        return this;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return this.isDeleted;
+    }
+
+    public Address isDeleted(Boolean isDeleted) {
+        this.setIsDeleted(isDeleted);
+        return this;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Instant getDeletedAt() {
+        return this.deletedAt;
+    }
+
+    public Address deletedAt(Instant deletedAt) {
+        this.setDeletedAt(deletedAt);
+        return this;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return this.deletedBy;
+    }
+
+    public Address deletedBy(UUID deletedBy) {
+        this.setDeletedBy(deletedBy);
+        return this;
+    }
+
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
     public Ward getWard() {
@@ -179,12 +216,14 @@ public class Address implements Serializable {
     public String toString() {
         return "Address{" +
             "id=" + getId() +
-            ", wardCode='" + getWardCode() + "'" +
             ", streetAddress='" + getStreetAddress() + "'" +
-            ", postalCode='" + getPostalCode() + "'" +
             ", latitude=" + getLatitude() +
             ", longitude=" + getLongitude() +
-            ", landmark='" + getLandmark() + "'" +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             "}";
     }
 }

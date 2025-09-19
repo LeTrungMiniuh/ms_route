@@ -1,8 +1,8 @@
 package com.ticketsystem.route.service.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -15,26 +15,28 @@ public class StationDTO implements Serializable {
     private Long id;
 
     @NotNull
-    private String code;
-
-    @NotNull
     private String name;
 
-    private String nameEn;
+    private String phoneNumber;
+
+    private String description;
 
     @NotNull
-    @Schema(
-        description = "Cross-service ID: Address lives in ms_route; keep as UUID to avoid hard relation across apps",
-        requiredMode = Schema.RequiredMode.REQUIRED
-    )
-    private UUID addressId;
-
-    private String facilities;
-
-    private String operatingHours;
+    private Boolean active;
 
     @NotNull
-    private Boolean isActive;
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+    private Boolean isDeleted;
+
+    private Instant deletedAt;
+
+    private UUID deletedBy;
+
+    @NotNull
+    private AddressDTO address;
 
     public Long getId() {
         return id;
@@ -42,14 +44,6 @@ public class StationDTO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getName() {
@@ -60,44 +54,76 @@ public class StationDTO implements Serializable {
         this.name = name;
     }
 
-    public String getNameEn() {
-        return nameEn;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setNameEn(String nameEn) {
-        this.nameEn = nameEn;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
-    public UUID getAddressId() {
-        return addressId;
+    public String getDescription() {
+        return description;
     }
 
-    public void setAddressId(UUID addressId) {
-        this.addressId = addressId;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getFacilities() {
-        return facilities;
+    public Boolean getActive() {
+        return active;
     }
 
-    public void setFacilities(String facilities) {
-        this.facilities = facilities;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
-    public String getOperatingHours() {
-        return operatingHours;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setOperatingHours(String operatingHours) {
-        this.operatingHours = operatingHours;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Boolean getIsActive() {
-        return isActive;
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Instant getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public AddressDTO getAddress() {
+        return address;
+    }
+
+    public void setAddress(AddressDTO address) {
+        this.address = address;
     }
 
     @Override
@@ -126,13 +152,16 @@ public class StationDTO implements Serializable {
     public String toString() {
         return "StationDTO{" +
             "id=" + getId() +
-            ", code='" + getCode() + "'" +
             ", name='" + getName() + "'" +
-            ", nameEn='" + getNameEn() + "'" +
-            ", addressId='" + getAddressId() + "'" +
-            ", facilities='" + getFacilities() + "'" +
-            ", operatingHours='" + getOperatingHours() + "'" +
-            ", isActive='" + getIsActive() + "'" +
+            ", phoneNumber='" + getPhoneNumber() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", active='" + getActive() + "'" +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
+            ", address=" + getAddress() +
             "}";
     }
 }

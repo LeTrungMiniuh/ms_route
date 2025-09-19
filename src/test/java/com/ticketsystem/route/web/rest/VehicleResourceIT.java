@@ -2,6 +2,7 @@ package com.ticketsystem.route.web.rest;
 
 import static com.ticketsystem.route.domain.VehicleAsserts.*;
 import static com.ticketsystem.route.web.rest.TestUtil.createUpdateProxyForBean;
+import static com.ticketsystem.route.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -10,17 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketsystem.route.IntegrationTest;
-import com.ticketsystem.route.domain.Operator;
-import com.ticketsystem.route.domain.ReviewSummary;
-import com.ticketsystem.route.domain.Station;
+import com.ticketsystem.route.domain.SeatMap;
 import com.ticketsystem.route.domain.Vehicle;
+import com.ticketsystem.route.domain.enumeration.VehicleType;
 import com.ticketsystem.route.repository.VehicleRepository;
 import com.ticketsystem.route.service.dto.VehicleDTO;
 import com.ticketsystem.route.service.mapper.VehicleMapper;
 import jakarta.persistence.EntityManager;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,43 +42,36 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class VehicleResourceIT {
 
+    private static final VehicleType DEFAULT_TYPE = VehicleType.STANDARD_BUS;
+    private static final VehicleType UPDATED_TYPE = VehicleType.LIMOUSINE;
+
+    private static final BigDecimal DEFAULT_TYPE_FACTOR = new BigDecimal(1);
+    private static final BigDecimal UPDATED_TYPE_FACTOR = new BigDecimal(2);
+    private static final BigDecimal SMALLER_TYPE_FACTOR = new BigDecimal(1 - 1);
+
     private static final String DEFAULT_PLATE_NUMBER = "AAAAAAAAAA";
     private static final String UPDATED_PLATE_NUMBER = "BBBBBBBBBB";
 
-    private static final String DEFAULT_MODEL = "AAAAAAAAAA";
-    private static final String UPDATED_MODEL = "BBBBBBBBBB";
+    private static final String DEFAULT_BRAND = "AAAAAAAAAA";
+    private static final String UPDATED_BRAND = "BBBBBBBBBB";
 
-    private static final Integer DEFAULT_CAPACITY = 1;
-    private static final Integer UPDATED_CAPACITY = 2;
-    private static final Integer SMALLER_CAPACITY = 1 - 1;
+    private static final String DEFAULT_DESCRIPTION = "AAAAAAAAAA";
+    private static final String UPDATED_DESCRIPTION = "BBBBBBBBBB";
 
-    private static final String DEFAULT_SEAT_LAYOUT = "AAAAAAAAAA";
-    private static final String UPDATED_SEAT_LAYOUT = "BBBBBBBBBB";
+    private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final String DEFAULT_AMENITIES = "AAAAAAAAAA";
-    private static final String UPDATED_AMENITIES = "BBBBBBBBBB";
+    private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final String DEFAULT_IMAGE_COVER_URL = "AAAAAAAAAA";
-    private static final String UPDATED_IMAGE_COVER_URL = "BBBBBBBBBB";
+    private static final Boolean DEFAULT_IS_DELETED = false;
+    private static final Boolean UPDATED_IS_DELETED = true;
 
-    private static final Double DEFAULT_AVERAGE_RATING = 1D;
-    private static final Double UPDATED_AVERAGE_RATING = 2D;
-    private static final Double SMALLER_AVERAGE_RATING = 1D - 1D;
+    private static final Instant DEFAULT_DELETED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DELETED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final Integer DEFAULT_TOTAL_REVIEWS = 1;
-    private static final Integer UPDATED_TOTAL_REVIEWS = 2;
-    private static final Integer SMALLER_TOTAL_REVIEWS = 1 - 1;
-
-    private static final Boolean DEFAULT_IS_ACTIVE = false;
-    private static final Boolean UPDATED_IS_ACTIVE = true;
-
-    private static final Integer DEFAULT_YEAR_MANUFACTURED = 1;
-    private static final Integer UPDATED_YEAR_MANUFACTURED = 2;
-    private static final Integer SMALLER_YEAR_MANUFACTURED = 1 - 1;
-
-    private static final LocalDate DEFAULT_LAST_MAINTENANCE_DATE = LocalDate.ofEpochDay(0L);
-    private static final LocalDate UPDATED_LAST_MAINTENANCE_DATE = LocalDate.now(ZoneId.systemDefault());
-    private static final LocalDate SMALLER_LAST_MAINTENANCE_DATE = LocalDate.ofEpochDay(-1L);
+    private static final UUID DEFAULT_DELETED_BY = UUID.randomUUID();
+    private static final UUID UPDATED_DELETED_BY = UUID.randomUUID();
 
     private static final String ENTITY_API_URL = "/api/vehicles";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -111,27 +106,26 @@ class VehicleResourceIT {
      */
     public static Vehicle createEntity(EntityManager em) {
         Vehicle vehicle = new Vehicle()
+            .type(DEFAULT_TYPE)
+            .typeFactor(DEFAULT_TYPE_FACTOR)
             .plateNumber(DEFAULT_PLATE_NUMBER)
-            .model(DEFAULT_MODEL)
-            .capacity(DEFAULT_CAPACITY)
-            .seatLayout(DEFAULT_SEAT_LAYOUT)
-            .amenities(DEFAULT_AMENITIES)
-            .imageCoverUrl(DEFAULT_IMAGE_COVER_URL)
-            .averageRating(DEFAULT_AVERAGE_RATING)
-            .totalReviews(DEFAULT_TOTAL_REVIEWS)
-            .isActive(DEFAULT_IS_ACTIVE)
-            .yearManufactured(DEFAULT_YEAR_MANUFACTURED)
-            .lastMaintenanceDate(DEFAULT_LAST_MAINTENANCE_DATE);
+            .brand(DEFAULT_BRAND)
+            .description(DEFAULT_DESCRIPTION)
+            .createdAt(DEFAULT_CREATED_AT)
+            .updatedAt(DEFAULT_UPDATED_AT)
+            .isDeleted(DEFAULT_IS_DELETED)
+            .deletedAt(DEFAULT_DELETED_AT)
+            .deletedBy(DEFAULT_DELETED_BY);
         // Add required entity
-        Operator operator;
-        if (TestUtil.findAll(em, Operator.class).isEmpty()) {
-            operator = OperatorResourceIT.createEntity();
-            em.persist(operator);
+        SeatMap seatMap;
+        if (TestUtil.findAll(em, SeatMap.class).isEmpty()) {
+            seatMap = SeatMapResourceIT.createEntity();
+            em.persist(seatMap);
             em.flush();
         } else {
-            operator = TestUtil.findAll(em, Operator.class).get(0);
+            seatMap = TestUtil.findAll(em, SeatMap.class).get(0);
         }
-        vehicle.setOperator(operator);
+        vehicle.setSeatMap(seatMap);
         return vehicle;
     }
 
@@ -143,27 +137,26 @@ class VehicleResourceIT {
      */
     public static Vehicle createUpdatedEntity(EntityManager em) {
         Vehicle updatedVehicle = new Vehicle()
+            .type(UPDATED_TYPE)
+            .typeFactor(UPDATED_TYPE_FACTOR)
             .plateNumber(UPDATED_PLATE_NUMBER)
-            .model(UPDATED_MODEL)
-            .capacity(UPDATED_CAPACITY)
-            .seatLayout(UPDATED_SEAT_LAYOUT)
-            .amenities(UPDATED_AMENITIES)
-            .imageCoverUrl(UPDATED_IMAGE_COVER_URL)
-            .averageRating(UPDATED_AVERAGE_RATING)
-            .totalReviews(UPDATED_TOTAL_REVIEWS)
-            .isActive(UPDATED_IS_ACTIVE)
-            .yearManufactured(UPDATED_YEAR_MANUFACTURED)
-            .lastMaintenanceDate(UPDATED_LAST_MAINTENANCE_DATE);
+            .brand(UPDATED_BRAND)
+            .description(UPDATED_DESCRIPTION)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         // Add required entity
-        Operator operator;
-        if (TestUtil.findAll(em, Operator.class).isEmpty()) {
-            operator = OperatorResourceIT.createUpdatedEntity();
-            em.persist(operator);
+        SeatMap seatMap;
+        if (TestUtil.findAll(em, SeatMap.class).isEmpty()) {
+            seatMap = SeatMapResourceIT.createUpdatedEntity();
+            em.persist(seatMap);
             em.flush();
         } else {
-            operator = TestUtil.findAll(em, Operator.class).get(0);
+            seatMap = TestUtil.findAll(em, SeatMap.class).get(0);
         }
-        updatedVehicle.setOperator(operator);
+        updatedVehicle.setSeatMap(seatMap);
         return updatedVehicle;
     }
 
@@ -226,6 +219,23 @@ class VehicleResourceIT {
 
     @Test
     @Transactional
+    void checkTypeIsRequired() throws Exception {
+        long databaseSizeBeforeTest = getRepositoryCount();
+        // set the field null
+        vehicle.setType(null);
+
+        // Create the Vehicle, which fails.
+        VehicleDTO vehicleDTO = vehicleMapper.toDto(vehicle);
+
+        restVehicleMockMvc
+            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(vehicleDTO)))
+            .andExpect(status().isBadRequest());
+
+        assertSameRepositoryCount(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void checkPlateNumberIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
@@ -243,27 +253,10 @@ class VehicleResourceIT {
 
     @Test
     @Transactional
-    void checkCapacityIsRequired() throws Exception {
+    void checkCreatedAtIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        vehicle.setCapacity(null);
-
-        // Create the Vehicle, which fails.
-        VehicleDTO vehicleDTO = vehicleMapper.toDto(vehicle);
-
-        restVehicleMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(vehicleDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    void checkIsActiveIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        // set the field null
-        vehicle.setIsActive(null);
+        vehicle.setCreatedAt(null);
 
         // Create the Vehicle, which fails.
         VehicleDTO vehicleDTO = vehicleMapper.toDto(vehicle);
@@ -287,17 +280,16 @@ class VehicleResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(vehicle.getId().intValue())))
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].typeFactor").value(hasItem(sameNumber(DEFAULT_TYPE_FACTOR))))
             .andExpect(jsonPath("$.[*].plateNumber").value(hasItem(DEFAULT_PLATE_NUMBER)))
-            .andExpect(jsonPath("$.[*].model").value(hasItem(DEFAULT_MODEL)))
-            .andExpect(jsonPath("$.[*].capacity").value(hasItem(DEFAULT_CAPACITY)))
-            .andExpect(jsonPath("$.[*].seatLayout").value(hasItem(DEFAULT_SEAT_LAYOUT)))
-            .andExpect(jsonPath("$.[*].amenities").value(hasItem(DEFAULT_AMENITIES)))
-            .andExpect(jsonPath("$.[*].imageCoverUrl").value(hasItem(DEFAULT_IMAGE_COVER_URL)))
-            .andExpect(jsonPath("$.[*].averageRating").value(hasItem(DEFAULT_AVERAGE_RATING)))
-            .andExpect(jsonPath("$.[*].totalReviews").value(hasItem(DEFAULT_TOTAL_REVIEWS)))
-            .andExpect(jsonPath("$.[*].isActive").value(hasItem(DEFAULT_IS_ACTIVE)))
-            .andExpect(jsonPath("$.[*].yearManufactured").value(hasItem(DEFAULT_YEAR_MANUFACTURED)))
-            .andExpect(jsonPath("$.[*].lastMaintenanceDate").value(hasItem(DEFAULT_LAST_MAINTENANCE_DATE.toString())));
+            .andExpect(jsonPath("$.[*].brand").value(hasItem(DEFAULT_BRAND)))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
     }
 
     @Test
@@ -312,17 +304,16 @@ class VehicleResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(vehicle.getId().intValue()))
+            .andExpect(jsonPath("$.type").value(DEFAULT_TYPE.toString()))
+            .andExpect(jsonPath("$.typeFactor").value(sameNumber(DEFAULT_TYPE_FACTOR)))
             .andExpect(jsonPath("$.plateNumber").value(DEFAULT_PLATE_NUMBER))
-            .andExpect(jsonPath("$.model").value(DEFAULT_MODEL))
-            .andExpect(jsonPath("$.capacity").value(DEFAULT_CAPACITY))
-            .andExpect(jsonPath("$.seatLayout").value(DEFAULT_SEAT_LAYOUT))
-            .andExpect(jsonPath("$.amenities").value(DEFAULT_AMENITIES))
-            .andExpect(jsonPath("$.imageCoverUrl").value(DEFAULT_IMAGE_COVER_URL))
-            .andExpect(jsonPath("$.averageRating").value(DEFAULT_AVERAGE_RATING))
-            .andExpect(jsonPath("$.totalReviews").value(DEFAULT_TOTAL_REVIEWS))
-            .andExpect(jsonPath("$.isActive").value(DEFAULT_IS_ACTIVE))
-            .andExpect(jsonPath("$.yearManufactured").value(DEFAULT_YEAR_MANUFACTURED))
-            .andExpect(jsonPath("$.lastMaintenanceDate").value(DEFAULT_LAST_MAINTENANCE_DATE.toString()));
+            .andExpect(jsonPath("$.brand").value(DEFAULT_BRAND))
+            .andExpect(jsonPath("$.description").value(DEFAULT_DESCRIPTION))
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
+            .andExpect(jsonPath("$.isDeleted").value(DEFAULT_IS_DELETED))
+            .andExpect(jsonPath("$.deletedAt").value(DEFAULT_DELETED_AT.toString()))
+            .andExpect(jsonPath("$.deletedBy").value(DEFAULT_DELETED_BY.toString()));
     }
 
     @Test
@@ -338,6 +329,109 @@ class VehicleResourceIT {
         defaultVehicleFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
         defaultVehicleFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
+    }
+
+    @Test
+    @Transactional
+    void getAllVehiclesByTypeIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
+
+        // Get all the vehicleList where type equals to
+        defaultVehicleFiltering("type.equals=" + DEFAULT_TYPE, "type.equals=" + UPDATED_TYPE);
+    }
+
+    @Test
+    @Transactional
+    void getAllVehiclesByTypeIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
+
+        // Get all the vehicleList where type in
+        defaultVehicleFiltering("type.in=" + DEFAULT_TYPE + "," + UPDATED_TYPE, "type.in=" + UPDATED_TYPE);
+    }
+
+    @Test
+    @Transactional
+    void getAllVehiclesByTypeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
+
+        // Get all the vehicleList where type is not null
+        defaultVehicleFiltering("type.specified=true", "type.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllVehiclesByTypeFactorIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
+
+        // Get all the vehicleList where typeFactor equals to
+        defaultVehicleFiltering("typeFactor.equals=" + DEFAULT_TYPE_FACTOR, "typeFactor.equals=" + UPDATED_TYPE_FACTOR);
+    }
+
+    @Test
+    @Transactional
+    void getAllVehiclesByTypeFactorIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
+
+        // Get all the vehicleList where typeFactor in
+        defaultVehicleFiltering("typeFactor.in=" + DEFAULT_TYPE_FACTOR + "," + UPDATED_TYPE_FACTOR, "typeFactor.in=" + UPDATED_TYPE_FACTOR);
+    }
+
+    @Test
+    @Transactional
+    void getAllVehiclesByTypeFactorIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
+
+        // Get all the vehicleList where typeFactor is not null
+        defaultVehicleFiltering("typeFactor.specified=true", "typeFactor.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllVehiclesByTypeFactorIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
+
+        // Get all the vehicleList where typeFactor is greater than or equal to
+        defaultVehicleFiltering(
+            "typeFactor.greaterThanOrEqual=" + DEFAULT_TYPE_FACTOR,
+            "typeFactor.greaterThanOrEqual=" + UPDATED_TYPE_FACTOR
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllVehiclesByTypeFactorIsLessThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
+
+        // Get all the vehicleList where typeFactor is less than or equal to
+        defaultVehicleFiltering("typeFactor.lessThanOrEqual=" + DEFAULT_TYPE_FACTOR, "typeFactor.lessThanOrEqual=" + SMALLER_TYPE_FACTOR);
+    }
+
+    @Test
+    @Transactional
+    void getAllVehiclesByTypeFactorIsLessThanSomething() throws Exception {
+        // Initialize the database
+        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
+
+        // Get all the vehicleList where typeFactor is less than
+        defaultVehicleFiltering("typeFactor.lessThan=" + UPDATED_TYPE_FACTOR, "typeFactor.lessThan=" + DEFAULT_TYPE_FACTOR);
+    }
+
+    @Test
+    @Transactional
+    void getAllVehiclesByTypeFactorIsGreaterThanSomething() throws Exception {
+        // Initialize the database
+        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
+
+        // Get all the vehicleList where typeFactor is greater than
+        defaultVehicleFiltering("typeFactor.greaterThan=" + SMALLER_TYPE_FACTOR, "typeFactor.greaterThan=" + DEFAULT_TYPE_FACTOR);
     }
 
     @Test
@@ -395,711 +489,277 @@ class VehicleResourceIT {
 
     @Test
     @Transactional
-    void getAllVehiclesByModelIsEqualToSomething() throws Exception {
+    void getAllVehiclesByBrandIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where model equals to
-        defaultVehicleFiltering("model.equals=" + DEFAULT_MODEL, "model.equals=" + UPDATED_MODEL);
+        // Get all the vehicleList where brand equals to
+        defaultVehicleFiltering("brand.equals=" + DEFAULT_BRAND, "brand.equals=" + UPDATED_BRAND);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByModelIsInShouldWork() throws Exception {
+    void getAllVehiclesByBrandIsInShouldWork() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where model in
-        defaultVehicleFiltering("model.in=" + DEFAULT_MODEL + "," + UPDATED_MODEL, "model.in=" + UPDATED_MODEL);
+        // Get all the vehicleList where brand in
+        defaultVehicleFiltering("brand.in=" + DEFAULT_BRAND + "," + UPDATED_BRAND, "brand.in=" + UPDATED_BRAND);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByModelIsNullOrNotNull() throws Exception {
+    void getAllVehiclesByBrandIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where model is not null
-        defaultVehicleFiltering("model.specified=true", "model.specified=false");
+        // Get all the vehicleList where brand is not null
+        defaultVehicleFiltering("brand.specified=true", "brand.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByModelContainsSomething() throws Exception {
+    void getAllVehiclesByBrandContainsSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where model contains
-        defaultVehicleFiltering("model.contains=" + DEFAULT_MODEL, "model.contains=" + UPDATED_MODEL);
+        // Get all the vehicleList where brand contains
+        defaultVehicleFiltering("brand.contains=" + DEFAULT_BRAND, "brand.contains=" + UPDATED_BRAND);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByModelNotContainsSomething() throws Exception {
+    void getAllVehiclesByBrandNotContainsSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where model does not contain
-        defaultVehicleFiltering("model.doesNotContain=" + UPDATED_MODEL, "model.doesNotContain=" + DEFAULT_MODEL);
+        // Get all the vehicleList where brand does not contain
+        defaultVehicleFiltering("brand.doesNotContain=" + UPDATED_BRAND, "brand.doesNotContain=" + DEFAULT_BRAND);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByCapacityIsEqualToSomething() throws Exception {
+    void getAllVehiclesByDescriptionIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where capacity equals to
-        defaultVehicleFiltering("capacity.equals=" + DEFAULT_CAPACITY, "capacity.equals=" + UPDATED_CAPACITY);
+        // Get all the vehicleList where description equals to
+        defaultVehicleFiltering("description.equals=" + DEFAULT_DESCRIPTION, "description.equals=" + UPDATED_DESCRIPTION);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByCapacityIsInShouldWork() throws Exception {
+    void getAllVehiclesByDescriptionIsInShouldWork() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where capacity in
-        defaultVehicleFiltering("capacity.in=" + DEFAULT_CAPACITY + "," + UPDATED_CAPACITY, "capacity.in=" + UPDATED_CAPACITY);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByCapacityIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where capacity is not null
-        defaultVehicleFiltering("capacity.specified=true", "capacity.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByCapacityIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where capacity is greater than or equal to
-        defaultVehicleFiltering("capacity.greaterThanOrEqual=" + DEFAULT_CAPACITY, "capacity.greaterThanOrEqual=" + UPDATED_CAPACITY);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByCapacityIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where capacity is less than or equal to
-        defaultVehicleFiltering("capacity.lessThanOrEqual=" + DEFAULT_CAPACITY, "capacity.lessThanOrEqual=" + SMALLER_CAPACITY);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByCapacityIsLessThanSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where capacity is less than
-        defaultVehicleFiltering("capacity.lessThan=" + UPDATED_CAPACITY, "capacity.lessThan=" + DEFAULT_CAPACITY);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByCapacityIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where capacity is greater than
-        defaultVehicleFiltering("capacity.greaterThan=" + SMALLER_CAPACITY, "capacity.greaterThan=" + DEFAULT_CAPACITY);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesBySeatLayoutIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where seatLayout equals to
-        defaultVehicleFiltering("seatLayout.equals=" + DEFAULT_SEAT_LAYOUT, "seatLayout.equals=" + UPDATED_SEAT_LAYOUT);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesBySeatLayoutIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where seatLayout in
-        defaultVehicleFiltering("seatLayout.in=" + DEFAULT_SEAT_LAYOUT + "," + UPDATED_SEAT_LAYOUT, "seatLayout.in=" + UPDATED_SEAT_LAYOUT);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesBySeatLayoutIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where seatLayout is not null
-        defaultVehicleFiltering("seatLayout.specified=true", "seatLayout.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesBySeatLayoutContainsSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where seatLayout contains
-        defaultVehicleFiltering("seatLayout.contains=" + DEFAULT_SEAT_LAYOUT, "seatLayout.contains=" + UPDATED_SEAT_LAYOUT);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesBySeatLayoutNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where seatLayout does not contain
-        defaultVehicleFiltering("seatLayout.doesNotContain=" + UPDATED_SEAT_LAYOUT, "seatLayout.doesNotContain=" + DEFAULT_SEAT_LAYOUT);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByAmenitiesIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where amenities equals to
-        defaultVehicleFiltering("amenities.equals=" + DEFAULT_AMENITIES, "amenities.equals=" + UPDATED_AMENITIES);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByAmenitiesIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where amenities in
-        defaultVehicleFiltering("amenities.in=" + DEFAULT_AMENITIES + "," + UPDATED_AMENITIES, "amenities.in=" + UPDATED_AMENITIES);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByAmenitiesIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where amenities is not null
-        defaultVehicleFiltering("amenities.specified=true", "amenities.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByAmenitiesContainsSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where amenities contains
-        defaultVehicleFiltering("amenities.contains=" + DEFAULT_AMENITIES, "amenities.contains=" + UPDATED_AMENITIES);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByAmenitiesNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where amenities does not contain
-        defaultVehicleFiltering("amenities.doesNotContain=" + UPDATED_AMENITIES, "amenities.doesNotContain=" + DEFAULT_AMENITIES);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByImageCoverUrlIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where imageCoverUrl equals to
-        defaultVehicleFiltering("imageCoverUrl.equals=" + DEFAULT_IMAGE_COVER_URL, "imageCoverUrl.equals=" + UPDATED_IMAGE_COVER_URL);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByImageCoverUrlIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where imageCoverUrl in
+        // Get all the vehicleList where description in
         defaultVehicleFiltering(
-            "imageCoverUrl.in=" + DEFAULT_IMAGE_COVER_URL + "," + UPDATED_IMAGE_COVER_URL,
-            "imageCoverUrl.in=" + UPDATED_IMAGE_COVER_URL
+            "description.in=" + DEFAULT_DESCRIPTION + "," + UPDATED_DESCRIPTION,
+            "description.in=" + UPDATED_DESCRIPTION
         );
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByImageCoverUrlIsNullOrNotNull() throws Exception {
+    void getAllVehiclesByDescriptionIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where imageCoverUrl is not null
-        defaultVehicleFiltering("imageCoverUrl.specified=true", "imageCoverUrl.specified=false");
+        // Get all the vehicleList where description is not null
+        defaultVehicleFiltering("description.specified=true", "description.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByImageCoverUrlContainsSomething() throws Exception {
+    void getAllVehiclesByDescriptionContainsSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where imageCoverUrl contains
-        defaultVehicleFiltering("imageCoverUrl.contains=" + DEFAULT_IMAGE_COVER_URL, "imageCoverUrl.contains=" + UPDATED_IMAGE_COVER_URL);
+        // Get all the vehicleList where description contains
+        defaultVehicleFiltering("description.contains=" + DEFAULT_DESCRIPTION, "description.contains=" + UPDATED_DESCRIPTION);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByImageCoverUrlNotContainsSomething() throws Exception {
+    void getAllVehiclesByDescriptionNotContainsSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where imageCoverUrl does not contain
-        defaultVehicleFiltering(
-            "imageCoverUrl.doesNotContain=" + UPDATED_IMAGE_COVER_URL,
-            "imageCoverUrl.doesNotContain=" + DEFAULT_IMAGE_COVER_URL
-        );
+        // Get all the vehicleList where description does not contain
+        defaultVehicleFiltering("description.doesNotContain=" + UPDATED_DESCRIPTION, "description.doesNotContain=" + DEFAULT_DESCRIPTION);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByAverageRatingIsEqualToSomething() throws Exception {
+    void getAllVehiclesByCreatedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where averageRating equals to
-        defaultVehicleFiltering("averageRating.equals=" + DEFAULT_AVERAGE_RATING, "averageRating.equals=" + UPDATED_AVERAGE_RATING);
+        // Get all the vehicleList where createdAt equals to
+        defaultVehicleFiltering("createdAt.equals=" + DEFAULT_CREATED_AT, "createdAt.equals=" + UPDATED_CREATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByAverageRatingIsInShouldWork() throws Exception {
+    void getAllVehiclesByCreatedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where averageRating in
-        defaultVehicleFiltering(
-            "averageRating.in=" + DEFAULT_AVERAGE_RATING + "," + UPDATED_AVERAGE_RATING,
-            "averageRating.in=" + UPDATED_AVERAGE_RATING
-        );
+        // Get all the vehicleList where createdAt in
+        defaultVehicleFiltering("createdAt.in=" + DEFAULT_CREATED_AT + "," + UPDATED_CREATED_AT, "createdAt.in=" + UPDATED_CREATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByAverageRatingIsNullOrNotNull() throws Exception {
+    void getAllVehiclesByCreatedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where averageRating is not null
-        defaultVehicleFiltering("averageRating.specified=true", "averageRating.specified=false");
+        // Get all the vehicleList where createdAt is not null
+        defaultVehicleFiltering("createdAt.specified=true", "createdAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByAverageRatingIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllVehiclesByUpdatedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where averageRating is greater than or equal to
-        defaultVehicleFiltering(
-            "averageRating.greaterThanOrEqual=" + DEFAULT_AVERAGE_RATING,
-            "averageRating.greaterThanOrEqual=" + UPDATED_AVERAGE_RATING
-        );
+        // Get all the vehicleList where updatedAt equals to
+        defaultVehicleFiltering("updatedAt.equals=" + DEFAULT_UPDATED_AT, "updatedAt.equals=" + UPDATED_UPDATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByAverageRatingIsLessThanOrEqualToSomething() throws Exception {
+    void getAllVehiclesByUpdatedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where averageRating is less than or equal to
-        defaultVehicleFiltering(
-            "averageRating.lessThanOrEqual=" + DEFAULT_AVERAGE_RATING,
-            "averageRating.lessThanOrEqual=" + SMALLER_AVERAGE_RATING
-        );
+        // Get all the vehicleList where updatedAt in
+        defaultVehicleFiltering("updatedAt.in=" + DEFAULT_UPDATED_AT + "," + UPDATED_UPDATED_AT, "updatedAt.in=" + UPDATED_UPDATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByAverageRatingIsLessThanSomething() throws Exception {
+    void getAllVehiclesByUpdatedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where averageRating is less than
-        defaultVehicleFiltering("averageRating.lessThan=" + UPDATED_AVERAGE_RATING, "averageRating.lessThan=" + DEFAULT_AVERAGE_RATING);
+        // Get all the vehicleList where updatedAt is not null
+        defaultVehicleFiltering("updatedAt.specified=true", "updatedAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByAverageRatingIsGreaterThanSomething() throws Exception {
+    void getAllVehiclesByIsDeletedIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where averageRating is greater than
-        defaultVehicleFiltering(
-            "averageRating.greaterThan=" + SMALLER_AVERAGE_RATING,
-            "averageRating.greaterThan=" + DEFAULT_AVERAGE_RATING
-        );
+        // Get all the vehicleList where isDeleted equals to
+        defaultVehicleFiltering("isDeleted.equals=" + DEFAULT_IS_DELETED, "isDeleted.equals=" + UPDATED_IS_DELETED);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByTotalReviewsIsEqualToSomething() throws Exception {
+    void getAllVehiclesByIsDeletedIsInShouldWork() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where totalReviews equals to
-        defaultVehicleFiltering("totalReviews.equals=" + DEFAULT_TOTAL_REVIEWS, "totalReviews.equals=" + UPDATED_TOTAL_REVIEWS);
+        // Get all the vehicleList where isDeleted in
+        defaultVehicleFiltering("isDeleted.in=" + DEFAULT_IS_DELETED + "," + UPDATED_IS_DELETED, "isDeleted.in=" + UPDATED_IS_DELETED);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByTotalReviewsIsInShouldWork() throws Exception {
+    void getAllVehiclesByIsDeletedIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where totalReviews in
-        defaultVehicleFiltering(
-            "totalReviews.in=" + DEFAULT_TOTAL_REVIEWS + "," + UPDATED_TOTAL_REVIEWS,
-            "totalReviews.in=" + UPDATED_TOTAL_REVIEWS
-        );
+        // Get all the vehicleList where isDeleted is not null
+        defaultVehicleFiltering("isDeleted.specified=true", "isDeleted.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByTotalReviewsIsNullOrNotNull() throws Exception {
+    void getAllVehiclesByDeletedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where totalReviews is not null
-        defaultVehicleFiltering("totalReviews.specified=true", "totalReviews.specified=false");
+        // Get all the vehicleList where deletedAt equals to
+        defaultVehicleFiltering("deletedAt.equals=" + DEFAULT_DELETED_AT, "deletedAt.equals=" + UPDATED_DELETED_AT);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByTotalReviewsIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllVehiclesByDeletedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where totalReviews is greater than or equal to
-        defaultVehicleFiltering(
-            "totalReviews.greaterThanOrEqual=" + DEFAULT_TOTAL_REVIEWS,
-            "totalReviews.greaterThanOrEqual=" + UPDATED_TOTAL_REVIEWS
-        );
+        // Get all the vehicleList where deletedAt in
+        defaultVehicleFiltering("deletedAt.in=" + DEFAULT_DELETED_AT + "," + UPDATED_DELETED_AT, "deletedAt.in=" + UPDATED_DELETED_AT);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByTotalReviewsIsLessThanOrEqualToSomething() throws Exception {
+    void getAllVehiclesByDeletedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where totalReviews is less than or equal to
-        defaultVehicleFiltering(
-            "totalReviews.lessThanOrEqual=" + DEFAULT_TOTAL_REVIEWS,
-            "totalReviews.lessThanOrEqual=" + SMALLER_TOTAL_REVIEWS
-        );
+        // Get all the vehicleList where deletedAt is not null
+        defaultVehicleFiltering("deletedAt.specified=true", "deletedAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByTotalReviewsIsLessThanSomething() throws Exception {
+    void getAllVehiclesByDeletedByIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where totalReviews is less than
-        defaultVehicleFiltering("totalReviews.lessThan=" + UPDATED_TOTAL_REVIEWS, "totalReviews.lessThan=" + DEFAULT_TOTAL_REVIEWS);
+        // Get all the vehicleList where deletedBy equals to
+        defaultVehicleFiltering("deletedBy.equals=" + DEFAULT_DELETED_BY, "deletedBy.equals=" + UPDATED_DELETED_BY);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByTotalReviewsIsGreaterThanSomething() throws Exception {
+    void getAllVehiclesByDeletedByIsInShouldWork() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where totalReviews is greater than
-        defaultVehicleFiltering("totalReviews.greaterThan=" + SMALLER_TOTAL_REVIEWS, "totalReviews.greaterThan=" + DEFAULT_TOTAL_REVIEWS);
+        // Get all the vehicleList where deletedBy in
+        defaultVehicleFiltering("deletedBy.in=" + DEFAULT_DELETED_BY + "," + UPDATED_DELETED_BY, "deletedBy.in=" + UPDATED_DELETED_BY);
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByIsActiveIsEqualToSomething() throws Exception {
+    void getAllVehiclesByDeletedByIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
 
-        // Get all the vehicleList where isActive equals to
-        defaultVehicleFiltering("isActive.equals=" + DEFAULT_IS_ACTIVE, "isActive.equals=" + UPDATED_IS_ACTIVE);
+        // Get all the vehicleList where deletedBy is not null
+        defaultVehicleFiltering("deletedBy.specified=true", "deletedBy.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllVehiclesByIsActiveIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where isActive in
-        defaultVehicleFiltering("isActive.in=" + DEFAULT_IS_ACTIVE + "," + UPDATED_IS_ACTIVE, "isActive.in=" + UPDATED_IS_ACTIVE);
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByIsActiveIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where isActive is not null
-        defaultVehicleFiltering("isActive.specified=true", "isActive.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByYearManufacturedIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where yearManufactured equals to
-        defaultVehicleFiltering(
-            "yearManufactured.equals=" + DEFAULT_YEAR_MANUFACTURED,
-            "yearManufactured.equals=" + UPDATED_YEAR_MANUFACTURED
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByYearManufacturedIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where yearManufactured in
-        defaultVehicleFiltering(
-            "yearManufactured.in=" + DEFAULT_YEAR_MANUFACTURED + "," + UPDATED_YEAR_MANUFACTURED,
-            "yearManufactured.in=" + UPDATED_YEAR_MANUFACTURED
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByYearManufacturedIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where yearManufactured is not null
-        defaultVehicleFiltering("yearManufactured.specified=true", "yearManufactured.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByYearManufacturedIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where yearManufactured is greater than or equal to
-        defaultVehicleFiltering(
-            "yearManufactured.greaterThanOrEqual=" + DEFAULT_YEAR_MANUFACTURED,
-            "yearManufactured.greaterThanOrEqual=" + UPDATED_YEAR_MANUFACTURED
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByYearManufacturedIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where yearManufactured is less than or equal to
-        defaultVehicleFiltering(
-            "yearManufactured.lessThanOrEqual=" + DEFAULT_YEAR_MANUFACTURED,
-            "yearManufactured.lessThanOrEqual=" + SMALLER_YEAR_MANUFACTURED
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByYearManufacturedIsLessThanSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where yearManufactured is less than
-        defaultVehicleFiltering(
-            "yearManufactured.lessThan=" + UPDATED_YEAR_MANUFACTURED,
-            "yearManufactured.lessThan=" + DEFAULT_YEAR_MANUFACTURED
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByYearManufacturedIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where yearManufactured is greater than
-        defaultVehicleFiltering(
-            "yearManufactured.greaterThan=" + SMALLER_YEAR_MANUFACTURED,
-            "yearManufactured.greaterThan=" + DEFAULT_YEAR_MANUFACTURED
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByLastMaintenanceDateIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where lastMaintenanceDate equals to
-        defaultVehicleFiltering(
-            "lastMaintenanceDate.equals=" + DEFAULT_LAST_MAINTENANCE_DATE,
-            "lastMaintenanceDate.equals=" + UPDATED_LAST_MAINTENANCE_DATE
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByLastMaintenanceDateIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where lastMaintenanceDate in
-        defaultVehicleFiltering(
-            "lastMaintenanceDate.in=" + DEFAULT_LAST_MAINTENANCE_DATE + "," + UPDATED_LAST_MAINTENANCE_DATE,
-            "lastMaintenanceDate.in=" + UPDATED_LAST_MAINTENANCE_DATE
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByLastMaintenanceDateIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where lastMaintenanceDate is not null
-        defaultVehicleFiltering("lastMaintenanceDate.specified=true", "lastMaintenanceDate.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByLastMaintenanceDateIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where lastMaintenanceDate is greater than or equal to
-        defaultVehicleFiltering(
-            "lastMaintenanceDate.greaterThanOrEqual=" + DEFAULT_LAST_MAINTENANCE_DATE,
-            "lastMaintenanceDate.greaterThanOrEqual=" + UPDATED_LAST_MAINTENANCE_DATE
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByLastMaintenanceDateIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where lastMaintenanceDate is less than or equal to
-        defaultVehicleFiltering(
-            "lastMaintenanceDate.lessThanOrEqual=" + DEFAULT_LAST_MAINTENANCE_DATE,
-            "lastMaintenanceDate.lessThanOrEqual=" + SMALLER_LAST_MAINTENANCE_DATE
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByLastMaintenanceDateIsLessThanSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where lastMaintenanceDate is less than
-        defaultVehicleFiltering(
-            "lastMaintenanceDate.lessThan=" + UPDATED_LAST_MAINTENANCE_DATE,
-            "lastMaintenanceDate.lessThan=" + DEFAULT_LAST_MAINTENANCE_DATE
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByLastMaintenanceDateIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        insertedVehicle = vehicleRepository.saveAndFlush(vehicle);
-
-        // Get all the vehicleList where lastMaintenanceDate is greater than
-        defaultVehicleFiltering(
-            "lastMaintenanceDate.greaterThan=" + SMALLER_LAST_MAINTENANCE_DATE,
-            "lastMaintenanceDate.greaterThan=" + DEFAULT_LAST_MAINTENANCE_DATE
-        );
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesBySummaryIsEqualToSomething() throws Exception {
-        ReviewSummary summary;
-        if (TestUtil.findAll(em, ReviewSummary.class).isEmpty()) {
+    void getAllVehiclesBySeatMapIsEqualToSomething() throws Exception {
+        SeatMap seatMap;
+        if (TestUtil.findAll(em, SeatMap.class).isEmpty()) {
             vehicleRepository.saveAndFlush(vehicle);
-            summary = ReviewSummaryResourceIT.createEntity(em);
+            seatMap = SeatMapResourceIT.createEntity();
         } else {
-            summary = TestUtil.findAll(em, ReviewSummary.class).get(0);
+            seatMap = TestUtil.findAll(em, SeatMap.class).get(0);
         }
-        em.persist(summary);
+        em.persist(seatMap);
         em.flush();
-        vehicle.setSummary(summary);
+        vehicle.setSeatMap(seatMap);
         vehicleRepository.saveAndFlush(vehicle);
-        Long summaryId = summary.getId();
-        // Get all the vehicleList where summary equals to summaryId
-        defaultVehicleShouldBeFound("summaryId.equals=" + summaryId);
+        Long seatMapId = seatMap.getId();
+        // Get all the vehicleList where seatMap equals to seatMapId
+        defaultVehicleShouldBeFound("seatMapId.equals=" + seatMapId);
 
-        // Get all the vehicleList where summary equals to (summaryId + 1)
-        defaultVehicleShouldNotBeFound("summaryId.equals=" + (summaryId + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByHomeStationIsEqualToSomething() throws Exception {
-        Station homeStation;
-        if (TestUtil.findAll(em, Station.class).isEmpty()) {
-            vehicleRepository.saveAndFlush(vehicle);
-            homeStation = StationResourceIT.createEntity();
-        } else {
-            homeStation = TestUtil.findAll(em, Station.class).get(0);
-        }
-        em.persist(homeStation);
-        em.flush();
-        vehicle.setHomeStation(homeStation);
-        vehicleRepository.saveAndFlush(vehicle);
-        Long homeStationId = homeStation.getId();
-        // Get all the vehicleList where homeStation equals to homeStationId
-        defaultVehicleShouldBeFound("homeStationId.equals=" + homeStationId);
-
-        // Get all the vehicleList where homeStation equals to (homeStationId + 1)
-        defaultVehicleShouldNotBeFound("homeStationId.equals=" + (homeStationId + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllVehiclesByOperatorIsEqualToSomething() throws Exception {
-        Operator operator;
-        if (TestUtil.findAll(em, Operator.class).isEmpty()) {
-            vehicleRepository.saveAndFlush(vehicle);
-            operator = OperatorResourceIT.createEntity();
-        } else {
-            operator = TestUtil.findAll(em, Operator.class).get(0);
-        }
-        em.persist(operator);
-        em.flush();
-        vehicle.setOperator(operator);
-        vehicleRepository.saveAndFlush(vehicle);
-        Long operatorId = operator.getId();
-        // Get all the vehicleList where operator equals to operatorId
-        defaultVehicleShouldBeFound("operatorId.equals=" + operatorId);
-
-        // Get all the vehicleList where operator equals to (operatorId + 1)
-        defaultVehicleShouldNotBeFound("operatorId.equals=" + (operatorId + 1));
+        // Get all the vehicleList where seatMap equals to (seatMapId + 1)
+        defaultVehicleShouldNotBeFound("seatMapId.equals=" + (seatMapId + 1));
     }
 
     private void defaultVehicleFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
@@ -1116,17 +776,16 @@ class VehicleResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(vehicle.getId().intValue())))
+            .andExpect(jsonPath("$.[*].type").value(hasItem(DEFAULT_TYPE.toString())))
+            .andExpect(jsonPath("$.[*].typeFactor").value(hasItem(sameNumber(DEFAULT_TYPE_FACTOR))))
             .andExpect(jsonPath("$.[*].plateNumber").value(hasItem(DEFAULT_PLATE_NUMBER)))
-            .andExpect(jsonPath("$.[*].model").value(hasItem(DEFAULT_MODEL)))
-            .andExpect(jsonPath("$.[*].capacity").value(hasItem(DEFAULT_CAPACITY)))
-            .andExpect(jsonPath("$.[*].seatLayout").value(hasItem(DEFAULT_SEAT_LAYOUT)))
-            .andExpect(jsonPath("$.[*].amenities").value(hasItem(DEFAULT_AMENITIES)))
-            .andExpect(jsonPath("$.[*].imageCoverUrl").value(hasItem(DEFAULT_IMAGE_COVER_URL)))
-            .andExpect(jsonPath("$.[*].averageRating").value(hasItem(DEFAULT_AVERAGE_RATING)))
-            .andExpect(jsonPath("$.[*].totalReviews").value(hasItem(DEFAULT_TOTAL_REVIEWS)))
-            .andExpect(jsonPath("$.[*].isActive").value(hasItem(DEFAULT_IS_ACTIVE)))
-            .andExpect(jsonPath("$.[*].yearManufactured").value(hasItem(DEFAULT_YEAR_MANUFACTURED)))
-            .andExpect(jsonPath("$.[*].lastMaintenanceDate").value(hasItem(DEFAULT_LAST_MAINTENANCE_DATE.toString())));
+            .andExpect(jsonPath("$.[*].brand").value(hasItem(DEFAULT_BRAND)))
+            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
 
         // Check, that the count call also returns 1
         restVehicleMockMvc
@@ -1175,17 +834,16 @@ class VehicleResourceIT {
         // Disconnect from session so that the updates on updatedVehicle are not directly saved in db
         em.detach(updatedVehicle);
         updatedVehicle
+            .type(UPDATED_TYPE)
+            .typeFactor(UPDATED_TYPE_FACTOR)
             .plateNumber(UPDATED_PLATE_NUMBER)
-            .model(UPDATED_MODEL)
-            .capacity(UPDATED_CAPACITY)
-            .seatLayout(UPDATED_SEAT_LAYOUT)
-            .amenities(UPDATED_AMENITIES)
-            .imageCoverUrl(UPDATED_IMAGE_COVER_URL)
-            .averageRating(UPDATED_AVERAGE_RATING)
-            .totalReviews(UPDATED_TOTAL_REVIEWS)
-            .isActive(UPDATED_IS_ACTIVE)
-            .yearManufactured(UPDATED_YEAR_MANUFACTURED)
-            .lastMaintenanceDate(UPDATED_LAST_MAINTENANCE_DATE);
+            .brand(UPDATED_BRAND)
+            .description(UPDATED_DESCRIPTION)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         VehicleDTO vehicleDTO = vehicleMapper.toDto(updatedVehicle);
 
         restVehicleMockMvc
@@ -1279,11 +937,10 @@ class VehicleResourceIT {
         partialUpdatedVehicle.setId(vehicle.getId());
 
         partialUpdatedVehicle
-            .plateNumber(UPDATED_PLATE_NUMBER)
-            .amenities(UPDATED_AMENITIES)
-            .imageCoverUrl(UPDATED_IMAGE_COVER_URL)
-            .averageRating(UPDATED_AVERAGE_RATING)
-            .lastMaintenanceDate(UPDATED_LAST_MAINTENANCE_DATE);
+            .type(UPDATED_TYPE)
+            .description(UPDATED_DESCRIPTION)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT);
 
         restVehicleMockMvc
             .perform(
@@ -1313,17 +970,16 @@ class VehicleResourceIT {
         partialUpdatedVehicle.setId(vehicle.getId());
 
         partialUpdatedVehicle
+            .type(UPDATED_TYPE)
+            .typeFactor(UPDATED_TYPE_FACTOR)
             .plateNumber(UPDATED_PLATE_NUMBER)
-            .model(UPDATED_MODEL)
-            .capacity(UPDATED_CAPACITY)
-            .seatLayout(UPDATED_SEAT_LAYOUT)
-            .amenities(UPDATED_AMENITIES)
-            .imageCoverUrl(UPDATED_IMAGE_COVER_URL)
-            .averageRating(UPDATED_AVERAGE_RATING)
-            .totalReviews(UPDATED_TOTAL_REVIEWS)
-            .isActive(UPDATED_IS_ACTIVE)
-            .yearManufactured(UPDATED_YEAR_MANUFACTURED)
-            .lastMaintenanceDate(UPDATED_LAST_MAINTENANCE_DATE);
+            .brand(UPDATED_BRAND)
+            .description(UPDATED_DESCRIPTION)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
 
         restVehicleMockMvc
             .perform(

@@ -24,17 +24,21 @@ public class AddressCriteria implements Serializable, Criteria {
 
     private LongFilter id;
 
-    private StringFilter wardCode;
-
     private StringFilter streetAddress;
-
-    private StringFilter postalCode;
 
     private BigDecimalFilter latitude;
 
     private BigDecimalFilter longitude;
 
-    private StringFilter landmark;
+    private InstantFilter createdAt;
+
+    private InstantFilter updatedAt;
+
+    private BooleanFilter isDeleted;
+
+    private InstantFilter deletedAt;
+
+    private UUIDFilter deletedBy;
 
     private LongFilter wardId;
 
@@ -44,12 +48,14 @@ public class AddressCriteria implements Serializable, Criteria {
 
     public AddressCriteria(AddressCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
-        this.wardCode = other.optionalWardCode().map(StringFilter::copy).orElse(null);
         this.streetAddress = other.optionalStreetAddress().map(StringFilter::copy).orElse(null);
-        this.postalCode = other.optionalPostalCode().map(StringFilter::copy).orElse(null);
         this.latitude = other.optionalLatitude().map(BigDecimalFilter::copy).orElse(null);
         this.longitude = other.optionalLongitude().map(BigDecimalFilter::copy).orElse(null);
-        this.landmark = other.optionalLandmark().map(StringFilter::copy).orElse(null);
+        this.createdAt = other.optionalCreatedAt().map(InstantFilter::copy).orElse(null);
+        this.updatedAt = other.optionalUpdatedAt().map(InstantFilter::copy).orElse(null);
+        this.isDeleted = other.optionalIsDeleted().map(BooleanFilter::copy).orElse(null);
+        this.deletedAt = other.optionalDeletedAt().map(InstantFilter::copy).orElse(null);
+        this.deletedBy = other.optionalDeletedBy().map(UUIDFilter::copy).orElse(null);
         this.wardId = other.optionalWardId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
@@ -78,25 +84,6 @@ public class AddressCriteria implements Serializable, Criteria {
         this.id = id;
     }
 
-    public StringFilter getWardCode() {
-        return wardCode;
-    }
-
-    public Optional<StringFilter> optionalWardCode() {
-        return Optional.ofNullable(wardCode);
-    }
-
-    public StringFilter wardCode() {
-        if (wardCode == null) {
-            setWardCode(new StringFilter());
-        }
-        return wardCode;
-    }
-
-    public void setWardCode(StringFilter wardCode) {
-        this.wardCode = wardCode;
-    }
-
     public StringFilter getStreetAddress() {
         return streetAddress;
     }
@@ -114,25 +101,6 @@ public class AddressCriteria implements Serializable, Criteria {
 
     public void setStreetAddress(StringFilter streetAddress) {
         this.streetAddress = streetAddress;
-    }
-
-    public StringFilter getPostalCode() {
-        return postalCode;
-    }
-
-    public Optional<StringFilter> optionalPostalCode() {
-        return Optional.ofNullable(postalCode);
-    }
-
-    public StringFilter postalCode() {
-        if (postalCode == null) {
-            setPostalCode(new StringFilter());
-        }
-        return postalCode;
-    }
-
-    public void setPostalCode(StringFilter postalCode) {
-        this.postalCode = postalCode;
     }
 
     public BigDecimalFilter getLatitude() {
@@ -173,23 +141,99 @@ public class AddressCriteria implements Serializable, Criteria {
         this.longitude = longitude;
     }
 
-    public StringFilter getLandmark() {
-        return landmark;
+    public InstantFilter getCreatedAt() {
+        return createdAt;
     }
 
-    public Optional<StringFilter> optionalLandmark() {
-        return Optional.ofNullable(landmark);
+    public Optional<InstantFilter> optionalCreatedAt() {
+        return Optional.ofNullable(createdAt);
     }
 
-    public StringFilter landmark() {
-        if (landmark == null) {
-            setLandmark(new StringFilter());
+    public InstantFilter createdAt() {
+        if (createdAt == null) {
+            setCreatedAt(new InstantFilter());
         }
-        return landmark;
+        return createdAt;
     }
 
-    public void setLandmark(StringFilter landmark) {
-        this.landmark = landmark;
+    public void setCreatedAt(InstantFilter createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public InstantFilter getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Optional<InstantFilter> optionalUpdatedAt() {
+        return Optional.ofNullable(updatedAt);
+    }
+
+    public InstantFilter updatedAt() {
+        if (updatedAt == null) {
+            setUpdatedAt(new InstantFilter());
+        }
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(InstantFilter updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public BooleanFilter getIsDeleted() {
+        return isDeleted;
+    }
+
+    public Optional<BooleanFilter> optionalIsDeleted() {
+        return Optional.ofNullable(isDeleted);
+    }
+
+    public BooleanFilter isDeleted() {
+        if (isDeleted == null) {
+            setIsDeleted(new BooleanFilter());
+        }
+        return isDeleted;
+    }
+
+    public void setIsDeleted(BooleanFilter isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public InstantFilter getDeletedAt() {
+        return deletedAt;
+    }
+
+    public Optional<InstantFilter> optionalDeletedAt() {
+        return Optional.ofNullable(deletedAt);
+    }
+
+    public InstantFilter deletedAt() {
+        if (deletedAt == null) {
+            setDeletedAt(new InstantFilter());
+        }
+        return deletedAt;
+    }
+
+    public void setDeletedAt(InstantFilter deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUIDFilter getDeletedBy() {
+        return deletedBy;
+    }
+
+    public Optional<UUIDFilter> optionalDeletedBy() {
+        return Optional.ofNullable(deletedBy);
+    }
+
+    public UUIDFilter deletedBy() {
+        if (deletedBy == null) {
+            setDeletedBy(new UUIDFilter());
+        }
+        return deletedBy;
+    }
+
+    public void setDeletedBy(UUIDFilter deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
     public LongFilter getWardId() {
@@ -241,12 +285,14 @@ public class AddressCriteria implements Serializable, Criteria {
         final AddressCriteria that = (AddressCriteria) o;
         return (
             Objects.equals(id, that.id) &&
-            Objects.equals(wardCode, that.wardCode) &&
             Objects.equals(streetAddress, that.streetAddress) &&
-            Objects.equals(postalCode, that.postalCode) &&
             Objects.equals(latitude, that.latitude) &&
             Objects.equals(longitude, that.longitude) &&
-            Objects.equals(landmark, that.landmark) &&
+            Objects.equals(createdAt, that.createdAt) &&
+            Objects.equals(updatedAt, that.updatedAt) &&
+            Objects.equals(isDeleted, that.isDeleted) &&
+            Objects.equals(deletedAt, that.deletedAt) &&
+            Objects.equals(deletedBy, that.deletedBy) &&
             Objects.equals(wardId, that.wardId) &&
             Objects.equals(distinct, that.distinct)
         );
@@ -254,7 +300,19 @@ public class AddressCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, wardCode, streetAddress, postalCode, latitude, longitude, landmark, wardId, distinct);
+        return Objects.hash(
+            id,
+            streetAddress,
+            latitude,
+            longitude,
+            createdAt,
+            updatedAt,
+            isDeleted,
+            deletedAt,
+            deletedBy,
+            wardId,
+            distinct
+        );
     }
 
     // prettier-ignore
@@ -262,12 +320,14 @@ public class AddressCriteria implements Serializable, Criteria {
     public String toString() {
         return "AddressCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
-            optionalWardCode().map(f -> "wardCode=" + f + ", ").orElse("") +
             optionalStreetAddress().map(f -> "streetAddress=" + f + ", ").orElse("") +
-            optionalPostalCode().map(f -> "postalCode=" + f + ", ").orElse("") +
             optionalLatitude().map(f -> "latitude=" + f + ", ").orElse("") +
             optionalLongitude().map(f -> "longitude=" + f + ", ").orElse("") +
-            optionalLandmark().map(f -> "landmark=" + f + ", ").orElse("") +
+            optionalCreatedAt().map(f -> "createdAt=" + f + ", ").orElse("") +
+            optionalUpdatedAt().map(f -> "updatedAt=" + f + ", ").orElse("") +
+            optionalIsDeleted().map(f -> "isDeleted=" + f + ", ").orElse("") +
+            optionalDeletedAt().map(f -> "deletedAt=" + f + ", ").orElse("") +
+            optionalDeletedBy().map(f -> "deletedBy=" + f + ", ").orElse("") +
             optionalWardId().map(f -> "wardId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";

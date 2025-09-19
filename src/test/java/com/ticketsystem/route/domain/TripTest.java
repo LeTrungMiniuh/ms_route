@@ -1,13 +1,12 @@
 package com.ticketsystem.route.domain;
 
+import static com.ticketsystem.route.domain.AttendantTestSamples.*;
+import static com.ticketsystem.route.domain.DriverTestSamples.*;
 import static com.ticketsystem.route.domain.RouteTestSamples.*;
-import static com.ticketsystem.route.domain.SeatTestSamples.*;
 import static com.ticketsystem.route.domain.TripTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.ticketsystem.route.web.rest.TestUtil;
-import java.util.HashSet;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class TripTest {
@@ -27,25 +26,27 @@ class TripTest {
     }
 
     @Test
-    void seatsTest() {
+    void driverTest() {
         Trip trip = getTripRandomSampleGenerator();
-        Seat seatBack = getSeatRandomSampleGenerator();
+        Driver driverBack = getDriverRandomSampleGenerator();
 
-        trip.addSeats(seatBack);
-        assertThat(trip.getSeats()).containsOnly(seatBack);
-        assertThat(seatBack.getTrip()).isEqualTo(trip);
+        trip.setDriver(driverBack);
+        assertThat(trip.getDriver()).isEqualTo(driverBack);
 
-        trip.removeSeats(seatBack);
-        assertThat(trip.getSeats()).doesNotContain(seatBack);
-        assertThat(seatBack.getTrip()).isNull();
+        trip.driver(null);
+        assertThat(trip.getDriver()).isNull();
+    }
 
-        trip.seats(new HashSet<>(Set.of(seatBack)));
-        assertThat(trip.getSeats()).containsOnly(seatBack);
-        assertThat(seatBack.getTrip()).isEqualTo(trip);
+    @Test
+    void attendantTest() {
+        Trip trip = getTripRandomSampleGenerator();
+        Attendant attendantBack = getAttendantRandomSampleGenerator();
 
-        trip.setSeats(new HashSet<>());
-        assertThat(trip.getSeats()).doesNotContain(seatBack);
-        assertThat(seatBack.getTrip()).isNull();
+        trip.setAttendant(attendantBack);
+        assertThat(trip.getAttendant()).isEqualTo(attendantBack);
+
+        trip.attendant(null);
+        assertThat(trip.getAttendant()).isNull();
     }
 
     @Test

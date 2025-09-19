@@ -13,18 +13,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketsystem.route.IntegrationTest;
-import com.ticketsystem.route.domain.Operator;
 import com.ticketsystem.route.domain.Route;
 import com.ticketsystem.route.domain.Station;
-import com.ticketsystem.route.domain.enumeration.TransportType;
 import com.ticketsystem.route.repository.RouteRepository;
 import com.ticketsystem.route.repository.search.RouteSearchRepository;
 import com.ticketsystem.route.service.dto.RouteDTO;
 import com.ticketsystem.route.service.mapper.RouteMapper;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import org.assertj.core.util.IterableUtil;
@@ -47,23 +48,27 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class RouteResourceIT {
 
-    private static final TransportType DEFAULT_TRANSPORT_TYPE = TransportType.BUS;
-    private static final TransportType UPDATED_TRANSPORT_TYPE = TransportType.TRAIN;
+    private static final String DEFAULT_ROUTE_CODE = "AAAAAAAAAA";
+    private static final String UPDATED_ROUTE_CODE = "BBBBBBBBBB";
 
-    private static final BigDecimal DEFAULT_DISTANCE = new BigDecimal(1);
-    private static final BigDecimal UPDATED_DISTANCE = new BigDecimal(2);
-    private static final BigDecimal SMALLER_DISTANCE = new BigDecimal(1 - 1);
+    private static final BigDecimal DEFAULT_DISTANCE_KM = new BigDecimal(1);
+    private static final BigDecimal UPDATED_DISTANCE_KM = new BigDecimal(2);
+    private static final BigDecimal SMALLER_DISTANCE_KM = new BigDecimal(1 - 1);
 
-    private static final Integer DEFAULT_ESTIMATED_DURATION = 1;
-    private static final Integer UPDATED_ESTIMATED_DURATION = 2;
-    private static final Integer SMALLER_ESTIMATED_DURATION = 1 - 1;
+    private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final BigDecimal DEFAULT_BASE_PRICE = new BigDecimal(1);
-    private static final BigDecimal UPDATED_BASE_PRICE = new BigDecimal(2);
-    private static final BigDecimal SMALLER_BASE_PRICE = new BigDecimal(1 - 1);
+    private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
 
-    private static final Boolean DEFAULT_IS_ACTIVE = false;
-    private static final Boolean UPDATED_IS_ACTIVE = true;
+    private static final Boolean DEFAULT_IS_DELETED = false;
+    private static final Boolean UPDATED_IS_DELETED = true;
+
+    private static final Instant DEFAULT_DELETED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DELETED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final UUID DEFAULT_DELETED_BY = UUID.randomUUID();
+    private static final UUID UPDATED_DELETED_BY = UUID.randomUUID();
 
     private static final String ENTITY_API_URL = "/api/routes";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -102,21 +107,25 @@ class RouteResourceIT {
      */
     public static Route createEntity(EntityManager em) {
         Route route = new Route()
-            .transportType(DEFAULT_TRANSPORT_TYPE)
-            .distance(DEFAULT_DISTANCE)
-            .estimatedDuration(DEFAULT_ESTIMATED_DURATION)
-            .basePrice(DEFAULT_BASE_PRICE)
-            .isActive(DEFAULT_IS_ACTIVE);
+            .routeCode(DEFAULT_ROUTE_CODE)
+            .distanceKm(DEFAULT_DISTANCE_KM)
+            .createdAt(DEFAULT_CREATED_AT)
+            .updatedAt(DEFAULT_UPDATED_AT)
+            .isDeleted(DEFAULT_IS_DELETED)
+            .deletedAt(DEFAULT_DELETED_AT)
+            .deletedBy(DEFAULT_DELETED_BY);
         // Add required entity
-        Operator operator;
-        if (TestUtil.findAll(em, Operator.class).isEmpty()) {
-            operator = OperatorResourceIT.createEntity();
-            em.persist(operator);
+        Station station;
+        if (TestUtil.findAll(em, Station.class).isEmpty()) {
+            station = StationResourceIT.createEntity(em);
+            em.persist(station);
             em.flush();
         } else {
-            operator = TestUtil.findAll(em, Operator.class).get(0);
+            station = TestUtil.findAll(em, Station.class).get(0);
         }
-        route.setOperator(operator);
+        route.setOrigin(station);
+        // Add required entity
+        route.setDestination(station);
         return route;
     }
 
@@ -128,21 +137,25 @@ class RouteResourceIT {
      */
     public static Route createUpdatedEntity(EntityManager em) {
         Route updatedRoute = new Route()
-            .transportType(UPDATED_TRANSPORT_TYPE)
-            .distance(UPDATED_DISTANCE)
-            .estimatedDuration(UPDATED_ESTIMATED_DURATION)
-            .basePrice(UPDATED_BASE_PRICE)
-            .isActive(UPDATED_IS_ACTIVE);
+            .routeCode(UPDATED_ROUTE_CODE)
+            .distanceKm(UPDATED_DISTANCE_KM)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         // Add required entity
-        Operator operator;
-        if (TestUtil.findAll(em, Operator.class).isEmpty()) {
-            operator = OperatorResourceIT.createUpdatedEntity();
-            em.persist(operator);
+        Station station;
+        if (TestUtil.findAll(em, Station.class).isEmpty()) {
+            station = StationResourceIT.createUpdatedEntity(em);
+            em.persist(station);
             em.flush();
         } else {
-            operator = TestUtil.findAll(em, Operator.class).get(0);
+            station = TestUtil.findAll(em, Station.class).get(0);
         }
-        updatedRoute.setOperator(operator);
+        updatedRoute.setOrigin(station);
+        // Add required entity
+        updatedRoute.setDestination(station);
         return updatedRoute;
     }
 
@@ -215,53 +228,11 @@ class RouteResourceIT {
 
     @Test
     @Transactional
-    void checkTransportTypeIsRequired() throws Exception {
+    void checkCreatedAtIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         int searchDatabaseSizeBefore = IterableUtil.sizeOf(routeSearchRepository.findAll());
         // set the field null
-        route.setTransportType(null);
-
-        // Create the Route, which fails.
-        RouteDTO routeDTO = routeMapper.toDto(route);
-
-        restRouteMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(routeDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(routeSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
-    }
-
-    @Test
-    @Transactional
-    void checkBasePriceIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(routeSearchRepository.findAll());
-        // set the field null
-        route.setBasePrice(null);
-
-        // Create the Route, which fails.
-        RouteDTO routeDTO = routeMapper.toDto(route);
-
-        restRouteMockMvc
-            .perform(post(ENTITY_API_URL).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(routeDTO)))
-            .andExpect(status().isBadRequest());
-
-        assertSameRepositoryCount(databaseSizeBeforeTest);
-
-        int searchDatabaseSizeAfter = IterableUtil.sizeOf(routeSearchRepository.findAll());
-        assertThat(searchDatabaseSizeAfter).isEqualTo(searchDatabaseSizeBefore);
-    }
-
-    @Test
-    @Transactional
-    void checkIsActiveIsRequired() throws Exception {
-        long databaseSizeBeforeTest = getRepositoryCount();
-        int searchDatabaseSizeBefore = IterableUtil.sizeOf(routeSearchRepository.findAll());
-        // set the field null
-        route.setIsActive(null);
+        route.setCreatedAt(null);
 
         // Create the Route, which fails.
         RouteDTO routeDTO = routeMapper.toDto(route);
@@ -288,11 +259,13 @@ class RouteResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(route.getId().intValue())))
-            .andExpect(jsonPath("$.[*].transportType").value(hasItem(DEFAULT_TRANSPORT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].distance").value(hasItem(sameNumber(DEFAULT_DISTANCE))))
-            .andExpect(jsonPath("$.[*].estimatedDuration").value(hasItem(DEFAULT_ESTIMATED_DURATION)))
-            .andExpect(jsonPath("$.[*].basePrice").value(hasItem(sameNumber(DEFAULT_BASE_PRICE))))
-            .andExpect(jsonPath("$.[*].isActive").value(hasItem(DEFAULT_IS_ACTIVE)));
+            .andExpect(jsonPath("$.[*].routeCode").value(hasItem(DEFAULT_ROUTE_CODE)))
+            .andExpect(jsonPath("$.[*].distanceKm").value(hasItem(sameNumber(DEFAULT_DISTANCE_KM))))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
     }
 
     @Test
@@ -307,11 +280,13 @@ class RouteResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(route.getId().intValue()))
-            .andExpect(jsonPath("$.transportType").value(DEFAULT_TRANSPORT_TYPE.toString()))
-            .andExpect(jsonPath("$.distance").value(sameNumber(DEFAULT_DISTANCE)))
-            .andExpect(jsonPath("$.estimatedDuration").value(DEFAULT_ESTIMATED_DURATION))
-            .andExpect(jsonPath("$.basePrice").value(sameNumber(DEFAULT_BASE_PRICE)))
-            .andExpect(jsonPath("$.isActive").value(DEFAULT_IS_ACTIVE));
+            .andExpect(jsonPath("$.routeCode").value(DEFAULT_ROUTE_CODE))
+            .andExpect(jsonPath("$.distanceKm").value(sameNumber(DEFAULT_DISTANCE_KM)))
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
+            .andExpect(jsonPath("$.isDeleted").value(DEFAULT_IS_DELETED))
+            .andExpect(jsonPath("$.deletedAt").value(DEFAULT_DELETED_AT.toString()))
+            .andExpect(jsonPath("$.deletedBy").value(DEFAULT_DELETED_BY.toString()));
     }
 
     @Test
@@ -331,293 +306,275 @@ class RouteResourceIT {
 
     @Test
     @Transactional
-    void getAllRoutesByTransportTypeIsEqualToSomething() throws Exception {
+    void getAllRoutesByRouteCodeIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where transportType equals to
-        defaultRouteFiltering("transportType.equals=" + DEFAULT_TRANSPORT_TYPE, "transportType.equals=" + UPDATED_TRANSPORT_TYPE);
+        // Get all the routeList where routeCode equals to
+        defaultRouteFiltering("routeCode.equals=" + DEFAULT_ROUTE_CODE, "routeCode.equals=" + UPDATED_ROUTE_CODE);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByTransportTypeIsInShouldWork() throws Exception {
+    void getAllRoutesByRouteCodeIsInShouldWork() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where transportType in
+        // Get all the routeList where routeCode in
+        defaultRouteFiltering("routeCode.in=" + DEFAULT_ROUTE_CODE + "," + UPDATED_ROUTE_CODE, "routeCode.in=" + UPDATED_ROUTE_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllRoutesByRouteCodeIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedRoute = routeRepository.saveAndFlush(route);
+
+        // Get all the routeList where routeCode is not null
+        defaultRouteFiltering("routeCode.specified=true", "routeCode.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllRoutesByRouteCodeContainsSomething() throws Exception {
+        // Initialize the database
+        insertedRoute = routeRepository.saveAndFlush(route);
+
+        // Get all the routeList where routeCode contains
+        defaultRouteFiltering("routeCode.contains=" + DEFAULT_ROUTE_CODE, "routeCode.contains=" + UPDATED_ROUTE_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllRoutesByRouteCodeNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedRoute = routeRepository.saveAndFlush(route);
+
+        // Get all the routeList where routeCode does not contain
+        defaultRouteFiltering("routeCode.doesNotContain=" + UPDATED_ROUTE_CODE, "routeCode.doesNotContain=" + DEFAULT_ROUTE_CODE);
+    }
+
+    @Test
+    @Transactional
+    void getAllRoutesByDistanceKmIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedRoute = routeRepository.saveAndFlush(route);
+
+        // Get all the routeList where distanceKm equals to
+        defaultRouteFiltering("distanceKm.equals=" + DEFAULT_DISTANCE_KM, "distanceKm.equals=" + UPDATED_DISTANCE_KM);
+    }
+
+    @Test
+    @Transactional
+    void getAllRoutesByDistanceKmIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedRoute = routeRepository.saveAndFlush(route);
+
+        // Get all the routeList where distanceKm in
+        defaultRouteFiltering("distanceKm.in=" + DEFAULT_DISTANCE_KM + "," + UPDATED_DISTANCE_KM, "distanceKm.in=" + UPDATED_DISTANCE_KM);
+    }
+
+    @Test
+    @Transactional
+    void getAllRoutesByDistanceKmIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedRoute = routeRepository.saveAndFlush(route);
+
+        // Get all the routeList where distanceKm is not null
+        defaultRouteFiltering("distanceKm.specified=true", "distanceKm.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllRoutesByDistanceKmIsGreaterThanOrEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedRoute = routeRepository.saveAndFlush(route);
+
+        // Get all the routeList where distanceKm is greater than or equal to
         defaultRouteFiltering(
-            "transportType.in=" + DEFAULT_TRANSPORT_TYPE + "," + UPDATED_TRANSPORT_TYPE,
-            "transportType.in=" + UPDATED_TRANSPORT_TYPE
+            "distanceKm.greaterThanOrEqual=" + DEFAULT_DISTANCE_KM,
+            "distanceKm.greaterThanOrEqual=" + UPDATED_DISTANCE_KM
         );
     }
 
     @Test
     @Transactional
-    void getAllRoutesByTransportTypeIsNullOrNotNull() throws Exception {
+    void getAllRoutesByDistanceKmIsLessThanOrEqualToSomething() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where transportType is not null
-        defaultRouteFiltering("transportType.specified=true", "transportType.specified=false");
+        // Get all the routeList where distanceKm is less than or equal to
+        defaultRouteFiltering("distanceKm.lessThanOrEqual=" + DEFAULT_DISTANCE_KM, "distanceKm.lessThanOrEqual=" + SMALLER_DISTANCE_KM);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByDistanceIsEqualToSomething() throws Exception {
+    void getAllRoutesByDistanceKmIsLessThanSomething() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where distance equals to
-        defaultRouteFiltering("distance.equals=" + DEFAULT_DISTANCE, "distance.equals=" + UPDATED_DISTANCE);
+        // Get all the routeList where distanceKm is less than
+        defaultRouteFiltering("distanceKm.lessThan=" + UPDATED_DISTANCE_KM, "distanceKm.lessThan=" + DEFAULT_DISTANCE_KM);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByDistanceIsInShouldWork() throws Exception {
+    void getAllRoutesByDistanceKmIsGreaterThanSomething() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where distance in
-        defaultRouteFiltering("distance.in=" + DEFAULT_DISTANCE + "," + UPDATED_DISTANCE, "distance.in=" + UPDATED_DISTANCE);
+        // Get all the routeList where distanceKm is greater than
+        defaultRouteFiltering("distanceKm.greaterThan=" + SMALLER_DISTANCE_KM, "distanceKm.greaterThan=" + DEFAULT_DISTANCE_KM);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByDistanceIsNullOrNotNull() throws Exception {
+    void getAllRoutesByCreatedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where distance is not null
-        defaultRouteFiltering("distance.specified=true", "distance.specified=false");
+        // Get all the routeList where createdAt equals to
+        defaultRouteFiltering("createdAt.equals=" + DEFAULT_CREATED_AT, "createdAt.equals=" + UPDATED_CREATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByDistanceIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllRoutesByCreatedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where distance is greater than or equal to
-        defaultRouteFiltering("distance.greaterThanOrEqual=" + DEFAULT_DISTANCE, "distance.greaterThanOrEqual=" + UPDATED_DISTANCE);
+        // Get all the routeList where createdAt in
+        defaultRouteFiltering("createdAt.in=" + DEFAULT_CREATED_AT + "," + UPDATED_CREATED_AT, "createdAt.in=" + UPDATED_CREATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByDistanceIsLessThanOrEqualToSomething() throws Exception {
+    void getAllRoutesByCreatedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where distance is less than or equal to
-        defaultRouteFiltering("distance.lessThanOrEqual=" + DEFAULT_DISTANCE, "distance.lessThanOrEqual=" + SMALLER_DISTANCE);
+        // Get all the routeList where createdAt is not null
+        defaultRouteFiltering("createdAt.specified=true", "createdAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllRoutesByDistanceIsLessThanSomething() throws Exception {
+    void getAllRoutesByUpdatedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where distance is less than
-        defaultRouteFiltering("distance.lessThan=" + UPDATED_DISTANCE, "distance.lessThan=" + DEFAULT_DISTANCE);
+        // Get all the routeList where updatedAt equals to
+        defaultRouteFiltering("updatedAt.equals=" + DEFAULT_UPDATED_AT, "updatedAt.equals=" + UPDATED_UPDATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByDistanceIsGreaterThanSomething() throws Exception {
+    void getAllRoutesByUpdatedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where distance is greater than
-        defaultRouteFiltering("distance.greaterThan=" + SMALLER_DISTANCE, "distance.greaterThan=" + DEFAULT_DISTANCE);
+        // Get all the routeList where updatedAt in
+        defaultRouteFiltering("updatedAt.in=" + DEFAULT_UPDATED_AT + "," + UPDATED_UPDATED_AT, "updatedAt.in=" + UPDATED_UPDATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByEstimatedDurationIsEqualToSomething() throws Exception {
+    void getAllRoutesByUpdatedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where estimatedDuration equals to
-        defaultRouteFiltering(
-            "estimatedDuration.equals=" + DEFAULT_ESTIMATED_DURATION,
-            "estimatedDuration.equals=" + UPDATED_ESTIMATED_DURATION
-        );
+        // Get all the routeList where updatedAt is not null
+        defaultRouteFiltering("updatedAt.specified=true", "updatedAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllRoutesByEstimatedDurationIsInShouldWork() throws Exception {
+    void getAllRoutesByIsDeletedIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where estimatedDuration in
-        defaultRouteFiltering(
-            "estimatedDuration.in=" + DEFAULT_ESTIMATED_DURATION + "," + UPDATED_ESTIMATED_DURATION,
-            "estimatedDuration.in=" + UPDATED_ESTIMATED_DURATION
-        );
+        // Get all the routeList where isDeleted equals to
+        defaultRouteFiltering("isDeleted.equals=" + DEFAULT_IS_DELETED, "isDeleted.equals=" + UPDATED_IS_DELETED);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByEstimatedDurationIsNullOrNotNull() throws Exception {
+    void getAllRoutesByIsDeletedIsInShouldWork() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where estimatedDuration is not null
-        defaultRouteFiltering("estimatedDuration.specified=true", "estimatedDuration.specified=false");
+        // Get all the routeList where isDeleted in
+        defaultRouteFiltering("isDeleted.in=" + DEFAULT_IS_DELETED + "," + UPDATED_IS_DELETED, "isDeleted.in=" + UPDATED_IS_DELETED);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByEstimatedDurationIsGreaterThanOrEqualToSomething() throws Exception {
+    void getAllRoutesByIsDeletedIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where estimatedDuration is greater than or equal to
-        defaultRouteFiltering(
-            "estimatedDuration.greaterThanOrEqual=" + DEFAULT_ESTIMATED_DURATION,
-            "estimatedDuration.greaterThanOrEqual=" + UPDATED_ESTIMATED_DURATION
-        );
+        // Get all the routeList where isDeleted is not null
+        defaultRouteFiltering("isDeleted.specified=true", "isDeleted.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllRoutesByEstimatedDurationIsLessThanOrEqualToSomething() throws Exception {
+    void getAllRoutesByDeletedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where estimatedDuration is less than or equal to
-        defaultRouteFiltering(
-            "estimatedDuration.lessThanOrEqual=" + DEFAULT_ESTIMATED_DURATION,
-            "estimatedDuration.lessThanOrEqual=" + SMALLER_ESTIMATED_DURATION
-        );
+        // Get all the routeList where deletedAt equals to
+        defaultRouteFiltering("deletedAt.equals=" + DEFAULT_DELETED_AT, "deletedAt.equals=" + UPDATED_DELETED_AT);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByEstimatedDurationIsLessThanSomething() throws Exception {
+    void getAllRoutesByDeletedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where estimatedDuration is less than
-        defaultRouteFiltering(
-            "estimatedDuration.lessThan=" + UPDATED_ESTIMATED_DURATION,
-            "estimatedDuration.lessThan=" + DEFAULT_ESTIMATED_DURATION
-        );
+        // Get all the routeList where deletedAt in
+        defaultRouteFiltering("deletedAt.in=" + DEFAULT_DELETED_AT + "," + UPDATED_DELETED_AT, "deletedAt.in=" + UPDATED_DELETED_AT);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByEstimatedDurationIsGreaterThanSomething() throws Exception {
+    void getAllRoutesByDeletedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where estimatedDuration is greater than
-        defaultRouteFiltering(
-            "estimatedDuration.greaterThan=" + SMALLER_ESTIMATED_DURATION,
-            "estimatedDuration.greaterThan=" + DEFAULT_ESTIMATED_DURATION
-        );
+        // Get all the routeList where deletedAt is not null
+        defaultRouteFiltering("deletedAt.specified=true", "deletedAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllRoutesByBasePriceIsEqualToSomething() throws Exception {
+    void getAllRoutesByDeletedByIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where basePrice equals to
-        defaultRouteFiltering("basePrice.equals=" + DEFAULT_BASE_PRICE, "basePrice.equals=" + UPDATED_BASE_PRICE);
+        // Get all the routeList where deletedBy equals to
+        defaultRouteFiltering("deletedBy.equals=" + DEFAULT_DELETED_BY, "deletedBy.equals=" + UPDATED_DELETED_BY);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByBasePriceIsInShouldWork() throws Exception {
+    void getAllRoutesByDeletedByIsInShouldWork() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where basePrice in
-        defaultRouteFiltering("basePrice.in=" + DEFAULT_BASE_PRICE + "," + UPDATED_BASE_PRICE, "basePrice.in=" + UPDATED_BASE_PRICE);
+        // Get all the routeList where deletedBy in
+        defaultRouteFiltering("deletedBy.in=" + DEFAULT_DELETED_BY + "," + UPDATED_DELETED_BY, "deletedBy.in=" + UPDATED_DELETED_BY);
     }
 
     @Test
     @Transactional
-    void getAllRoutesByBasePriceIsNullOrNotNull() throws Exception {
+    void getAllRoutesByDeletedByIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedRoute = routeRepository.saveAndFlush(route);
 
-        // Get all the routeList where basePrice is not null
-        defaultRouteFiltering("basePrice.specified=true", "basePrice.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllRoutesByBasePriceIsGreaterThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedRoute = routeRepository.saveAndFlush(route);
-
-        // Get all the routeList where basePrice is greater than or equal to
-        defaultRouteFiltering("basePrice.greaterThanOrEqual=" + DEFAULT_BASE_PRICE, "basePrice.greaterThanOrEqual=" + UPDATED_BASE_PRICE);
-    }
-
-    @Test
-    @Transactional
-    void getAllRoutesByBasePriceIsLessThanOrEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedRoute = routeRepository.saveAndFlush(route);
-
-        // Get all the routeList where basePrice is less than or equal to
-        defaultRouteFiltering("basePrice.lessThanOrEqual=" + DEFAULT_BASE_PRICE, "basePrice.lessThanOrEqual=" + SMALLER_BASE_PRICE);
-    }
-
-    @Test
-    @Transactional
-    void getAllRoutesByBasePriceIsLessThanSomething() throws Exception {
-        // Initialize the database
-        insertedRoute = routeRepository.saveAndFlush(route);
-
-        // Get all the routeList where basePrice is less than
-        defaultRouteFiltering("basePrice.lessThan=" + UPDATED_BASE_PRICE, "basePrice.lessThan=" + DEFAULT_BASE_PRICE);
-    }
-
-    @Test
-    @Transactional
-    void getAllRoutesByBasePriceIsGreaterThanSomething() throws Exception {
-        // Initialize the database
-        insertedRoute = routeRepository.saveAndFlush(route);
-
-        // Get all the routeList where basePrice is greater than
-        defaultRouteFiltering("basePrice.greaterThan=" + SMALLER_BASE_PRICE, "basePrice.greaterThan=" + DEFAULT_BASE_PRICE);
-    }
-
-    @Test
-    @Transactional
-    void getAllRoutesByIsActiveIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedRoute = routeRepository.saveAndFlush(route);
-
-        // Get all the routeList where isActive equals to
-        defaultRouteFiltering("isActive.equals=" + DEFAULT_IS_ACTIVE, "isActive.equals=" + UPDATED_IS_ACTIVE);
-    }
-
-    @Test
-    @Transactional
-    void getAllRoutesByIsActiveIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedRoute = routeRepository.saveAndFlush(route);
-
-        // Get all the routeList where isActive in
-        defaultRouteFiltering("isActive.in=" + DEFAULT_IS_ACTIVE + "," + UPDATED_IS_ACTIVE, "isActive.in=" + UPDATED_IS_ACTIVE);
-    }
-
-    @Test
-    @Transactional
-    void getAllRoutesByIsActiveIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedRoute = routeRepository.saveAndFlush(route);
-
-        // Get all the routeList where isActive is not null
-        defaultRouteFiltering("isActive.specified=true", "isActive.specified=false");
+        // Get all the routeList where deletedBy is not null
+        defaultRouteFiltering("deletedBy.specified=true", "deletedBy.specified=false");
     }
 
     @Test
@@ -626,7 +583,7 @@ class RouteResourceIT {
         Station origin;
         if (TestUtil.findAll(em, Station.class).isEmpty()) {
             routeRepository.saveAndFlush(route);
-            origin = StationResourceIT.createEntity();
+            origin = StationResourceIT.createEntity(em);
         } else {
             origin = TestUtil.findAll(em, Station.class).get(0);
         }
@@ -648,7 +605,7 @@ class RouteResourceIT {
         Station destination;
         if (TestUtil.findAll(em, Station.class).isEmpty()) {
             routeRepository.saveAndFlush(route);
-            destination = StationResourceIT.createEntity();
+            destination = StationResourceIT.createEntity(em);
         } else {
             destination = TestUtil.findAll(em, Station.class).get(0);
         }
@@ -662,28 +619,6 @@ class RouteResourceIT {
 
         // Get all the routeList where destination equals to (destinationId + 1)
         defaultRouteShouldNotBeFound("destinationId.equals=" + (destinationId + 1));
-    }
-
-    @Test
-    @Transactional
-    void getAllRoutesByOperatorIsEqualToSomething() throws Exception {
-        Operator operator;
-        if (TestUtil.findAll(em, Operator.class).isEmpty()) {
-            routeRepository.saveAndFlush(route);
-            operator = OperatorResourceIT.createEntity();
-        } else {
-            operator = TestUtil.findAll(em, Operator.class).get(0);
-        }
-        em.persist(operator);
-        em.flush();
-        route.setOperator(operator);
-        routeRepository.saveAndFlush(route);
-        Long operatorId = operator.getId();
-        // Get all the routeList where operator equals to operatorId
-        defaultRouteShouldBeFound("operatorId.equals=" + operatorId);
-
-        // Get all the routeList where operator equals to (operatorId + 1)
-        defaultRouteShouldNotBeFound("operatorId.equals=" + (operatorId + 1));
     }
 
     private void defaultRouteFiltering(String shouldBeFound, String shouldNotBeFound) throws Exception {
@@ -700,11 +635,13 @@ class RouteResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(route.getId().intValue())))
-            .andExpect(jsonPath("$.[*].transportType").value(hasItem(DEFAULT_TRANSPORT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].distance").value(hasItem(sameNumber(DEFAULT_DISTANCE))))
-            .andExpect(jsonPath("$.[*].estimatedDuration").value(hasItem(DEFAULT_ESTIMATED_DURATION)))
-            .andExpect(jsonPath("$.[*].basePrice").value(hasItem(sameNumber(DEFAULT_BASE_PRICE))))
-            .andExpect(jsonPath("$.[*].isActive").value(hasItem(DEFAULT_IS_ACTIVE)));
+            .andExpect(jsonPath("$.[*].routeCode").value(hasItem(DEFAULT_ROUTE_CODE)))
+            .andExpect(jsonPath("$.[*].distanceKm").value(hasItem(sameNumber(DEFAULT_DISTANCE_KM))))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
 
         // Check, that the count call also returns 1
         restRouteMockMvc
@@ -755,11 +692,13 @@ class RouteResourceIT {
         // Disconnect from session so that the updates on updatedRoute are not directly saved in db
         em.detach(updatedRoute);
         updatedRoute
-            .transportType(UPDATED_TRANSPORT_TYPE)
-            .distance(UPDATED_DISTANCE)
-            .estimatedDuration(UPDATED_ESTIMATED_DURATION)
-            .basePrice(UPDATED_BASE_PRICE)
-            .isActive(UPDATED_IS_ACTIVE);
+            .routeCode(UPDATED_ROUTE_CODE)
+            .distanceKm(UPDATED_DISTANCE_KM)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         RouteDTO routeDTO = routeMapper.toDto(updatedRoute);
 
         restRouteMockMvc
@@ -872,7 +811,7 @@ class RouteResourceIT {
         Route partialUpdatedRoute = new Route();
         partialUpdatedRoute.setId(route.getId());
 
-        partialUpdatedRoute.transportType(UPDATED_TRANSPORT_TYPE);
+        partialUpdatedRoute.routeCode(UPDATED_ROUTE_CODE).deletedAt(UPDATED_DELETED_AT);
 
         restRouteMockMvc
             .perform(
@@ -902,11 +841,13 @@ class RouteResourceIT {
         partialUpdatedRoute.setId(route.getId());
 
         partialUpdatedRoute
-            .transportType(UPDATED_TRANSPORT_TYPE)
-            .distance(UPDATED_DISTANCE)
-            .estimatedDuration(UPDATED_ESTIMATED_DURATION)
-            .basePrice(UPDATED_BASE_PRICE)
-            .isActive(UPDATED_IS_ACTIVE);
+            .routeCode(UPDATED_ROUTE_CODE)
+            .distanceKm(UPDATED_DISTANCE_KM)
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
 
         restRouteMockMvc
             .perform(
@@ -1032,11 +973,13 @@ class RouteResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(route.getId().intValue())))
-            .andExpect(jsonPath("$.[*].transportType").value(hasItem(DEFAULT_TRANSPORT_TYPE.toString())))
-            .andExpect(jsonPath("$.[*].distance").value(hasItem(sameNumber(DEFAULT_DISTANCE))))
-            .andExpect(jsonPath("$.[*].estimatedDuration").value(hasItem(DEFAULT_ESTIMATED_DURATION)))
-            .andExpect(jsonPath("$.[*].basePrice").value(hasItem(sameNumber(DEFAULT_BASE_PRICE))))
-            .andExpect(jsonPath("$.[*].isActive").value(hasItem(DEFAULT_IS_ACTIVE)));
+            .andExpect(jsonPath("$.[*].routeCode").value(hasItem(DEFAULT_ROUTE_CODE)))
+            .andExpect(jsonPath("$.[*].distanceKm").value(hasItem(sameNumber(DEFAULT_DISTANCE_KM))))
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
     }
 
     protected long getRepositoryCount() {

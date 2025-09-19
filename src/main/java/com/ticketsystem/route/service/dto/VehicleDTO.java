@@ -1,9 +1,12 @@
 package com.ticketsystem.route.service.dto;
 
+import com.ticketsystem.route.domain.enumeration.VehicleType;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A DTO for the {@link com.ticketsystem.route.domain.Vehicle} entity.
@@ -14,36 +17,30 @@ public class VehicleDTO implements Serializable {
     private Long id;
 
     @NotNull
+    private VehicleType type;
+
+    private BigDecimal typeFactor;
+
+    @NotNull
     private String plateNumber;
 
-    private String model;
+    private String brand;
+
+    private String description;
 
     @NotNull
-    private Integer capacity;
+    private Instant createdAt;
 
-    private String seatLayout;
+    private Instant updatedAt;
 
-    private String amenities;
+    private Boolean isDeleted;
 
-    private String imageCoverUrl;
+    private Instant deletedAt;
 
-    private Double averageRating;
-
-    private Integer totalReviews;
+    private UUID deletedBy;
 
     @NotNull
-    private Boolean isActive;
-
-    private Integer yearManufactured;
-
-    private LocalDate lastMaintenanceDate;
-
-    private ReviewSummaryDTO summary;
-
-    private StationDTO homeStation;
-
-    @NotNull
-    private OperatorDTO operator;
+    private SeatMapDTO seatMap;
 
     public Long getId() {
         return id;
@@ -51,6 +48,22 @@ public class VehicleDTO implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public VehicleType getType() {
+        return type;
+    }
+
+    public void setType(VehicleType type) {
+        this.type = type;
+    }
+
+    public BigDecimal getTypeFactor() {
+        return typeFactor;
+    }
+
+    public void setTypeFactor(BigDecimal typeFactor) {
+        this.typeFactor = typeFactor;
     }
 
     public String getPlateNumber() {
@@ -61,108 +74,68 @@ public class VehicleDTO implements Serializable {
         this.plateNumber = plateNumber;
     }
 
-    public String getModel() {
-        return model;
+    public String getBrand() {
+        return brand;
     }
 
-    public void setModel(String model) {
-        this.model = model;
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 
-    public Integer getCapacity() {
-        return capacity;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getSeatLayout() {
-        return seatLayout;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setSeatLayout(String seatLayout) {
-        this.seatLayout = seatLayout;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public String getAmenities() {
-        return amenities;
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setAmenities(String amenities) {
-        this.amenities = amenities;
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public String getImageCoverUrl() {
-        return imageCoverUrl;
+    public Boolean getIsDeleted() {
+        return isDeleted;
     }
 
-    public void setImageCoverUrl(String imageCoverUrl) {
-        this.imageCoverUrl = imageCoverUrl;
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
-    public Double getAverageRating() {
-        return averageRating;
+    public Instant getDeletedAt() {
+        return deletedAt;
     }
 
-    public void setAverageRating(Double averageRating) {
-        this.averageRating = averageRating;
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
-    public Integer getTotalReviews() {
-        return totalReviews;
+    public UUID getDeletedBy() {
+        return deletedBy;
     }
 
-    public void setTotalReviews(Integer totalReviews) {
-        this.totalReviews = totalReviews;
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
-    public Boolean getIsActive() {
-        return isActive;
+    public SeatMapDTO getSeatMap() {
+        return seatMap;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
-    }
-
-    public Integer getYearManufactured() {
-        return yearManufactured;
-    }
-
-    public void setYearManufactured(Integer yearManufactured) {
-        this.yearManufactured = yearManufactured;
-    }
-
-    public LocalDate getLastMaintenanceDate() {
-        return lastMaintenanceDate;
-    }
-
-    public void setLastMaintenanceDate(LocalDate lastMaintenanceDate) {
-        this.lastMaintenanceDate = lastMaintenanceDate;
-    }
-
-    public ReviewSummaryDTO getSummary() {
-        return summary;
-    }
-
-    public void setSummary(ReviewSummaryDTO summary) {
-        this.summary = summary;
-    }
-
-    public StationDTO getHomeStation() {
-        return homeStation;
-    }
-
-    public void setHomeStation(StationDTO homeStation) {
-        this.homeStation = homeStation;
-    }
-
-    public OperatorDTO getOperator() {
-        return operator;
-    }
-
-    public void setOperator(OperatorDTO operator) {
-        this.operator = operator;
+    public void setSeatMap(SeatMapDTO seatMap) {
+        this.seatMap = seatMap;
     }
 
     @Override
@@ -191,20 +164,17 @@ public class VehicleDTO implements Serializable {
     public String toString() {
         return "VehicleDTO{" +
             "id=" + getId() +
+            ", type='" + getType() + "'" +
+            ", typeFactor=" + getTypeFactor() +
             ", plateNumber='" + getPlateNumber() + "'" +
-            ", model='" + getModel() + "'" +
-            ", capacity=" + getCapacity() +
-            ", seatLayout='" + getSeatLayout() + "'" +
-            ", amenities='" + getAmenities() + "'" +
-            ", imageCoverUrl='" + getImageCoverUrl() + "'" +
-            ", averageRating=" + getAverageRating() +
-            ", totalReviews=" + getTotalReviews() +
-            ", isActive='" + getIsActive() + "'" +
-            ", yearManufactured=" + getYearManufactured() +
-            ", lastMaintenanceDate='" + getLastMaintenanceDate() + "'" +
-            ", summary=" + getSummary() +
-            ", homeStation=" + getHomeStation() +
-            ", operator=" + getOperator() +
+            ", brand='" + getBrand() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
+            ", seatMap=" + getSeatMap() +
             "}";
     }
 }

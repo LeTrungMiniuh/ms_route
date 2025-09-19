@@ -1,33 +1,38 @@
 {
   "annotations": {
-    "changelogDate": "20250914155823"
+    "changelogDate": "20250919165351"
   },
   "applications": ["ms_route"],
   "dto": "mapstruct",
   "fields": [
     {
-      "fieldName": "transportType",
-      "fieldType": "TransportType",
-      "fieldValidateRules": ["required"],
-      "fieldValues": "BUS,TRAIN,FERRY"
+      "fieldName": "routeCode",
+      "fieldType": "String"
     },
     {
-      "fieldName": "distance",
+      "fieldName": "distanceKm",
       "fieldType": "BigDecimal"
     },
     {
-      "fieldName": "estimatedDuration",
-      "fieldType": "Integer"
-    },
-    {
-      "fieldName": "basePrice",
-      "fieldType": "BigDecimal",
+      "fieldName": "createdAt",
+      "fieldType": "Instant",
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "isActive",
-      "fieldType": "Boolean",
-      "fieldValidateRules": ["required"]
+      "fieldName": "updatedAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "isDeleted",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "deletedAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "deletedBy",
+      "fieldType": "UUID"
     }
   ],
   "jpaMetamodelFiltering": true,
@@ -36,29 +41,16 @@
   "pagination": "infinite-scroll",
   "relationships": [
     {
-      "otherEntityName": "trip",
-      "otherEntityRelationshipName": "route",
-      "relationshipName": "trips",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
-    },
-    {
       "otherEntityName": "station",
       "relationshipName": "origin",
       "relationshipSide": "left",
-      "relationshipType": "many-to-one"
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
     },
     {
       "otherEntityName": "station",
       "relationshipName": "destination",
       "relationshipSide": "left",
-      "relationshipType": "many-to-one"
-    },
-    {
-      "otherEntityName": "operator",
-      "otherEntityRelationshipName": "routes",
-      "relationshipName": "operator",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }

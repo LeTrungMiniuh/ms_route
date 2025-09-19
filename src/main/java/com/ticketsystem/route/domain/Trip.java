@@ -4,9 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -29,6 +28,9 @@ public class Trip implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "trip_code")
+    private String tripCode;
+
     @NotNull
     @Column(name = "departure_time", nullable = false)
     private Instant departureTime;
@@ -38,28 +40,39 @@ public class Trip implements Serializable {
     private Instant arrivalTime;
 
     @NotNull
-    @Column(name = "available_seats", nullable = false)
-    private Integer availableSeats;
+    @Column(name = "base_fare", precision = 21, scale = 2, nullable = false)
+    private BigDecimal baseFare;
 
     @NotNull
-    @Column(name = "total_seats", nullable = false)
-    private Integer totalSeats;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
 
-    @Column(name = "status")
-    private String status;
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "driver_id", length = 36)
-    private UUID driverId;
+    @Column(name = "deleted_by", length = 36)
+    private UUID deletedBy;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "trip")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "trip" }, allowSetters = true)
-    private Set<Seat> seats = new HashSet<>();
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(unique = true)
+    private Driver driver;
+
+    @JsonIgnoreProperties(value = { "trip" }, allowSetters = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(unique = true)
+    private Attendant attendant;
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "trips", "origin", "destination", "operator" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "origin", "destination" }, allowSetters = true)
     private Route route;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
@@ -75,6 +88,19 @@ public class Trip implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getTripCode() {
+        return this.tripCode;
+    }
+
+    public Trip tripCode(String tripCode) {
+        this.setTripCode(tripCode);
+        return this;
+    }
+
+    public void setTripCode(String tripCode) {
+        this.tripCode = tripCode;
     }
 
     public Instant getDepartureTime() {
@@ -103,86 +129,107 @@ public class Trip implements Serializable {
         this.arrivalTime = arrivalTime;
     }
 
-    public Integer getAvailableSeats() {
-        return this.availableSeats;
+    public BigDecimal getBaseFare() {
+        return this.baseFare;
     }
 
-    public Trip availableSeats(Integer availableSeats) {
-        this.setAvailableSeats(availableSeats);
+    public Trip baseFare(BigDecimal baseFare) {
+        this.setBaseFare(baseFare);
         return this;
     }
 
-    public void setAvailableSeats(Integer availableSeats) {
-        this.availableSeats = availableSeats;
+    public void setBaseFare(BigDecimal baseFare) {
+        this.baseFare = baseFare;
     }
 
-    public Integer getTotalSeats() {
-        return this.totalSeats;
+    public Instant getCreatedAt() {
+        return this.createdAt;
     }
 
-    public Trip totalSeats(Integer totalSeats) {
-        this.setTotalSeats(totalSeats);
+    public Trip createdAt(Instant createdAt) {
+        this.setCreatedAt(createdAt);
         return this;
     }
 
-    public void setTotalSeats(Integer totalSeats) {
-        this.totalSeats = totalSeats;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public String getStatus() {
-        return this.status;
+    public Instant getUpdatedAt() {
+        return this.updatedAt;
     }
 
-    public Trip status(String status) {
-        this.setStatus(status);
+    public Trip updatedAt(Instant updatedAt) {
+        this.setUpdatedAt(updatedAt);
         return this;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public UUID getDriverId() {
-        return this.driverId;
+    public Boolean getIsDeleted() {
+        return this.isDeleted;
     }
 
-    public Trip driverId(UUID driverId) {
-        this.setDriverId(driverId);
+    public Trip isDeleted(Boolean isDeleted) {
+        this.setIsDeleted(isDeleted);
         return this;
     }
 
-    public void setDriverId(UUID driverId) {
-        this.driverId = driverId;
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
-    public Set<Seat> getSeats() {
-        return this.seats;
+    public Instant getDeletedAt() {
+        return this.deletedAt;
     }
 
-    public void setSeats(Set<Seat> seats) {
-        if (this.seats != null) {
-            this.seats.forEach(i -> i.setTrip(null));
-        }
-        if (seats != null) {
-            seats.forEach(i -> i.setTrip(this));
-        }
-        this.seats = seats;
-    }
-
-    public Trip seats(Set<Seat> seats) {
-        this.setSeats(seats);
+    public Trip deletedAt(Instant deletedAt) {
+        this.setDeletedAt(deletedAt);
         return this;
     }
 
-    public Trip addSeats(Seat seat) {
-        this.seats.add(seat);
-        seat.setTrip(this);
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return this.deletedBy;
+    }
+
+    public Trip deletedBy(UUID deletedBy) {
+        this.setDeletedBy(deletedBy);
         return this;
     }
 
-    public Trip removeSeats(Seat seat) {
-        this.seats.remove(seat);
-        seat.setTrip(null);
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public Driver getDriver() {
+        return this.driver;
+    }
+
+    public void setDriver(Driver driver) {
+        this.driver = driver;
+    }
+
+    public Trip driver(Driver driver) {
+        this.setDriver(driver);
+        return this;
+    }
+
+    public Attendant getAttendant() {
+        return this.attendant;
+    }
+
+    public void setAttendant(Attendant attendant) {
+        this.attendant = attendant;
+    }
+
+    public Trip attendant(Attendant attendant) {
+        this.setAttendant(attendant);
         return this;
     }
 
@@ -223,12 +270,15 @@ public class Trip implements Serializable {
     public String toString() {
         return "Trip{" +
             "id=" + getId() +
+            ", tripCode='" + getTripCode() + "'" +
             ", departureTime='" + getDepartureTime() + "'" +
             ", arrivalTime='" + getArrivalTime() + "'" +
-            ", availableSeats=" + getAvailableSeats() +
-            ", totalSeats=" + getTotalSeats() +
-            ", status='" + getStatus() + "'" +
-            ", driverId='" + getDriverId() + "'" +
+            ", baseFare=" + getBaseFare() +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             "}";
     }
 }

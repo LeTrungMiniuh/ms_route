@@ -1,10 +1,14 @@
 {
   "annotations": {
-    "changelogDate": "20250914155923"
+    "changelogDate": "20250919165851"
   },
   "applications": ["ms_route"],
   "dto": "mapstruct",
   "fields": [
+    {
+      "fieldName": "tripCode",
+      "fieldType": "String"
+    },
     {
       "fieldName": "departureTime",
       "fieldType": "Instant",
@@ -16,21 +20,29 @@
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "availableSeats",
-      "fieldType": "Integer",
+      "fieldName": "baseFare",
+      "fieldType": "BigDecimal",
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "totalSeats",
-      "fieldType": "Integer",
+      "fieldName": "createdAt",
+      "fieldType": "Instant",
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "status",
-      "fieldType": "String"
+      "fieldName": "updatedAt",
+      "fieldType": "Instant"
     },
     {
-      "fieldName": "driverId",
+      "fieldName": "isDeleted",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "deletedAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "deletedBy",
       "fieldType": "UUID"
     }
   ],
@@ -40,17 +52,23 @@
   "pagination": "infinite-scroll",
   "relationships": [
     {
-      "otherEntityName": "seat",
+      "otherEntityName": "driver",
       "otherEntityRelationshipName": "trip",
-      "relationshipName": "seats",
+      "relationshipName": "driver",
       "relationshipSide": "left",
-      "relationshipType": "one-to-many"
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "attendant",
+      "otherEntityRelationshipName": "trip",
+      "relationshipName": "attendant",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
     },
     {
       "otherEntityName": "route",
-      "otherEntityRelationshipName": "trips",
       "relationshipName": "route",
-      "relationshipSide": "right",
+      "relationshipSide": "left",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }

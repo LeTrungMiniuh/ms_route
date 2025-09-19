@@ -1,13 +1,16 @@
 package com.ticketsystem.route.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ticketsystem.route.domain.enumeration.SeatType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * A Seat.
@@ -26,28 +29,39 @@ public class Seat implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "seat_number", nullable = false)
-    private String seatNumber;
+    @Column(name = "seat_no", nullable = false)
+    private String seatNo;
+
+    @Column(name = "row")
+    private Integer row;
+
+    @Column(name = "col")
+    private Integer col;
+
+    @Column(name = "price_factor", precision = 21, scale = 2)
+    private BigDecimal priceFactor;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "seat_type", nullable = false)
-    private SeatType seatType;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
 
-    @Column(name = "deck")
-    private String deck;
+    @Column(name = "updated_at")
+    private Instant updatedAt;
 
-    @Column(name = "price_modifier", precision = 21, scale = 2)
-    private BigDecimal priceModifier;
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
-    @NotNull
-    @Column(name = "is_available", nullable = false)
-    private Boolean isAvailable;
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "deleted_by", length = 36)
+    private UUID deletedBy;
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "seats", "route" }, allowSetters = true)
-    private Trip trip;
+    @JsonIgnoreProperties(value = { "seatMap" }, allowSetters = true)
+    private Floor floor;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -64,81 +78,133 @@ public class Seat implements Serializable {
         this.id = id;
     }
 
-    public String getSeatNumber() {
-        return this.seatNumber;
+    public String getSeatNo() {
+        return this.seatNo;
     }
 
-    public Seat seatNumber(String seatNumber) {
-        this.setSeatNumber(seatNumber);
+    public Seat seatNo(String seatNo) {
+        this.setSeatNo(seatNo);
         return this;
     }
 
-    public void setSeatNumber(String seatNumber) {
-        this.seatNumber = seatNumber;
+    public void setSeatNo(String seatNo) {
+        this.seatNo = seatNo;
     }
 
-    public SeatType getSeatType() {
-        return this.seatType;
+    public Integer getRow() {
+        return this.row;
     }
 
-    public Seat seatType(SeatType seatType) {
-        this.setSeatType(seatType);
+    public Seat row(Integer row) {
+        this.setRow(row);
         return this;
     }
 
-    public void setSeatType(SeatType seatType) {
-        this.seatType = seatType;
+    public void setRow(Integer row) {
+        this.row = row;
     }
 
-    public String getDeck() {
-        return this.deck;
+    public Integer getCol() {
+        return this.col;
     }
 
-    public Seat deck(String deck) {
-        this.setDeck(deck);
+    public Seat col(Integer col) {
+        this.setCol(col);
         return this;
     }
 
-    public void setDeck(String deck) {
-        this.deck = deck;
+    public void setCol(Integer col) {
+        this.col = col;
     }
 
-    public BigDecimal getPriceModifier() {
-        return this.priceModifier;
+    public BigDecimal getPriceFactor() {
+        return this.priceFactor;
     }
 
-    public Seat priceModifier(BigDecimal priceModifier) {
-        this.setPriceModifier(priceModifier);
+    public Seat priceFactor(BigDecimal priceFactor) {
+        this.setPriceFactor(priceFactor);
         return this;
     }
 
-    public void setPriceModifier(BigDecimal priceModifier) {
-        this.priceModifier = priceModifier;
+    public void setPriceFactor(BigDecimal priceFactor) {
+        this.priceFactor = priceFactor;
     }
 
-    public Boolean getIsAvailable() {
-        return this.isAvailable;
+    public Instant getCreatedAt() {
+        return this.createdAt;
     }
 
-    public Seat isAvailable(Boolean isAvailable) {
-        this.setIsAvailable(isAvailable);
+    public Seat createdAt(Instant createdAt) {
+        this.setCreatedAt(createdAt);
         return this;
     }
 
-    public void setIsAvailable(Boolean isAvailable) {
-        this.isAvailable = isAvailable;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Trip getTrip() {
-        return this.trip;
+    public Instant getUpdatedAt() {
+        return this.updatedAt;
     }
 
-    public void setTrip(Trip trip) {
-        this.trip = trip;
+    public Seat updatedAt(Instant updatedAt) {
+        this.setUpdatedAt(updatedAt);
+        return this;
     }
 
-    public Seat trip(Trip trip) {
-        this.setTrip(trip);
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return this.isDeleted;
+    }
+
+    public Seat isDeleted(Boolean isDeleted) {
+        this.setIsDeleted(isDeleted);
+        return this;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Instant getDeletedAt() {
+        return this.deletedAt;
+    }
+
+    public Seat deletedAt(Instant deletedAt) {
+        this.setDeletedAt(deletedAt);
+        return this;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return this.deletedBy;
+    }
+
+    public Seat deletedBy(UUID deletedBy) {
+        this.setDeletedBy(deletedBy);
+        return this;
+    }
+
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public Floor getFloor() {
+        return this.floor;
+    }
+
+    public void setFloor(Floor floor) {
+        this.floor = floor;
+    }
+
+    public Seat floor(Floor floor) {
+        this.setFloor(floor);
         return this;
     }
 
@@ -166,11 +232,15 @@ public class Seat implements Serializable {
     public String toString() {
         return "Seat{" +
             "id=" + getId() +
-            ", seatNumber='" + getSeatNumber() + "'" +
-            ", seatType='" + getSeatType() + "'" +
-            ", deck='" + getDeck() + "'" +
-            ", priceModifier=" + getPriceModifier() +
-            ", isAvailable='" + getIsAvailable() + "'" +
+            ", seatNo='" + getSeatNo() + "'" +
+            ", row=" + getRow() +
+            ", col=" + getCol() +
+            ", priceFactor=" + getPriceFactor() +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             "}";
     }
 }

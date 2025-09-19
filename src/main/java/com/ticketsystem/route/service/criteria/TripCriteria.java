@@ -24,19 +24,27 @@ public class TripCriteria implements Serializable, Criteria {
 
     private LongFilter id;
 
+    private StringFilter tripCode;
+
     private InstantFilter departureTime;
 
     private InstantFilter arrivalTime;
 
-    private IntegerFilter availableSeats;
+    private BigDecimalFilter baseFare;
 
-    private IntegerFilter totalSeats;
+    private InstantFilter createdAt;
 
-    private StringFilter status;
+    private InstantFilter updatedAt;
 
-    private UUIDFilter driverId;
+    private BooleanFilter isDeleted;
 
-    private LongFilter seatsId;
+    private InstantFilter deletedAt;
+
+    private UUIDFilter deletedBy;
+
+    private LongFilter driverId;
+
+    private LongFilter attendantId;
 
     private LongFilter routeId;
 
@@ -46,13 +54,17 @@ public class TripCriteria implements Serializable, Criteria {
 
     public TripCriteria(TripCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
+        this.tripCode = other.optionalTripCode().map(StringFilter::copy).orElse(null);
         this.departureTime = other.optionalDepartureTime().map(InstantFilter::copy).orElse(null);
         this.arrivalTime = other.optionalArrivalTime().map(InstantFilter::copy).orElse(null);
-        this.availableSeats = other.optionalAvailableSeats().map(IntegerFilter::copy).orElse(null);
-        this.totalSeats = other.optionalTotalSeats().map(IntegerFilter::copy).orElse(null);
-        this.status = other.optionalStatus().map(StringFilter::copy).orElse(null);
-        this.driverId = other.optionalDriverId().map(UUIDFilter::copy).orElse(null);
-        this.seatsId = other.optionalSeatsId().map(LongFilter::copy).orElse(null);
+        this.baseFare = other.optionalBaseFare().map(BigDecimalFilter::copy).orElse(null);
+        this.createdAt = other.optionalCreatedAt().map(InstantFilter::copy).orElse(null);
+        this.updatedAt = other.optionalUpdatedAt().map(InstantFilter::copy).orElse(null);
+        this.isDeleted = other.optionalIsDeleted().map(BooleanFilter::copy).orElse(null);
+        this.deletedAt = other.optionalDeletedAt().map(InstantFilter::copy).orElse(null);
+        this.deletedBy = other.optionalDeletedBy().map(UUIDFilter::copy).orElse(null);
+        this.driverId = other.optionalDriverId().map(LongFilter::copy).orElse(null);
+        this.attendantId = other.optionalAttendantId().map(LongFilter::copy).orElse(null);
         this.routeId = other.optionalRouteId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
@@ -79,6 +91,25 @@ public class TripCriteria implements Serializable, Criteria {
 
     public void setId(LongFilter id) {
         this.id = id;
+    }
+
+    public StringFilter getTripCode() {
+        return tripCode;
+    }
+
+    public Optional<StringFilter> optionalTripCode() {
+        return Optional.ofNullable(tripCode);
+    }
+
+    public StringFilter tripCode() {
+        if (tripCode == null) {
+            setTripCode(new StringFilter());
+        }
+        return tripCode;
+    }
+
+    public void setTripCode(StringFilter tripCode) {
+        this.tripCode = tripCode;
     }
 
     public InstantFilter getDepartureTime() {
@@ -119,99 +150,156 @@ public class TripCriteria implements Serializable, Criteria {
         this.arrivalTime = arrivalTime;
     }
 
-    public IntegerFilter getAvailableSeats() {
-        return availableSeats;
+    public BigDecimalFilter getBaseFare() {
+        return baseFare;
     }
 
-    public Optional<IntegerFilter> optionalAvailableSeats() {
-        return Optional.ofNullable(availableSeats);
+    public Optional<BigDecimalFilter> optionalBaseFare() {
+        return Optional.ofNullable(baseFare);
     }
 
-    public IntegerFilter availableSeats() {
-        if (availableSeats == null) {
-            setAvailableSeats(new IntegerFilter());
+    public BigDecimalFilter baseFare() {
+        if (baseFare == null) {
+            setBaseFare(new BigDecimalFilter());
         }
-        return availableSeats;
+        return baseFare;
     }
 
-    public void setAvailableSeats(IntegerFilter availableSeats) {
-        this.availableSeats = availableSeats;
+    public void setBaseFare(BigDecimalFilter baseFare) {
+        this.baseFare = baseFare;
     }
 
-    public IntegerFilter getTotalSeats() {
-        return totalSeats;
+    public InstantFilter getCreatedAt() {
+        return createdAt;
     }
 
-    public Optional<IntegerFilter> optionalTotalSeats() {
-        return Optional.ofNullable(totalSeats);
+    public Optional<InstantFilter> optionalCreatedAt() {
+        return Optional.ofNullable(createdAt);
     }
 
-    public IntegerFilter totalSeats() {
-        if (totalSeats == null) {
-            setTotalSeats(new IntegerFilter());
+    public InstantFilter createdAt() {
+        if (createdAt == null) {
+            setCreatedAt(new InstantFilter());
         }
-        return totalSeats;
+        return createdAt;
     }
 
-    public void setTotalSeats(IntegerFilter totalSeats) {
-        this.totalSeats = totalSeats;
+    public void setCreatedAt(InstantFilter createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public StringFilter getStatus() {
-        return status;
+    public InstantFilter getUpdatedAt() {
+        return updatedAt;
     }
 
-    public Optional<StringFilter> optionalStatus() {
-        return Optional.ofNullable(status);
+    public Optional<InstantFilter> optionalUpdatedAt() {
+        return Optional.ofNullable(updatedAt);
     }
 
-    public StringFilter status() {
-        if (status == null) {
-            setStatus(new StringFilter());
+    public InstantFilter updatedAt() {
+        if (updatedAt == null) {
+            setUpdatedAt(new InstantFilter());
         }
-        return status;
+        return updatedAt;
     }
 
-    public void setStatus(StringFilter status) {
-        this.status = status;
+    public void setUpdatedAt(InstantFilter updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public UUIDFilter getDriverId() {
+    public BooleanFilter getIsDeleted() {
+        return isDeleted;
+    }
+
+    public Optional<BooleanFilter> optionalIsDeleted() {
+        return Optional.ofNullable(isDeleted);
+    }
+
+    public BooleanFilter isDeleted() {
+        if (isDeleted == null) {
+            setIsDeleted(new BooleanFilter());
+        }
+        return isDeleted;
+    }
+
+    public void setIsDeleted(BooleanFilter isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public InstantFilter getDeletedAt() {
+        return deletedAt;
+    }
+
+    public Optional<InstantFilter> optionalDeletedAt() {
+        return Optional.ofNullable(deletedAt);
+    }
+
+    public InstantFilter deletedAt() {
+        if (deletedAt == null) {
+            setDeletedAt(new InstantFilter());
+        }
+        return deletedAt;
+    }
+
+    public void setDeletedAt(InstantFilter deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUIDFilter getDeletedBy() {
+        return deletedBy;
+    }
+
+    public Optional<UUIDFilter> optionalDeletedBy() {
+        return Optional.ofNullable(deletedBy);
+    }
+
+    public UUIDFilter deletedBy() {
+        if (deletedBy == null) {
+            setDeletedBy(new UUIDFilter());
+        }
+        return deletedBy;
+    }
+
+    public void setDeletedBy(UUIDFilter deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public LongFilter getDriverId() {
         return driverId;
     }
 
-    public Optional<UUIDFilter> optionalDriverId() {
+    public Optional<LongFilter> optionalDriverId() {
         return Optional.ofNullable(driverId);
     }
 
-    public UUIDFilter driverId() {
+    public LongFilter driverId() {
         if (driverId == null) {
-            setDriverId(new UUIDFilter());
+            setDriverId(new LongFilter());
         }
         return driverId;
     }
 
-    public void setDriverId(UUIDFilter driverId) {
+    public void setDriverId(LongFilter driverId) {
         this.driverId = driverId;
     }
 
-    public LongFilter getSeatsId() {
-        return seatsId;
+    public LongFilter getAttendantId() {
+        return attendantId;
     }
 
-    public Optional<LongFilter> optionalSeatsId() {
-        return Optional.ofNullable(seatsId);
+    public Optional<LongFilter> optionalAttendantId() {
+        return Optional.ofNullable(attendantId);
     }
 
-    public LongFilter seatsId() {
-        if (seatsId == null) {
-            setSeatsId(new LongFilter());
+    public LongFilter attendantId() {
+        if (attendantId == null) {
+            setAttendantId(new LongFilter());
         }
-        return seatsId;
+        return attendantId;
     }
 
-    public void setSeatsId(LongFilter seatsId) {
-        this.seatsId = seatsId;
+    public void setAttendantId(LongFilter attendantId) {
+        this.attendantId = attendantId;
     }
 
     public LongFilter getRouteId() {
@@ -263,13 +351,17 @@ public class TripCriteria implements Serializable, Criteria {
         final TripCriteria that = (TripCriteria) o;
         return (
             Objects.equals(id, that.id) &&
+            Objects.equals(tripCode, that.tripCode) &&
             Objects.equals(departureTime, that.departureTime) &&
             Objects.equals(arrivalTime, that.arrivalTime) &&
-            Objects.equals(availableSeats, that.availableSeats) &&
-            Objects.equals(totalSeats, that.totalSeats) &&
-            Objects.equals(status, that.status) &&
+            Objects.equals(baseFare, that.baseFare) &&
+            Objects.equals(createdAt, that.createdAt) &&
+            Objects.equals(updatedAt, that.updatedAt) &&
+            Objects.equals(isDeleted, that.isDeleted) &&
+            Objects.equals(deletedAt, that.deletedAt) &&
+            Objects.equals(deletedBy, that.deletedBy) &&
             Objects.equals(driverId, that.driverId) &&
-            Objects.equals(seatsId, that.seatsId) &&
+            Objects.equals(attendantId, that.attendantId) &&
             Objects.equals(routeId, that.routeId) &&
             Objects.equals(distinct, that.distinct)
         );
@@ -277,7 +369,22 @@ public class TripCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, departureTime, arrivalTime, availableSeats, totalSeats, status, driverId, seatsId, routeId, distinct);
+        return Objects.hash(
+            id,
+            tripCode,
+            departureTime,
+            arrivalTime,
+            baseFare,
+            createdAt,
+            updatedAt,
+            isDeleted,
+            deletedAt,
+            deletedBy,
+            driverId,
+            attendantId,
+            routeId,
+            distinct
+        );
     }
 
     // prettier-ignore
@@ -285,13 +392,17 @@ public class TripCriteria implements Serializable, Criteria {
     public String toString() {
         return "TripCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
+            optionalTripCode().map(f -> "tripCode=" + f + ", ").orElse("") +
             optionalDepartureTime().map(f -> "departureTime=" + f + ", ").orElse("") +
             optionalArrivalTime().map(f -> "arrivalTime=" + f + ", ").orElse("") +
-            optionalAvailableSeats().map(f -> "availableSeats=" + f + ", ").orElse("") +
-            optionalTotalSeats().map(f -> "totalSeats=" + f + ", ").orElse("") +
-            optionalStatus().map(f -> "status=" + f + ", ").orElse("") +
+            optionalBaseFare().map(f -> "baseFare=" + f + ", ").orElse("") +
+            optionalCreatedAt().map(f -> "createdAt=" + f + ", ").orElse("") +
+            optionalUpdatedAt().map(f -> "updatedAt=" + f + ", ").orElse("") +
+            optionalIsDeleted().map(f -> "isDeleted=" + f + ", ").orElse("") +
+            optionalDeletedAt().map(f -> "deletedAt=" + f + ", ").orElse("") +
+            optionalDeletedBy().map(f -> "deletedBy=" + f + ", ").orElse("") +
             optionalDriverId().map(f -> "driverId=" + f + ", ").orElse("") +
-            optionalSeatsId().map(f -> "seatsId=" + f + ", ").orElse("") +
+            optionalAttendantId().map(f -> "attendantId=" + f + ", ").orElse("") +
             optionalRouteId().map(f -> "routeId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";

@@ -1,6 +1,5 @@
 package com.ticketsystem.route.service.criteria;
 
-import com.ticketsystem.route.domain.enumeration.SeatType;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,38 +20,29 @@ import tech.jhipster.service.filter.*;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class SeatCriteria implements Serializable, Criteria {
 
-    /**
-     * Class for filtering SeatType
-     */
-    public static class SeatTypeFilter extends Filter<SeatType> {
-
-        public SeatTypeFilter() {}
-
-        public SeatTypeFilter(SeatTypeFilter filter) {
-            super(filter);
-        }
-
-        @Override
-        public SeatTypeFilter copy() {
-            return new SeatTypeFilter(this);
-        }
-    }
-
     private static final long serialVersionUID = 1L;
 
     private LongFilter id;
 
-    private StringFilter seatNumber;
+    private StringFilter seatNo;
 
-    private SeatTypeFilter seatType;
+    private IntegerFilter row;
 
-    private StringFilter deck;
+    private IntegerFilter col;
 
-    private BigDecimalFilter priceModifier;
+    private BigDecimalFilter priceFactor;
 
-    private BooleanFilter isAvailable;
+    private InstantFilter createdAt;
 
-    private LongFilter tripId;
+    private InstantFilter updatedAt;
+
+    private BooleanFilter isDeleted;
+
+    private InstantFilter deletedAt;
+
+    private UUIDFilter deletedBy;
+
+    private LongFilter floorId;
 
     private Boolean distinct;
 
@@ -60,12 +50,16 @@ public class SeatCriteria implements Serializable, Criteria {
 
     public SeatCriteria(SeatCriteria other) {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
-        this.seatNumber = other.optionalSeatNumber().map(StringFilter::copy).orElse(null);
-        this.seatType = other.optionalSeatType().map(SeatTypeFilter::copy).orElse(null);
-        this.deck = other.optionalDeck().map(StringFilter::copy).orElse(null);
-        this.priceModifier = other.optionalPriceModifier().map(BigDecimalFilter::copy).orElse(null);
-        this.isAvailable = other.optionalIsAvailable().map(BooleanFilter::copy).orElse(null);
-        this.tripId = other.optionalTripId().map(LongFilter::copy).orElse(null);
+        this.seatNo = other.optionalSeatNo().map(StringFilter::copy).orElse(null);
+        this.row = other.optionalRow().map(IntegerFilter::copy).orElse(null);
+        this.col = other.optionalCol().map(IntegerFilter::copy).orElse(null);
+        this.priceFactor = other.optionalPriceFactor().map(BigDecimalFilter::copy).orElse(null);
+        this.createdAt = other.optionalCreatedAt().map(InstantFilter::copy).orElse(null);
+        this.updatedAt = other.optionalUpdatedAt().map(InstantFilter::copy).orElse(null);
+        this.isDeleted = other.optionalIsDeleted().map(BooleanFilter::copy).orElse(null);
+        this.deletedAt = other.optionalDeletedAt().map(InstantFilter::copy).orElse(null);
+        this.deletedBy = other.optionalDeletedBy().map(UUIDFilter::copy).orElse(null);
+        this.floorId = other.optionalFloorId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
     }
 
@@ -93,118 +87,194 @@ public class SeatCriteria implements Serializable, Criteria {
         this.id = id;
     }
 
-    public StringFilter getSeatNumber() {
-        return seatNumber;
+    public StringFilter getSeatNo() {
+        return seatNo;
     }
 
-    public Optional<StringFilter> optionalSeatNumber() {
-        return Optional.ofNullable(seatNumber);
+    public Optional<StringFilter> optionalSeatNo() {
+        return Optional.ofNullable(seatNo);
     }
 
-    public StringFilter seatNumber() {
-        if (seatNumber == null) {
-            setSeatNumber(new StringFilter());
+    public StringFilter seatNo() {
+        if (seatNo == null) {
+            setSeatNo(new StringFilter());
         }
-        return seatNumber;
+        return seatNo;
     }
 
-    public void setSeatNumber(StringFilter seatNumber) {
-        this.seatNumber = seatNumber;
+    public void setSeatNo(StringFilter seatNo) {
+        this.seatNo = seatNo;
     }
 
-    public SeatTypeFilter getSeatType() {
-        return seatType;
+    public IntegerFilter getRow() {
+        return row;
     }
 
-    public Optional<SeatTypeFilter> optionalSeatType() {
-        return Optional.ofNullable(seatType);
+    public Optional<IntegerFilter> optionalRow() {
+        return Optional.ofNullable(row);
     }
 
-    public SeatTypeFilter seatType() {
-        if (seatType == null) {
-            setSeatType(new SeatTypeFilter());
+    public IntegerFilter row() {
+        if (row == null) {
+            setRow(new IntegerFilter());
         }
-        return seatType;
+        return row;
     }
 
-    public void setSeatType(SeatTypeFilter seatType) {
-        this.seatType = seatType;
+    public void setRow(IntegerFilter row) {
+        this.row = row;
     }
 
-    public StringFilter getDeck() {
-        return deck;
+    public IntegerFilter getCol() {
+        return col;
     }
 
-    public Optional<StringFilter> optionalDeck() {
-        return Optional.ofNullable(deck);
+    public Optional<IntegerFilter> optionalCol() {
+        return Optional.ofNullable(col);
     }
 
-    public StringFilter deck() {
-        if (deck == null) {
-            setDeck(new StringFilter());
+    public IntegerFilter col() {
+        if (col == null) {
+            setCol(new IntegerFilter());
         }
-        return deck;
+        return col;
     }
 
-    public void setDeck(StringFilter deck) {
-        this.deck = deck;
+    public void setCol(IntegerFilter col) {
+        this.col = col;
     }
 
-    public BigDecimalFilter getPriceModifier() {
-        return priceModifier;
+    public BigDecimalFilter getPriceFactor() {
+        return priceFactor;
     }
 
-    public Optional<BigDecimalFilter> optionalPriceModifier() {
-        return Optional.ofNullable(priceModifier);
+    public Optional<BigDecimalFilter> optionalPriceFactor() {
+        return Optional.ofNullable(priceFactor);
     }
 
-    public BigDecimalFilter priceModifier() {
-        if (priceModifier == null) {
-            setPriceModifier(new BigDecimalFilter());
+    public BigDecimalFilter priceFactor() {
+        if (priceFactor == null) {
+            setPriceFactor(new BigDecimalFilter());
         }
-        return priceModifier;
+        return priceFactor;
     }
 
-    public void setPriceModifier(BigDecimalFilter priceModifier) {
-        this.priceModifier = priceModifier;
+    public void setPriceFactor(BigDecimalFilter priceFactor) {
+        this.priceFactor = priceFactor;
     }
 
-    public BooleanFilter getIsAvailable() {
-        return isAvailable;
+    public InstantFilter getCreatedAt() {
+        return createdAt;
     }
 
-    public Optional<BooleanFilter> optionalIsAvailable() {
-        return Optional.ofNullable(isAvailable);
+    public Optional<InstantFilter> optionalCreatedAt() {
+        return Optional.ofNullable(createdAt);
     }
 
-    public BooleanFilter isAvailable() {
-        if (isAvailable == null) {
-            setIsAvailable(new BooleanFilter());
+    public InstantFilter createdAt() {
+        if (createdAt == null) {
+            setCreatedAt(new InstantFilter());
         }
-        return isAvailable;
+        return createdAt;
     }
 
-    public void setIsAvailable(BooleanFilter isAvailable) {
-        this.isAvailable = isAvailable;
+    public void setCreatedAt(InstantFilter createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public LongFilter getTripId() {
-        return tripId;
+    public InstantFilter getUpdatedAt() {
+        return updatedAt;
     }
 
-    public Optional<LongFilter> optionalTripId() {
-        return Optional.ofNullable(tripId);
+    public Optional<InstantFilter> optionalUpdatedAt() {
+        return Optional.ofNullable(updatedAt);
     }
 
-    public LongFilter tripId() {
-        if (tripId == null) {
-            setTripId(new LongFilter());
+    public InstantFilter updatedAt() {
+        if (updatedAt == null) {
+            setUpdatedAt(new InstantFilter());
         }
-        return tripId;
+        return updatedAt;
     }
 
-    public void setTripId(LongFilter tripId) {
-        this.tripId = tripId;
+    public void setUpdatedAt(InstantFilter updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public BooleanFilter getIsDeleted() {
+        return isDeleted;
+    }
+
+    public Optional<BooleanFilter> optionalIsDeleted() {
+        return Optional.ofNullable(isDeleted);
+    }
+
+    public BooleanFilter isDeleted() {
+        if (isDeleted == null) {
+            setIsDeleted(new BooleanFilter());
+        }
+        return isDeleted;
+    }
+
+    public void setIsDeleted(BooleanFilter isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public InstantFilter getDeletedAt() {
+        return deletedAt;
+    }
+
+    public Optional<InstantFilter> optionalDeletedAt() {
+        return Optional.ofNullable(deletedAt);
+    }
+
+    public InstantFilter deletedAt() {
+        if (deletedAt == null) {
+            setDeletedAt(new InstantFilter());
+        }
+        return deletedAt;
+    }
+
+    public void setDeletedAt(InstantFilter deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUIDFilter getDeletedBy() {
+        return deletedBy;
+    }
+
+    public Optional<UUIDFilter> optionalDeletedBy() {
+        return Optional.ofNullable(deletedBy);
+    }
+
+    public UUIDFilter deletedBy() {
+        if (deletedBy == null) {
+            setDeletedBy(new UUIDFilter());
+        }
+        return deletedBy;
+    }
+
+    public void setDeletedBy(UUIDFilter deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public LongFilter getFloorId() {
+        return floorId;
+    }
+
+    public Optional<LongFilter> optionalFloorId() {
+        return Optional.ofNullable(floorId);
+    }
+
+    public LongFilter floorId() {
+        if (floorId == null) {
+            setFloorId(new LongFilter());
+        }
+        return floorId;
+    }
+
+    public void setFloorId(LongFilter floorId) {
+        this.floorId = floorId;
     }
 
     public Boolean getDistinct() {
@@ -237,19 +307,23 @@ public class SeatCriteria implements Serializable, Criteria {
         final SeatCriteria that = (SeatCriteria) o;
         return (
             Objects.equals(id, that.id) &&
-            Objects.equals(seatNumber, that.seatNumber) &&
-            Objects.equals(seatType, that.seatType) &&
-            Objects.equals(deck, that.deck) &&
-            Objects.equals(priceModifier, that.priceModifier) &&
-            Objects.equals(isAvailable, that.isAvailable) &&
-            Objects.equals(tripId, that.tripId) &&
+            Objects.equals(seatNo, that.seatNo) &&
+            Objects.equals(row, that.row) &&
+            Objects.equals(col, that.col) &&
+            Objects.equals(priceFactor, that.priceFactor) &&
+            Objects.equals(createdAt, that.createdAt) &&
+            Objects.equals(updatedAt, that.updatedAt) &&
+            Objects.equals(isDeleted, that.isDeleted) &&
+            Objects.equals(deletedAt, that.deletedAt) &&
+            Objects.equals(deletedBy, that.deletedBy) &&
+            Objects.equals(floorId, that.floorId) &&
             Objects.equals(distinct, that.distinct)
         );
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, seatNumber, seatType, deck, priceModifier, isAvailable, tripId, distinct);
+        return Objects.hash(id, seatNo, row, col, priceFactor, createdAt, updatedAt, isDeleted, deletedAt, deletedBy, floorId, distinct);
     }
 
     // prettier-ignore
@@ -257,12 +331,16 @@ public class SeatCriteria implements Serializable, Criteria {
     public String toString() {
         return "SeatCriteria{" +
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
-            optionalSeatNumber().map(f -> "seatNumber=" + f + ", ").orElse("") +
-            optionalSeatType().map(f -> "seatType=" + f + ", ").orElse("") +
-            optionalDeck().map(f -> "deck=" + f + ", ").orElse("") +
-            optionalPriceModifier().map(f -> "priceModifier=" + f + ", ").orElse("") +
-            optionalIsAvailable().map(f -> "isAvailable=" + f + ", ").orElse("") +
-            optionalTripId().map(f -> "tripId=" + f + ", ").orElse("") +
+            optionalSeatNo().map(f -> "seatNo=" + f + ", ").orElse("") +
+            optionalRow().map(f -> "row=" + f + ", ").orElse("") +
+            optionalCol().map(f -> "col=" + f + ", ").orElse("") +
+            optionalPriceFactor().map(f -> "priceFactor=" + f + ", ").orElse("") +
+            optionalCreatedAt().map(f -> "createdAt=" + f + ", ").orElse("") +
+            optionalUpdatedAt().map(f -> "updatedAt=" + f + ", ").orElse("") +
+            optionalIsDeleted().map(f -> "isDeleted=" + f + ", ").orElse("") +
+            optionalDeletedAt().map(f -> "deletedAt=" + f + ", ").orElse("") +
+            optionalDeletedBy().map(f -> "deletedBy=" + f + ", ").orElse("") +
+            optionalFloorId().map(f -> "floorId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +
         "}";
     }

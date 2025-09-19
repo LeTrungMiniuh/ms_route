@@ -3,7 +3,9 @@ package com.ticketsystem.route.service.dto;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A DTO for the {@link com.ticketsystem.route.domain.Address} entity.
@@ -14,18 +16,22 @@ public class AddressDTO implements Serializable {
     private Long id;
 
     @NotNull
-    private String wardCode;
-
-    @NotNull
     private String streetAddress;
-
-    private String postalCode;
 
     private BigDecimal latitude;
 
     private BigDecimal longitude;
 
-    private String landmark;
+    @NotNull
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+    private Boolean isDeleted;
+
+    private Instant deletedAt;
+
+    private UUID deletedBy;
 
     @NotNull
     private WardDTO ward;
@@ -38,28 +44,12 @@ public class AddressDTO implements Serializable {
         this.id = id;
     }
 
-    public String getWardCode() {
-        return wardCode;
-    }
-
-    public void setWardCode(String wardCode) {
-        this.wardCode = wardCode;
-    }
-
     public String getStreetAddress() {
         return streetAddress;
     }
 
     public void setStreetAddress(String streetAddress) {
         this.streetAddress = streetAddress;
-    }
-
-    public String getPostalCode() {
-        return postalCode;
-    }
-
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
     }
 
     public BigDecimal getLatitude() {
@@ -78,12 +68,44 @@ public class AddressDTO implements Serializable {
         this.longitude = longitude;
     }
 
-    public String getLandmark() {
-        return landmark;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setLandmark(String landmark) {
-        this.landmark = landmark;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Instant getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
     public WardDTO getWard() {
@@ -120,12 +142,14 @@ public class AddressDTO implements Serializable {
     public String toString() {
         return "AddressDTO{" +
             "id=" + getId() +
-            ", wardCode='" + getWardCode() + "'" +
             ", streetAddress='" + getStreetAddress() + "'" +
-            ", postalCode='" + getPostalCode() + "'" +
             ", latitude=" + getLatitude() +
             ", longitude=" + getLongitude() +
-            ", landmark='" + getLandmark() + "'" +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             ", ward=" + getWard() +
             "}";
     }

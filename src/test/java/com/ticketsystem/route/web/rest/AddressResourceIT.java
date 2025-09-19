@@ -18,7 +18,10 @@ import com.ticketsystem.route.service.dto.AddressDTO;
 import com.ticketsystem.route.service.mapper.AddressMapper;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,14 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser
 class AddressResourceIT {
 
-    private static final String DEFAULT_WARD_CODE = "AAAAAAAAAA";
-    private static final String UPDATED_WARD_CODE = "BBBBBBBBBB";
-
     private static final String DEFAULT_STREET_ADDRESS = "AAAAAAAAAA";
     private static final String UPDATED_STREET_ADDRESS = "BBBBBBBBBB";
-
-    private static final String DEFAULT_POSTAL_CODE = "AAAAAAAAAA";
-    private static final String UPDATED_POSTAL_CODE = "BBBBBBBBBB";
 
     private static final BigDecimal DEFAULT_LATITUDE = new BigDecimal(1);
     private static final BigDecimal UPDATED_LATITUDE = new BigDecimal(2);
@@ -55,8 +52,20 @@ class AddressResourceIT {
     private static final BigDecimal UPDATED_LONGITUDE = new BigDecimal(2);
     private static final BigDecimal SMALLER_LONGITUDE = new BigDecimal(1 - 1);
 
-    private static final String DEFAULT_LANDMARK = "AAAAAAAAAA";
-    private static final String UPDATED_LANDMARK = "BBBBBBBBBB";
+    private static final Instant DEFAULT_CREATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_CREATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Instant DEFAULT_UPDATED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_UPDATED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final Boolean DEFAULT_IS_DELETED = false;
+    private static final Boolean UPDATED_IS_DELETED = true;
+
+    private static final Instant DEFAULT_DELETED_AT = Instant.ofEpochMilli(0L);
+    private static final Instant UPDATED_DELETED_AT = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+
+    private static final UUID DEFAULT_DELETED_BY = UUID.randomUUID();
+    private static final UUID UPDATED_DELETED_BY = UUID.randomUUID();
 
     private static final String ENTITY_API_URL = "/api/addresses";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
@@ -91,12 +100,14 @@ class AddressResourceIT {
      */
     public static Address createEntity(EntityManager em) {
         Address address = new Address()
-            .wardCode(DEFAULT_WARD_CODE)
             .streetAddress(DEFAULT_STREET_ADDRESS)
-            .postalCode(DEFAULT_POSTAL_CODE)
             .latitude(DEFAULT_LATITUDE)
             .longitude(DEFAULT_LONGITUDE)
-            .landmark(DEFAULT_LANDMARK);
+            .createdAt(DEFAULT_CREATED_AT)
+            .updatedAt(DEFAULT_UPDATED_AT)
+            .isDeleted(DEFAULT_IS_DELETED)
+            .deletedAt(DEFAULT_DELETED_AT)
+            .deletedBy(DEFAULT_DELETED_BY);
         // Add required entity
         Ward ward;
         if (TestUtil.findAll(em, Ward.class).isEmpty()) {
@@ -118,12 +129,14 @@ class AddressResourceIT {
      */
     public static Address createUpdatedEntity(EntityManager em) {
         Address updatedAddress = new Address()
-            .wardCode(UPDATED_WARD_CODE)
             .streetAddress(UPDATED_STREET_ADDRESS)
-            .postalCode(UPDATED_POSTAL_CODE)
             .latitude(UPDATED_LATITUDE)
             .longitude(UPDATED_LONGITUDE)
-            .landmark(UPDATED_LANDMARK);
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         // Add required entity
         Ward ward;
         if (TestUtil.findAll(em, Ward.class).isEmpty()) {
@@ -196,10 +209,10 @@ class AddressResourceIT {
 
     @Test
     @Transactional
-    void checkWardCodeIsRequired() throws Exception {
+    void checkStreetAddressIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        address.setWardCode(null);
+        address.setStreetAddress(null);
 
         // Create the Address, which fails.
         AddressDTO addressDTO = addressMapper.toDto(address);
@@ -213,10 +226,10 @@ class AddressResourceIT {
 
     @Test
     @Transactional
-    void checkStreetAddressIsRequired() throws Exception {
+    void checkCreatedAtIsRequired() throws Exception {
         long databaseSizeBeforeTest = getRepositoryCount();
         // set the field null
-        address.setStreetAddress(null);
+        address.setCreatedAt(null);
 
         // Create the Address, which fails.
         AddressDTO addressDTO = addressMapper.toDto(address);
@@ -240,12 +253,14 @@ class AddressResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(address.getId().intValue())))
-            .andExpect(jsonPath("$.[*].wardCode").value(hasItem(DEFAULT_WARD_CODE)))
             .andExpect(jsonPath("$.[*].streetAddress").value(hasItem(DEFAULT_STREET_ADDRESS)))
-            .andExpect(jsonPath("$.[*].postalCode").value(hasItem(DEFAULT_POSTAL_CODE)))
             .andExpect(jsonPath("$.[*].latitude").value(hasItem(sameNumber(DEFAULT_LATITUDE))))
             .andExpect(jsonPath("$.[*].longitude").value(hasItem(sameNumber(DEFAULT_LONGITUDE))))
-            .andExpect(jsonPath("$.[*].landmark").value(hasItem(DEFAULT_LANDMARK)));
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
     }
 
     @Test
@@ -260,12 +275,14 @@ class AddressResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(address.getId().intValue()))
-            .andExpect(jsonPath("$.wardCode").value(DEFAULT_WARD_CODE))
             .andExpect(jsonPath("$.streetAddress").value(DEFAULT_STREET_ADDRESS))
-            .andExpect(jsonPath("$.postalCode").value(DEFAULT_POSTAL_CODE))
             .andExpect(jsonPath("$.latitude").value(sameNumber(DEFAULT_LATITUDE)))
             .andExpect(jsonPath("$.longitude").value(sameNumber(DEFAULT_LONGITUDE)))
-            .andExpect(jsonPath("$.landmark").value(DEFAULT_LANDMARK));
+            .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
+            .andExpect(jsonPath("$.updatedAt").value(DEFAULT_UPDATED_AT.toString()))
+            .andExpect(jsonPath("$.isDeleted").value(DEFAULT_IS_DELETED))
+            .andExpect(jsonPath("$.deletedAt").value(DEFAULT_DELETED_AT.toString()))
+            .andExpect(jsonPath("$.deletedBy").value(DEFAULT_DELETED_BY.toString()));
     }
 
     @Test
@@ -281,56 +298,6 @@ class AddressResourceIT {
         defaultAddressFiltering("id.greaterThanOrEqual=" + id, "id.greaterThan=" + id);
 
         defaultAddressFiltering("id.lessThanOrEqual=" + id, "id.lessThan=" + id);
-    }
-
-    @Test
-    @Transactional
-    void getAllAddressesByWardCodeIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedAddress = addressRepository.saveAndFlush(address);
-
-        // Get all the addressList where wardCode equals to
-        defaultAddressFiltering("wardCode.equals=" + DEFAULT_WARD_CODE, "wardCode.equals=" + UPDATED_WARD_CODE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAddressesByWardCodeIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedAddress = addressRepository.saveAndFlush(address);
-
-        // Get all the addressList where wardCode in
-        defaultAddressFiltering("wardCode.in=" + DEFAULT_WARD_CODE + "," + UPDATED_WARD_CODE, "wardCode.in=" + UPDATED_WARD_CODE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAddressesByWardCodeIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedAddress = addressRepository.saveAndFlush(address);
-
-        // Get all the addressList where wardCode is not null
-        defaultAddressFiltering("wardCode.specified=true", "wardCode.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllAddressesByWardCodeContainsSomething() throws Exception {
-        // Initialize the database
-        insertedAddress = addressRepository.saveAndFlush(address);
-
-        // Get all the addressList where wardCode contains
-        defaultAddressFiltering("wardCode.contains=" + DEFAULT_WARD_CODE, "wardCode.contains=" + UPDATED_WARD_CODE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAddressesByWardCodeNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedAddress = addressRepository.saveAndFlush(address);
-
-        // Get all the addressList where wardCode does not contain
-        defaultAddressFiltering("wardCode.doesNotContain=" + UPDATED_WARD_CODE, "wardCode.doesNotContain=" + DEFAULT_WARD_CODE);
     }
 
     @Test
@@ -387,56 +354,6 @@ class AddressResourceIT {
             "streetAddress.doesNotContain=" + UPDATED_STREET_ADDRESS,
             "streetAddress.doesNotContain=" + DEFAULT_STREET_ADDRESS
         );
-    }
-
-    @Test
-    @Transactional
-    void getAllAddressesByPostalCodeIsEqualToSomething() throws Exception {
-        // Initialize the database
-        insertedAddress = addressRepository.saveAndFlush(address);
-
-        // Get all the addressList where postalCode equals to
-        defaultAddressFiltering("postalCode.equals=" + DEFAULT_POSTAL_CODE, "postalCode.equals=" + UPDATED_POSTAL_CODE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAddressesByPostalCodeIsInShouldWork() throws Exception {
-        // Initialize the database
-        insertedAddress = addressRepository.saveAndFlush(address);
-
-        // Get all the addressList where postalCode in
-        defaultAddressFiltering("postalCode.in=" + DEFAULT_POSTAL_CODE + "," + UPDATED_POSTAL_CODE, "postalCode.in=" + UPDATED_POSTAL_CODE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAddressesByPostalCodeIsNullOrNotNull() throws Exception {
-        // Initialize the database
-        insertedAddress = addressRepository.saveAndFlush(address);
-
-        // Get all the addressList where postalCode is not null
-        defaultAddressFiltering("postalCode.specified=true", "postalCode.specified=false");
-    }
-
-    @Test
-    @Transactional
-    void getAllAddressesByPostalCodeContainsSomething() throws Exception {
-        // Initialize the database
-        insertedAddress = addressRepository.saveAndFlush(address);
-
-        // Get all the addressList where postalCode contains
-        defaultAddressFiltering("postalCode.contains=" + DEFAULT_POSTAL_CODE, "postalCode.contains=" + UPDATED_POSTAL_CODE);
-    }
-
-    @Test
-    @Transactional
-    void getAllAddressesByPostalCodeNotContainsSomething() throws Exception {
-        // Initialize the database
-        insertedAddress = addressRepository.saveAndFlush(address);
-
-        // Get all the addressList where postalCode does not contain
-        defaultAddressFiltering("postalCode.doesNotContain=" + UPDATED_POSTAL_CODE, "postalCode.doesNotContain=" + DEFAULT_POSTAL_CODE);
     }
 
     @Test
@@ -581,52 +498,152 @@ class AddressResourceIT {
 
     @Test
     @Transactional
-    void getAllAddressesByLandmarkIsEqualToSomething() throws Exception {
+    void getAllAddressesByCreatedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedAddress = addressRepository.saveAndFlush(address);
 
-        // Get all the addressList where landmark equals to
-        defaultAddressFiltering("landmark.equals=" + DEFAULT_LANDMARK, "landmark.equals=" + UPDATED_LANDMARK);
+        // Get all the addressList where createdAt equals to
+        defaultAddressFiltering("createdAt.equals=" + DEFAULT_CREATED_AT, "createdAt.equals=" + UPDATED_CREATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllAddressesByLandmarkIsInShouldWork() throws Exception {
+    void getAllAddressesByCreatedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedAddress = addressRepository.saveAndFlush(address);
 
-        // Get all the addressList where landmark in
-        defaultAddressFiltering("landmark.in=" + DEFAULT_LANDMARK + "," + UPDATED_LANDMARK, "landmark.in=" + UPDATED_LANDMARK);
+        // Get all the addressList where createdAt in
+        defaultAddressFiltering("createdAt.in=" + DEFAULT_CREATED_AT + "," + UPDATED_CREATED_AT, "createdAt.in=" + UPDATED_CREATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllAddressesByLandmarkIsNullOrNotNull() throws Exception {
+    void getAllAddressesByCreatedAtIsNullOrNotNull() throws Exception {
         // Initialize the database
         insertedAddress = addressRepository.saveAndFlush(address);
 
-        // Get all the addressList where landmark is not null
-        defaultAddressFiltering("landmark.specified=true", "landmark.specified=false");
+        // Get all the addressList where createdAt is not null
+        defaultAddressFiltering("createdAt.specified=true", "createdAt.specified=false");
     }
 
     @Test
     @Transactional
-    void getAllAddressesByLandmarkContainsSomething() throws Exception {
+    void getAllAddressesByUpdatedAtIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedAddress = addressRepository.saveAndFlush(address);
 
-        // Get all the addressList where landmark contains
-        defaultAddressFiltering("landmark.contains=" + DEFAULT_LANDMARK, "landmark.contains=" + UPDATED_LANDMARK);
+        // Get all the addressList where updatedAt equals to
+        defaultAddressFiltering("updatedAt.equals=" + DEFAULT_UPDATED_AT, "updatedAt.equals=" + UPDATED_UPDATED_AT);
     }
 
     @Test
     @Transactional
-    void getAllAddressesByLandmarkNotContainsSomething() throws Exception {
+    void getAllAddressesByUpdatedAtIsInShouldWork() throws Exception {
         // Initialize the database
         insertedAddress = addressRepository.saveAndFlush(address);
 
-        // Get all the addressList where landmark does not contain
-        defaultAddressFiltering("landmark.doesNotContain=" + UPDATED_LANDMARK, "landmark.doesNotContain=" + DEFAULT_LANDMARK);
+        // Get all the addressList where updatedAt in
+        defaultAddressFiltering("updatedAt.in=" + DEFAULT_UPDATED_AT + "," + UPDATED_UPDATED_AT, "updatedAt.in=" + UPDATED_UPDATED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllAddressesByUpdatedAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedAddress = addressRepository.saveAndFlush(address);
+
+        // Get all the addressList where updatedAt is not null
+        defaultAddressFiltering("updatedAt.specified=true", "updatedAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllAddressesByIsDeletedIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedAddress = addressRepository.saveAndFlush(address);
+
+        // Get all the addressList where isDeleted equals to
+        defaultAddressFiltering("isDeleted.equals=" + DEFAULT_IS_DELETED, "isDeleted.equals=" + UPDATED_IS_DELETED);
+    }
+
+    @Test
+    @Transactional
+    void getAllAddressesByIsDeletedIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedAddress = addressRepository.saveAndFlush(address);
+
+        // Get all the addressList where isDeleted in
+        defaultAddressFiltering("isDeleted.in=" + DEFAULT_IS_DELETED + "," + UPDATED_IS_DELETED, "isDeleted.in=" + UPDATED_IS_DELETED);
+    }
+
+    @Test
+    @Transactional
+    void getAllAddressesByIsDeletedIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedAddress = addressRepository.saveAndFlush(address);
+
+        // Get all the addressList where isDeleted is not null
+        defaultAddressFiltering("isDeleted.specified=true", "isDeleted.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllAddressesByDeletedAtIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedAddress = addressRepository.saveAndFlush(address);
+
+        // Get all the addressList where deletedAt equals to
+        defaultAddressFiltering("deletedAt.equals=" + DEFAULT_DELETED_AT, "deletedAt.equals=" + UPDATED_DELETED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllAddressesByDeletedAtIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedAddress = addressRepository.saveAndFlush(address);
+
+        // Get all the addressList where deletedAt in
+        defaultAddressFiltering("deletedAt.in=" + DEFAULT_DELETED_AT + "," + UPDATED_DELETED_AT, "deletedAt.in=" + UPDATED_DELETED_AT);
+    }
+
+    @Test
+    @Transactional
+    void getAllAddressesByDeletedAtIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedAddress = addressRepository.saveAndFlush(address);
+
+        // Get all the addressList where deletedAt is not null
+        defaultAddressFiltering("deletedAt.specified=true", "deletedAt.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllAddressesByDeletedByIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedAddress = addressRepository.saveAndFlush(address);
+
+        // Get all the addressList where deletedBy equals to
+        defaultAddressFiltering("deletedBy.equals=" + DEFAULT_DELETED_BY, "deletedBy.equals=" + UPDATED_DELETED_BY);
+    }
+
+    @Test
+    @Transactional
+    void getAllAddressesByDeletedByIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedAddress = addressRepository.saveAndFlush(address);
+
+        // Get all the addressList where deletedBy in
+        defaultAddressFiltering("deletedBy.in=" + DEFAULT_DELETED_BY + "," + UPDATED_DELETED_BY, "deletedBy.in=" + UPDATED_DELETED_BY);
+    }
+
+    @Test
+    @Transactional
+    void getAllAddressesByDeletedByIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedAddress = addressRepository.saveAndFlush(address);
+
+        // Get all the addressList where deletedBy is not null
+        defaultAddressFiltering("deletedBy.specified=true", "deletedBy.specified=false");
     }
 
     @Test
@@ -665,12 +682,14 @@ class AddressResourceIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(address.getId().intValue())))
-            .andExpect(jsonPath("$.[*].wardCode").value(hasItem(DEFAULT_WARD_CODE)))
             .andExpect(jsonPath("$.[*].streetAddress").value(hasItem(DEFAULT_STREET_ADDRESS)))
-            .andExpect(jsonPath("$.[*].postalCode").value(hasItem(DEFAULT_POSTAL_CODE)))
             .andExpect(jsonPath("$.[*].latitude").value(hasItem(sameNumber(DEFAULT_LATITUDE))))
             .andExpect(jsonPath("$.[*].longitude").value(hasItem(sameNumber(DEFAULT_LONGITUDE))))
-            .andExpect(jsonPath("$.[*].landmark").value(hasItem(DEFAULT_LANDMARK)));
+            .andExpect(jsonPath("$.[*].createdAt").value(hasItem(DEFAULT_CREATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].updatedAt").value(hasItem(DEFAULT_UPDATED_AT.toString())))
+            .andExpect(jsonPath("$.[*].isDeleted").value(hasItem(DEFAULT_IS_DELETED)))
+            .andExpect(jsonPath("$.[*].deletedAt").value(hasItem(DEFAULT_DELETED_AT.toString())))
+            .andExpect(jsonPath("$.[*].deletedBy").value(hasItem(DEFAULT_DELETED_BY.toString())));
 
         // Check, that the count call also returns 1
         restAddressMockMvc
@@ -719,12 +738,14 @@ class AddressResourceIT {
         // Disconnect from session so that the updates on updatedAddress are not directly saved in db
         em.detach(updatedAddress);
         updatedAddress
-            .wardCode(UPDATED_WARD_CODE)
             .streetAddress(UPDATED_STREET_ADDRESS)
-            .postalCode(UPDATED_POSTAL_CODE)
             .latitude(UPDATED_LATITUDE)
             .longitude(UPDATED_LONGITUDE)
-            .landmark(UPDATED_LANDMARK);
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
         AddressDTO addressDTO = addressMapper.toDto(updatedAddress);
 
         restAddressMockMvc
@@ -817,7 +838,11 @@ class AddressResourceIT {
         Address partialUpdatedAddress = new Address();
         partialUpdatedAddress.setId(address.getId());
 
-        partialUpdatedAddress.wardCode(UPDATED_WARD_CODE).longitude(UPDATED_LONGITUDE).landmark(UPDATED_LANDMARK);
+        partialUpdatedAddress
+            .streetAddress(UPDATED_STREET_ADDRESS)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedBy(UPDATED_DELETED_BY);
 
         restAddressMockMvc
             .perform(
@@ -847,12 +872,14 @@ class AddressResourceIT {
         partialUpdatedAddress.setId(address.getId());
 
         partialUpdatedAddress
-            .wardCode(UPDATED_WARD_CODE)
             .streetAddress(UPDATED_STREET_ADDRESS)
-            .postalCode(UPDATED_POSTAL_CODE)
             .latitude(UPDATED_LATITUDE)
             .longitude(UPDATED_LONGITUDE)
-            .landmark(UPDATED_LANDMARK);
+            .createdAt(UPDATED_CREATED_AT)
+            .updatedAt(UPDATED_UPDATED_AT)
+            .isDeleted(UPDATED_IS_DELETED)
+            .deletedAt(UPDATED_DELETED_AT)
+            .deletedBy(UPDATED_DELETED_BY);
 
         restAddressMockMvc
             .perform(

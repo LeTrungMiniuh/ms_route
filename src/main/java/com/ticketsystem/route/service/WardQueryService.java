@@ -72,10 +72,18 @@ public class WardQueryService extends QueryService<Ward> {
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
                 buildRangeSpecification(criteria.getId(), Ward_.id),
-                buildStringSpecification(criteria.getCode(), Ward_.code),
+                buildStringSpecification(criteria.getWardCode(), Ward_.wardCode),
                 buildStringSpecification(criteria.getName(), Ward_.name),
                 buildStringSpecification(criteria.getNameEn(), Ward_.nameEn),
-                buildStringSpecification(criteria.getType(), Ward_.type),
+                buildStringSpecification(criteria.getFullName(), Ward_.fullName),
+                buildStringSpecification(criteria.getFullNameEn(), Ward_.fullNameEn),
+                buildStringSpecification(criteria.getCodeName(), Ward_.codeName),
+                buildRangeSpecification(criteria.getAdministrativeUnitId(), Ward_.administrativeUnitId),
+                buildRangeSpecification(criteria.getCreatedAt(), Ward_.createdAt),
+                buildRangeSpecification(criteria.getUpdatedAt(), Ward_.updatedAt),
+                buildSpecification(criteria.getIsDeleted(), Ward_.isDeleted),
+                buildRangeSpecification(criteria.getDeletedAt(), Ward_.deletedAt),
+                buildSpecification(criteria.getDeletedBy(), Ward_.deletedBy),
                 buildSpecification(criteria.getAddressesId(), root -> root.join(Ward_.addresses, JoinType.LEFT).get(Address_.id)),
                 buildSpecification(criteria.getDistrictId(), root -> root.join(Ward_.district, JoinType.LEFT).get(District_.id))
             );

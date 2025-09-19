@@ -1,10 +1,11 @@
 package com.ticketsystem.route.service.dto;
 
-import com.ticketsystem.route.domain.enumeration.TransportType;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A DTO for the {@link com.ticketsystem.route.domain.Route} entity.
@@ -14,25 +15,26 @@ public class RouteDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
-    private TransportType transportType;
+    private String routeCode;
 
-    private BigDecimal distance;
-
-    private Integer estimatedDuration;
+    private BigDecimal distanceKm;
 
     @NotNull
-    private BigDecimal basePrice;
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+    private Boolean isDeleted;
+
+    private Instant deletedAt;
+
+    private UUID deletedBy;
 
     @NotNull
-    private Boolean isActive;
-
     private StationDTO origin;
 
-    private StationDTO destination;
-
     @NotNull
-    private OperatorDTO operator;
+    private StationDTO destination;
 
     public Long getId() {
         return id;
@@ -42,44 +44,60 @@ public class RouteDTO implements Serializable {
         this.id = id;
     }
 
-    public TransportType getTransportType() {
-        return transportType;
+    public String getRouteCode() {
+        return routeCode;
     }
 
-    public void setTransportType(TransportType transportType) {
-        this.transportType = transportType;
+    public void setRouteCode(String routeCode) {
+        this.routeCode = routeCode;
     }
 
-    public BigDecimal getDistance() {
-        return distance;
+    public BigDecimal getDistanceKm() {
+        return distanceKm;
     }
 
-    public void setDistance(BigDecimal distance) {
-        this.distance = distance;
+    public void setDistanceKm(BigDecimal distanceKm) {
+        this.distanceKm = distanceKm;
     }
 
-    public Integer getEstimatedDuration() {
-        return estimatedDuration;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setEstimatedDuration(Integer estimatedDuration) {
-        this.estimatedDuration = estimatedDuration;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public BigDecimal getBasePrice() {
-        return basePrice;
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setBasePrice(BigDecimal basePrice) {
-        this.basePrice = basePrice;
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public Boolean getIsActive() {
-        return isActive;
+    public Boolean getIsDeleted() {
+        return isDeleted;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Instant getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
     public StationDTO getOrigin() {
@@ -96,14 +114,6 @@ public class RouteDTO implements Serializable {
 
     public void setDestination(StationDTO destination) {
         this.destination = destination;
-    }
-
-    public OperatorDTO getOperator() {
-        return operator;
-    }
-
-    public void setOperator(OperatorDTO operator) {
-        this.operator = operator;
     }
 
     @Override
@@ -132,14 +142,15 @@ public class RouteDTO implements Serializable {
     public String toString() {
         return "RouteDTO{" +
             "id=" + getId() +
-            ", transportType='" + getTransportType() + "'" +
-            ", distance=" + getDistance() +
-            ", estimatedDuration=" + getEstimatedDuration() +
-            ", basePrice=" + getBasePrice() +
-            ", isActive='" + getIsActive() + "'" +
+            ", routeCode='" + getRouteCode() + "'" +
+            ", distanceKm=" + getDistanceKm() +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             ", origin=" + getOrigin() +
             ", destination=" + getDestination() +
-            ", operator=" + getOperator() +
             "}";
     }
 }

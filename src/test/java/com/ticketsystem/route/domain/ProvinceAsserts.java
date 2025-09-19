@@ -47,10 +47,23 @@ public class ProvinceAsserts {
     public static void assertProvinceUpdatableFieldsEquals(Province expected, Province actual) {
         assertThat(actual)
             .as("Verify Province relevant properties")
-            .satisfies(a -> assertThat(a.getCode()).as("check code").isEqualTo(expected.getCode()))
+            .satisfies(a -> assertThat(a.getProvinceCode()).as("check provinceCode").isEqualTo(expected.getProvinceCode()))
             .satisfies(a -> assertThat(a.getName()).as("check name").isEqualTo(expected.getName()))
             .satisfies(a -> assertThat(a.getNameEn()).as("check nameEn").isEqualTo(expected.getNameEn()))
-            .satisfies(a -> assertThat(a.getRegion()).as("check region").isEqualTo(expected.getRegion()));
+            .satisfies(a -> assertThat(a.getFullName()).as("check fullName").isEqualTo(expected.getFullName()))
+            .satisfies(a -> assertThat(a.getFullNameEn()).as("check fullNameEn").isEqualTo(expected.getFullNameEn()))
+            .satisfies(a -> assertThat(a.getCodeName()).as("check codeName").isEqualTo(expected.getCodeName()))
+            .satisfies(a ->
+                assertThat(a.getAdministrativeUnitId()).as("check administrativeUnitId").isEqualTo(expected.getAdministrativeUnitId())
+            )
+            .satisfies(a ->
+                assertThat(a.getAdministrativeRegionId()).as("check administrativeRegionId").isEqualTo(expected.getAdministrativeRegionId())
+            )
+            .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()))
+            .satisfies(a -> assertThat(a.getUpdatedAt()).as("check updatedAt").isEqualTo(expected.getUpdatedAt()))
+            .satisfies(a -> assertThat(a.getIsDeleted()).as("check isDeleted").isEqualTo(expected.getIsDeleted()))
+            .satisfies(a -> assertThat(a.getDeletedAt()).as("check deletedAt").isEqualTo(expected.getDeletedAt()))
+            .satisfies(a -> assertThat(a.getDeletedBy()).as("check deletedBy").isEqualTo(expected.getDeletedBy()));
     }
 
     /**

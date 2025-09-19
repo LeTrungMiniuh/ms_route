@@ -48,16 +48,20 @@ public class SeatAsserts {
     public static void assertSeatUpdatableFieldsEquals(Seat expected, Seat actual) {
         assertThat(actual)
             .as("Verify Seat relevant properties")
-            .satisfies(a -> assertThat(a.getSeatNumber()).as("check seatNumber").isEqualTo(expected.getSeatNumber()))
-            .satisfies(a -> assertThat(a.getSeatType()).as("check seatType").isEqualTo(expected.getSeatType()))
-            .satisfies(a -> assertThat(a.getDeck()).as("check deck").isEqualTo(expected.getDeck()))
+            .satisfies(a -> assertThat(a.getSeatNo()).as("check seatNo").isEqualTo(expected.getSeatNo()))
+            .satisfies(a -> assertThat(a.getRow()).as("check row").isEqualTo(expected.getRow()))
+            .satisfies(a -> assertThat(a.getCol()).as("check col").isEqualTo(expected.getCol()))
             .satisfies(a ->
-                assertThat(a.getPriceModifier())
-                    .as("check priceModifier")
+                assertThat(a.getPriceFactor())
+                    .as("check priceFactor")
                     .usingComparator(bigDecimalCompareTo)
-                    .isEqualTo(expected.getPriceModifier())
+                    .isEqualTo(expected.getPriceFactor())
             )
-            .satisfies(a -> assertThat(a.getIsAvailable()).as("check isAvailable").isEqualTo(expected.getIsAvailable()));
+            .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()))
+            .satisfies(a -> assertThat(a.getUpdatedAt()).as("check updatedAt").isEqualTo(expected.getUpdatedAt()))
+            .satisfies(a -> assertThat(a.getIsDeleted()).as("check isDeleted").isEqualTo(expected.getIsDeleted()))
+            .satisfies(a -> assertThat(a.getDeletedAt()).as("check deletedAt").isEqualTo(expected.getDeletedAt()))
+            .satisfies(a -> assertThat(a.getDeletedBy()).as("check deletedBy").isEqualTo(expected.getDeletedBy()));
     }
 
     /**
@@ -69,6 +73,6 @@ public class SeatAsserts {
     public static void assertSeatUpdatableRelationshipsEquals(Seat expected, Seat actual) {
         assertThat(actual)
             .as("Verify Seat relationships")
-            .satisfies(a -> assertThat(a.getTrip()).as("check trip").isEqualTo(expected.getTrip()));
+            .satisfies(a -> assertThat(a.getFloor()).as("check floor").isEqualTo(expected.getFloor()));
     }
 }

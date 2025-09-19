@@ -72,12 +72,14 @@ public class AddressQueryService extends QueryService<Address> {
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
                 buildRangeSpecification(criteria.getId(), Address_.id),
-                buildStringSpecification(criteria.getWardCode(), Address_.wardCode),
                 buildStringSpecification(criteria.getStreetAddress(), Address_.streetAddress),
-                buildStringSpecification(criteria.getPostalCode(), Address_.postalCode),
                 buildRangeSpecification(criteria.getLatitude(), Address_.latitude),
                 buildRangeSpecification(criteria.getLongitude(), Address_.longitude),
-                buildStringSpecification(criteria.getLandmark(), Address_.landmark),
+                buildRangeSpecification(criteria.getCreatedAt(), Address_.createdAt),
+                buildRangeSpecification(criteria.getUpdatedAt(), Address_.updatedAt),
+                buildSpecification(criteria.getIsDeleted(), Address_.isDeleted),
+                buildRangeSpecification(criteria.getDeletedAt(), Address_.deletedAt),
+                buildSpecification(criteria.getDeletedBy(), Address_.deletedBy),
                 buildSpecification(criteria.getWardId(), root -> root.join(Address_.ward, JoinType.LEFT).get(Ward_.id))
             );
         }

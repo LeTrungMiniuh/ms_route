@@ -1,8 +1,10 @@
 package com.ticketsystem.route.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -27,39 +29,45 @@ public class Station implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "code", nullable = false, unique = true)
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
-    private String code;
-
-    @NotNull
     @Column(name = "name", nullable = false)
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
     private String name;
 
-    @Column(name = "name_en")
+    @Column(name = "phone_number")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
-    private String nameEn;
+    private String phoneNumber;
 
-    /**
-     * Cross-service ID: Address lives in ms_route; keep as UUID to avoid hard relation across apps
-     */
-    @NotNull
-    @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "address_id", length = 36, nullable = false)
-    private UUID addressId;
-
-    @Column(name = "facilities")
+    @Column(name = "description")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
-    private String facilities;
-
-    @Column(name = "operating_hours")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
-    private String operatingHours;
+    private String description;
 
     @NotNull
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "active", nullable = false)
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
-    private Boolean isActive;
+    private Boolean active;
+
+    @NotNull
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "is_deleted")
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
+    private Boolean isDeleted;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "deleted_by", length = 36)
+    private UUID deletedBy;
+
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "ward" }, allowSetters = true)
+    private Address address;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -76,19 +84,6 @@ public class Station implements Serializable {
         this.id = id;
     }
 
-    public String getCode() {
-        return this.code;
-    }
-
-    public Station code(String code) {
-        this.setCode(code);
-        return this;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public String getName() {
         return this.name;
     }
@@ -102,69 +97,121 @@ public class Station implements Serializable {
         this.name = name;
     }
 
-    public String getNameEn() {
-        return this.nameEn;
+    public String getPhoneNumber() {
+        return this.phoneNumber;
     }
 
-    public Station nameEn(String nameEn) {
-        this.setNameEn(nameEn);
+    public Station phoneNumber(String phoneNumber) {
+        this.setPhoneNumber(phoneNumber);
         return this;
     }
 
-    public void setNameEn(String nameEn) {
-        this.nameEn = nameEn;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
-    public UUID getAddressId() {
-        return this.addressId;
+    public String getDescription() {
+        return this.description;
     }
 
-    public Station addressId(UUID addressId) {
-        this.setAddressId(addressId);
+    public Station description(String description) {
+        this.setDescription(description);
         return this;
     }
 
-    public void setAddressId(UUID addressId) {
-        this.addressId = addressId;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getFacilities() {
-        return this.facilities;
+    public Boolean getActive() {
+        return this.active;
     }
 
-    public Station facilities(String facilities) {
-        this.setFacilities(facilities);
+    public Station active(Boolean active) {
+        this.setActive(active);
         return this;
     }
 
-    public void setFacilities(String facilities) {
-        this.facilities = facilities;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
-    public String getOperatingHours() {
-        return this.operatingHours;
+    public Instant getCreatedAt() {
+        return this.createdAt;
     }
 
-    public Station operatingHours(String operatingHours) {
-        this.setOperatingHours(operatingHours);
+    public Station createdAt(Instant createdAt) {
+        this.setCreatedAt(createdAt);
         return this;
     }
 
-    public void setOperatingHours(String operatingHours) {
-        this.operatingHours = operatingHours;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Boolean getIsActive() {
-        return this.isActive;
+    public Instant getUpdatedAt() {
+        return this.updatedAt;
     }
 
-    public Station isActive(Boolean isActive) {
-        this.setIsActive(isActive);
+    public Station updatedAt(Instant updatedAt) {
+        this.setUpdatedAt(updatedAt);
         return this;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return this.isDeleted;
+    }
+
+    public Station isDeleted(Boolean isDeleted) {
+        this.setIsDeleted(isDeleted);
+        return this;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Instant getDeletedAt() {
+        return this.deletedAt;
+    }
+
+    public Station deletedAt(Instant deletedAt) {
+        this.setDeletedAt(deletedAt);
+        return this;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return this.deletedBy;
+    }
+
+    public Station deletedBy(UUID deletedBy) {
+        this.setDeletedBy(deletedBy);
+        return this;
+    }
+
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public Address getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public Station address(Address address) {
+        this.setAddress(address);
+        return this;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
@@ -191,13 +238,15 @@ public class Station implements Serializable {
     public String toString() {
         return "Station{" +
             "id=" + getId() +
-            ", code='" + getCode() + "'" +
             ", name='" + getName() + "'" +
-            ", nameEn='" + getNameEn() + "'" +
-            ", addressId='" + getAddressId() + "'" +
-            ", facilities='" + getFacilities() + "'" +
-            ", operatingHours='" + getOperatingHours() + "'" +
-            ", isActive='" + getIsActive() + "'" +
+            ", phoneNumber='" + getPhoneNumber() + "'" +
+            ", description='" + getDescription() + "'" +
+            ", active='" + getActive() + "'" +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             "}";
     }
 }

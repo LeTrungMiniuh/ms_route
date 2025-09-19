@@ -4,10 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * A Ward.
@@ -26,8 +30,8 @@ public class Ward implements Serializable {
     private Long id;
 
     @NotNull
-    @Column(name = "code", nullable = false)
-    private String code;
+    @Column(name = "ward_code", nullable = false)
+    private String wardCode;
 
     @NotNull
     @Column(name = "name", nullable = false)
@@ -36,8 +40,34 @@ public class Ward implements Serializable {
     @Column(name = "name_en")
     private String nameEn;
 
-    @Column(name = "type")
-    private String type;
+    @Column(name = "full_name")
+    private String fullName;
+
+    @Column(name = "full_name_en")
+    private String fullNameEn;
+
+    @Column(name = "code_name")
+    private String codeName;
+
+    @Column(name = "administrative_unit_id")
+    private Integer administrativeUnitId;
+
+    @NotNull
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "deleted_by", length = 36)
+    private UUID deletedBy;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "ward")
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -64,17 +94,17 @@ public class Ward implements Serializable {
         this.id = id;
     }
 
-    public String getCode() {
-        return this.code;
+    public String getWardCode() {
+        return this.wardCode;
     }
 
-    public Ward code(String code) {
-        this.setCode(code);
+    public Ward wardCode(String wardCode) {
+        this.setWardCode(wardCode);
         return this;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setWardCode(String wardCode) {
+        this.wardCode = wardCode;
     }
 
     public String getName() {
@@ -103,17 +133,121 @@ public class Ward implements Serializable {
         this.nameEn = nameEn;
     }
 
-    public String getType() {
-        return this.type;
+    public String getFullName() {
+        return this.fullName;
     }
 
-    public Ward type(String type) {
-        this.setType(type);
+    public Ward fullName(String fullName) {
+        this.setFullName(fullName);
         return this;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getFullNameEn() {
+        return this.fullNameEn;
+    }
+
+    public Ward fullNameEn(String fullNameEn) {
+        this.setFullNameEn(fullNameEn);
+        return this;
+    }
+
+    public void setFullNameEn(String fullNameEn) {
+        this.fullNameEn = fullNameEn;
+    }
+
+    public String getCodeName() {
+        return this.codeName;
+    }
+
+    public Ward codeName(String codeName) {
+        this.setCodeName(codeName);
+        return this;
+    }
+
+    public void setCodeName(String codeName) {
+        this.codeName = codeName;
+    }
+
+    public Integer getAdministrativeUnitId() {
+        return this.administrativeUnitId;
+    }
+
+    public Ward administrativeUnitId(Integer administrativeUnitId) {
+        this.setAdministrativeUnitId(administrativeUnitId);
+        return this;
+    }
+
+    public void setAdministrativeUnitId(Integer administrativeUnitId) {
+        this.administrativeUnitId = administrativeUnitId;
+    }
+
+    public Instant getCreatedAt() {
+        return this.createdAt;
+    }
+
+    public Ward createdAt(Instant createdAt) {
+        this.setCreatedAt(createdAt);
+        return this;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    public Ward updatedAt(Instant updatedAt) {
+        this.setUpdatedAt(updatedAt);
+        return this;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return this.isDeleted;
+    }
+
+    public Ward isDeleted(Boolean isDeleted) {
+        this.setIsDeleted(isDeleted);
+        return this;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Instant getDeletedAt() {
+        return this.deletedAt;
+    }
+
+    public Ward deletedAt(Instant deletedAt) {
+        this.setDeletedAt(deletedAt);
+        return this;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return this.deletedBy;
+    }
+
+    public Ward deletedBy(UUID deletedBy) {
+        this.setDeletedBy(deletedBy);
+        return this;
+    }
+
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
     public Set<Address> getAddresses() {
@@ -184,10 +318,18 @@ public class Ward implements Serializable {
     public String toString() {
         return "Ward{" +
             "id=" + getId() +
-            ", code='" + getCode() + "'" +
+            ", wardCode='" + getWardCode() + "'" +
             ", name='" + getName() + "'" +
             ", nameEn='" + getNameEn() + "'" +
-            ", type='" + getType() + "'" +
+            ", fullName='" + getFullName() + "'" +
+            ", fullNameEn='" + getFullNameEn() + "'" +
+            ", codeName='" + getCodeName() + "'" +
+            ", administrativeUnitId=" + getAdministrativeUnitId() +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             "}";
     }
 }

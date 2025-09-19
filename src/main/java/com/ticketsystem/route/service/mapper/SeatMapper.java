@@ -1,9 +1,9 @@
 package com.ticketsystem.route.service.mapper;
 
+import com.ticketsystem.route.domain.Floor;
 import com.ticketsystem.route.domain.Seat;
-import com.ticketsystem.route.domain.Trip;
+import com.ticketsystem.route.service.dto.FloorDTO;
 import com.ticketsystem.route.service.dto.SeatDTO;
-import com.ticketsystem.route.service.dto.TripDTO;
 import org.mapstruct.*;
 
 /**
@@ -11,11 +11,11 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface SeatMapper extends EntityMapper<SeatDTO, Seat> {
-    @Mapping(target = "trip", source = "trip", qualifiedByName = "tripId")
+    @Mapping(target = "floor", source = "floor", qualifiedByName = "floorId")
     SeatDTO toDto(Seat s);
 
-    @Named("tripId")
+    @Named("floorId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    TripDTO toDtoTripId(Trip trip);
+    FloorDTO toDtoFloorId(Floor floor);
 }

@@ -1,5 +1,6 @@
 package com.ticketsystem.route.domain;
 
+import static com.ticketsystem.route.domain.AssertUtils.bigDecimalCompareTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class VehicleAsserts {
@@ -47,19 +48,21 @@ public class VehicleAsserts {
     public static void assertVehicleUpdatableFieldsEquals(Vehicle expected, Vehicle actual) {
         assertThat(actual)
             .as("Verify Vehicle relevant properties")
-            .satisfies(a -> assertThat(a.getPlateNumber()).as("check plateNumber").isEqualTo(expected.getPlateNumber()))
-            .satisfies(a -> assertThat(a.getModel()).as("check model").isEqualTo(expected.getModel()))
-            .satisfies(a -> assertThat(a.getCapacity()).as("check capacity").isEqualTo(expected.getCapacity()))
-            .satisfies(a -> assertThat(a.getSeatLayout()).as("check seatLayout").isEqualTo(expected.getSeatLayout()))
-            .satisfies(a -> assertThat(a.getAmenities()).as("check amenities").isEqualTo(expected.getAmenities()))
-            .satisfies(a -> assertThat(a.getImageCoverUrl()).as("check imageCoverUrl").isEqualTo(expected.getImageCoverUrl()))
-            .satisfies(a -> assertThat(a.getAverageRating()).as("check averageRating").isEqualTo(expected.getAverageRating()))
-            .satisfies(a -> assertThat(a.getTotalReviews()).as("check totalReviews").isEqualTo(expected.getTotalReviews()))
-            .satisfies(a -> assertThat(a.getIsActive()).as("check isActive").isEqualTo(expected.getIsActive()))
-            .satisfies(a -> assertThat(a.getYearManufactured()).as("check yearManufactured").isEqualTo(expected.getYearManufactured()))
+            .satisfies(a -> assertThat(a.getType()).as("check type").isEqualTo(expected.getType()))
             .satisfies(a ->
-                assertThat(a.getLastMaintenanceDate()).as("check lastMaintenanceDate").isEqualTo(expected.getLastMaintenanceDate())
-            );
+                assertThat(a.getTypeFactor())
+                    .as("check typeFactor")
+                    .usingComparator(bigDecimalCompareTo)
+                    .isEqualTo(expected.getTypeFactor())
+            )
+            .satisfies(a -> assertThat(a.getPlateNumber()).as("check plateNumber").isEqualTo(expected.getPlateNumber()))
+            .satisfies(a -> assertThat(a.getBrand()).as("check brand").isEqualTo(expected.getBrand()))
+            .satisfies(a -> assertThat(a.getDescription()).as("check description").isEqualTo(expected.getDescription()))
+            .satisfies(a -> assertThat(a.getCreatedAt()).as("check createdAt").isEqualTo(expected.getCreatedAt()))
+            .satisfies(a -> assertThat(a.getUpdatedAt()).as("check updatedAt").isEqualTo(expected.getUpdatedAt()))
+            .satisfies(a -> assertThat(a.getIsDeleted()).as("check isDeleted").isEqualTo(expected.getIsDeleted()))
+            .satisfies(a -> assertThat(a.getDeletedAt()).as("check deletedAt").isEqualTo(expected.getDeletedAt()))
+            .satisfies(a -> assertThat(a.getDeletedBy()).as("check deletedBy").isEqualTo(expected.getDeletedBy()));
     }
 
     /**
@@ -71,8 +74,6 @@ public class VehicleAsserts {
     public static void assertVehicleUpdatableRelationshipsEquals(Vehicle expected, Vehicle actual) {
         assertThat(actual)
             .as("Verify Vehicle relationships")
-            .satisfies(a -> assertThat(a.getSummary()).as("check summary").isEqualTo(expected.getSummary()))
-            .satisfies(a -> assertThat(a.getHomeStation()).as("check homeStation").isEqualTo(expected.getHomeStation()))
-            .satisfies(a -> assertThat(a.getOperator()).as("check operator").isEqualTo(expected.getOperator()));
+            .satisfies(a -> assertThat(a.getSeatMap()).as("check seatMap").isEqualTo(expected.getSeatMap()));
     }
 }

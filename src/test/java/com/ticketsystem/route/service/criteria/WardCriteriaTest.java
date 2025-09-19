@@ -76,10 +76,18 @@ class WardCriteriaTest {
 
     private static void setAllFilters(WardCriteria wardCriteria) {
         wardCriteria.id();
-        wardCriteria.code();
+        wardCriteria.wardCode();
         wardCriteria.name();
         wardCriteria.nameEn();
-        wardCriteria.type();
+        wardCriteria.fullName();
+        wardCriteria.fullNameEn();
+        wardCriteria.codeName();
+        wardCriteria.administrativeUnitId();
+        wardCriteria.createdAt();
+        wardCriteria.updatedAt();
+        wardCriteria.isDeleted();
+        wardCriteria.deletedAt();
+        wardCriteria.deletedBy();
         wardCriteria.addressesId();
         wardCriteria.districtId();
         wardCriteria.distinct();
@@ -89,10 +97,18 @@ class WardCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
-                condition.apply(criteria.getCode()) &&
+                condition.apply(criteria.getWardCode()) &&
                 condition.apply(criteria.getName()) &&
                 condition.apply(criteria.getNameEn()) &&
-                condition.apply(criteria.getType()) &&
+                condition.apply(criteria.getFullName()) &&
+                condition.apply(criteria.getFullNameEn()) &&
+                condition.apply(criteria.getCodeName()) &&
+                condition.apply(criteria.getAdministrativeUnitId()) &&
+                condition.apply(criteria.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy()) &&
                 condition.apply(criteria.getAddressesId()) &&
                 condition.apply(criteria.getDistrictId()) &&
                 condition.apply(criteria.getDistinct()),
@@ -104,10 +120,18 @@ class WardCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
-                condition.apply(criteria.getCode(), copy.getCode()) &&
+                condition.apply(criteria.getWardCode(), copy.getWardCode()) &&
                 condition.apply(criteria.getName(), copy.getName()) &&
                 condition.apply(criteria.getNameEn(), copy.getNameEn()) &&
-                condition.apply(criteria.getType(), copy.getType()) &&
+                condition.apply(criteria.getFullName(), copy.getFullName()) &&
+                condition.apply(criteria.getFullNameEn(), copy.getFullNameEn()) &&
+                condition.apply(criteria.getCodeName(), copy.getCodeName()) &&
+                condition.apply(criteria.getAdministrativeUnitId(), copy.getAdministrativeUnitId()) &&
+                condition.apply(criteria.getCreatedAt(), copy.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt(), copy.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted(), copy.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt(), copy.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy(), copy.getDeletedBy()) &&
                 condition.apply(criteria.getAddressesId(), copy.getAddressesId()) &&
                 condition.apply(criteria.getDistrictId(), copy.getDistrictId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),

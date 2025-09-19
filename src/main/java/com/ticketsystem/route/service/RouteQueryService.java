@@ -78,15 +78,15 @@ public class RouteQueryService extends QueryService<Route> {
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
                 buildRangeSpecification(criteria.getId(), Route_.id),
-                buildSpecification(criteria.getTransportType(), Route_.transportType),
-                buildRangeSpecification(criteria.getDistance(), Route_.distance),
-                buildRangeSpecification(criteria.getEstimatedDuration(), Route_.estimatedDuration),
-                buildRangeSpecification(criteria.getBasePrice(), Route_.basePrice),
-                buildSpecification(criteria.getIsActive(), Route_.isActive),
-                buildSpecification(criteria.getTripsId(), root -> root.join(Route_.trips, JoinType.LEFT).get(Trip_.id)),
+                buildStringSpecification(criteria.getRouteCode(), Route_.routeCode),
+                buildRangeSpecification(criteria.getDistanceKm(), Route_.distanceKm),
+                buildRangeSpecification(criteria.getCreatedAt(), Route_.createdAt),
+                buildRangeSpecification(criteria.getUpdatedAt(), Route_.updatedAt),
+                buildSpecification(criteria.getIsDeleted(), Route_.isDeleted),
+                buildRangeSpecification(criteria.getDeletedAt(), Route_.deletedAt),
+                buildSpecification(criteria.getDeletedBy(), Route_.deletedBy),
                 buildSpecification(criteria.getOriginId(), root -> root.join(Route_.origin, JoinType.LEFT).get(Station_.id)),
-                buildSpecification(criteria.getDestinationId(), root -> root.join(Route_.destination, JoinType.LEFT).get(Station_.id)),
-                buildSpecification(criteria.getOperatorId(), root -> root.join(Route_.operator, JoinType.LEFT).get(Operator_.id))
+                buildSpecification(criteria.getDestinationId(), root -> root.join(Route_.destination, JoinType.LEFT).get(Station_.id))
             );
         }
         return specification;

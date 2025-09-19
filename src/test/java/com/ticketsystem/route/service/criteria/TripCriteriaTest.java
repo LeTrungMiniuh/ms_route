@@ -76,13 +76,17 @@ class TripCriteriaTest {
 
     private static void setAllFilters(TripCriteria tripCriteria) {
         tripCriteria.id();
+        tripCriteria.tripCode();
         tripCriteria.departureTime();
         tripCriteria.arrivalTime();
-        tripCriteria.availableSeats();
-        tripCriteria.totalSeats();
-        tripCriteria.status();
+        tripCriteria.baseFare();
+        tripCriteria.createdAt();
+        tripCriteria.updatedAt();
+        tripCriteria.isDeleted();
+        tripCriteria.deletedAt();
+        tripCriteria.deletedBy();
         tripCriteria.driverId();
-        tripCriteria.seatsId();
+        tripCriteria.attendantId();
         tripCriteria.routeId();
         tripCriteria.distinct();
     }
@@ -91,13 +95,17 @@ class TripCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId()) &&
+                condition.apply(criteria.getTripCode()) &&
                 condition.apply(criteria.getDepartureTime()) &&
                 condition.apply(criteria.getArrivalTime()) &&
-                condition.apply(criteria.getAvailableSeats()) &&
-                condition.apply(criteria.getTotalSeats()) &&
-                condition.apply(criteria.getStatus()) &&
+                condition.apply(criteria.getBaseFare()) &&
+                condition.apply(criteria.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy()) &&
                 condition.apply(criteria.getDriverId()) &&
-                condition.apply(criteria.getSeatsId()) &&
+                condition.apply(criteria.getAttendantId()) &&
                 condition.apply(criteria.getRouteId()) &&
                 condition.apply(criteria.getDistinct()),
             "every filter matches"
@@ -108,13 +116,17 @@ class TripCriteriaTest {
         return new Condition<>(
             criteria ->
                 condition.apply(criteria.getId(), copy.getId()) &&
+                condition.apply(criteria.getTripCode(), copy.getTripCode()) &&
                 condition.apply(criteria.getDepartureTime(), copy.getDepartureTime()) &&
                 condition.apply(criteria.getArrivalTime(), copy.getArrivalTime()) &&
-                condition.apply(criteria.getAvailableSeats(), copy.getAvailableSeats()) &&
-                condition.apply(criteria.getTotalSeats(), copy.getTotalSeats()) &&
-                condition.apply(criteria.getStatus(), copy.getStatus()) &&
+                condition.apply(criteria.getBaseFare(), copy.getBaseFare()) &&
+                condition.apply(criteria.getCreatedAt(), copy.getCreatedAt()) &&
+                condition.apply(criteria.getUpdatedAt(), copy.getUpdatedAt()) &&
+                condition.apply(criteria.getIsDeleted(), copy.getIsDeleted()) &&
+                condition.apply(criteria.getDeletedAt(), copy.getDeletedAt()) &&
+                condition.apply(criteria.getDeletedBy(), copy.getDeletedBy()) &&
                 condition.apply(criteria.getDriverId(), copy.getDriverId()) &&
-                condition.apply(criteria.getSeatsId(), copy.getSeatsId()) &&
+                condition.apply(criteria.getAttendantId(), copy.getAttendantId()) &&
                 condition.apply(criteria.getRouteId(), copy.getRouteId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),
             "every filter matches"

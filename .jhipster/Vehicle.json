@@ -1,56 +1,53 @@
 {
   "annotations": {
-    "changelogDate": "20250914160023"
+    "changelogDate": "20250919165451"
   },
   "applications": ["ms_route"],
   "dto": "mapstruct",
   "fields": [
+    {
+      "fieldName": "type",
+      "fieldType": "VehicleType",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "STANDARD_BUS,LIMOUSINE"
+    },
+    {
+      "fieldName": "typeFactor",
+      "fieldType": "BigDecimal"
+    },
     {
       "fieldName": "plateNumber",
       "fieldType": "String",
       "fieldValidateRules": ["required", "unique"]
     },
     {
-      "fieldName": "model",
+      "fieldName": "brand",
       "fieldType": "String"
     },
     {
-      "fieldName": "capacity",
-      "fieldType": "Integer",
+      "fieldName": "description",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "Instant",
       "fieldValidateRules": ["required"]
     },
     {
-      "fieldName": "seatLayout",
-      "fieldType": "String"
+      "fieldName": "updatedAt",
+      "fieldType": "Instant"
     },
     {
-      "fieldName": "amenities",
-      "fieldType": "String"
+      "fieldName": "isDeleted",
+      "fieldType": "Boolean"
     },
     {
-      "fieldName": "imageCoverUrl",
-      "fieldType": "String"
+      "fieldName": "deletedAt",
+      "fieldType": "Instant"
     },
     {
-      "fieldName": "averageRating",
-      "fieldType": "Double"
-    },
-    {
-      "fieldName": "totalReviews",
-      "fieldType": "Integer"
-    },
-    {
-      "fieldName": "isActive",
-      "fieldType": "Boolean",
-      "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "yearManufactured",
-      "fieldType": "Integer"
-    },
-    {
-      "fieldName": "lastMaintenanceDate",
-      "fieldType": "LocalDate"
+      "fieldName": "deletedBy",
+      "fieldType": "UUID"
     }
   ],
   "jpaMetamodelFiltering": true,
@@ -59,44 +56,9 @@
   "pagination": "infinite-scroll",
   "relationships": [
     {
-      "otherEntityName": "reviewSummary",
-      "otherEntityRelationshipName": "vehicle",
-      "relationshipName": "summary",
+      "otherEntityName": "seatMap",
+      "relationshipName": "seatMap",
       "relationshipSide": "left",
-      "relationshipType": "one-to-one"
-    },
-    {
-      "otherEntityName": "vehicleImage",
-      "otherEntityRelationshipName": "vehicle",
-      "relationshipName": "images",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
-    },
-    {
-      "otherEntityName": "vehicleReview",
-      "otherEntityRelationshipName": "vehicle",
-      "relationshipName": "reviews",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
-    },
-    {
-      "otherEntityName": "vehicleAmenity",
-      "otherEntityRelationshipName": "vehicle",
-      "relationshipName": "amenityItems",
-      "relationshipSide": "left",
-      "relationshipType": "one-to-many"
-    },
-    {
-      "otherEntityName": "station",
-      "relationshipName": "homeStation",
-      "relationshipSide": "left",
-      "relationshipType": "many-to-one"
-    },
-    {
-      "otherEntityName": "operator",
-      "otherEntityRelationshipName": "vehicles",
-      "relationshipName": "operator",
-      "relationshipSide": "right",
       "relationshipType": "many-to-one",
       "relationshipValidateRules": "required"
     }

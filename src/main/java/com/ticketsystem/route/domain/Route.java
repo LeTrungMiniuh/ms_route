@@ -1,15 +1,16 @@
 package com.ticketsystem.route.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.ticketsystem.route.domain.enumeration.TransportType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.Instant;
+import java.util.UUID;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 /**
  * A Route.
@@ -28,44 +29,40 @@ public class Route implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "transport_type", nullable = false)
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Keyword)
-    private TransportType transportType;
+    @Column(name = "route_code")
+    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Text)
+    private String routeCode;
 
-    @Column(name = "distance", precision = 21, scale = 2)
-    private BigDecimal distance;
-
-    @Column(name = "estimated_duration")
-    @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Integer)
-    private Integer estimatedDuration;
+    @Column(name = "distance_km", precision = 21, scale = 2)
+    private BigDecimal distanceKm;
 
     @NotNull
-    @Column(name = "base_price", precision = 21, scale = 2, nullable = false)
-    private BigDecimal basePrice;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
 
-    @NotNull
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "updated_at")
+    private Instant updatedAt;
+
+    @Column(name = "is_deleted")
     @org.springframework.data.elasticsearch.annotations.Field(type = org.springframework.data.elasticsearch.annotations.FieldType.Boolean)
-    private Boolean isActive;
+    private Boolean isDeleted;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "route")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @org.springframework.data.annotation.Transient
-    @JsonIgnoreProperties(value = { "seats", "route" }, allowSetters = true)
-    private Set<Trip> trips = new HashSet<>();
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station origin;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Station destination;
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "deleted_by", length = 36)
+    private UUID deletedBy;
 
     @ManyToOne(optional = false)
     @NotNull
-    @JsonIgnoreProperties(value = { "vehicles", "routes" }, allowSetters = true)
-    private Operator operator;
+    @JsonIgnoreProperties(value = { "address" }, allowSetters = true)
+    private Station origin;
+
+    @ManyToOne(optional = false)
+    @NotNull
+    @JsonIgnoreProperties(value = { "address" }, allowSetters = true)
+    private Station destination;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -82,100 +79,95 @@ public class Route implements Serializable {
         this.id = id;
     }
 
-    public TransportType getTransportType() {
-        return this.transportType;
+    public String getRouteCode() {
+        return this.routeCode;
     }
 
-    public Route transportType(TransportType transportType) {
-        this.setTransportType(transportType);
+    public Route routeCode(String routeCode) {
+        this.setRouteCode(routeCode);
         return this;
     }
 
-    public void setTransportType(TransportType transportType) {
-        this.transportType = transportType;
+    public void setRouteCode(String routeCode) {
+        this.routeCode = routeCode;
     }
 
-    public BigDecimal getDistance() {
-        return this.distance;
+    public BigDecimal getDistanceKm() {
+        return this.distanceKm;
     }
 
-    public Route distance(BigDecimal distance) {
-        this.setDistance(distance);
+    public Route distanceKm(BigDecimal distanceKm) {
+        this.setDistanceKm(distanceKm);
         return this;
     }
 
-    public void setDistance(BigDecimal distance) {
-        this.distance = distance;
+    public void setDistanceKm(BigDecimal distanceKm) {
+        this.distanceKm = distanceKm;
     }
 
-    public Integer getEstimatedDuration() {
-        return this.estimatedDuration;
+    public Instant getCreatedAt() {
+        return this.createdAt;
     }
 
-    public Route estimatedDuration(Integer estimatedDuration) {
-        this.setEstimatedDuration(estimatedDuration);
+    public Route createdAt(Instant createdAt) {
+        this.setCreatedAt(createdAt);
         return this;
     }
 
-    public void setEstimatedDuration(Integer estimatedDuration) {
-        this.estimatedDuration = estimatedDuration;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public BigDecimal getBasePrice() {
-        return this.basePrice;
+    public Instant getUpdatedAt() {
+        return this.updatedAt;
     }
 
-    public Route basePrice(BigDecimal basePrice) {
-        this.setBasePrice(basePrice);
+    public Route updatedAt(Instant updatedAt) {
+        this.setUpdatedAt(updatedAt);
         return this;
     }
 
-    public void setBasePrice(BigDecimal basePrice) {
-        this.basePrice = basePrice;
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public Boolean getIsActive() {
-        return this.isActive;
+    public Boolean getIsDeleted() {
+        return this.isDeleted;
     }
 
-    public Route isActive(Boolean isActive) {
-        this.setIsActive(isActive);
+    public Route isDeleted(Boolean isDeleted) {
+        this.setIsDeleted(isDeleted);
         return this;
     }
 
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 
-    public Set<Trip> getTrips() {
-        return this.trips;
+    public Instant getDeletedAt() {
+        return this.deletedAt;
     }
 
-    public void setTrips(Set<Trip> trips) {
-        if (this.trips != null) {
-            this.trips.forEach(i -> i.setRoute(null));
-        }
-        if (trips != null) {
-            trips.forEach(i -> i.setRoute(this));
-        }
-        this.trips = trips;
-    }
-
-    public Route trips(Set<Trip> trips) {
-        this.setTrips(trips);
+    public Route deletedAt(Instant deletedAt) {
+        this.setDeletedAt(deletedAt);
         return this;
     }
 
-    public Route addTrips(Trip trip) {
-        this.trips.add(trip);
-        trip.setRoute(this);
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return this.deletedBy;
+    }
+
+    public Route deletedBy(UUID deletedBy) {
+        this.setDeletedBy(deletedBy);
         return this;
     }
 
-    public Route removeTrips(Trip trip) {
-        this.trips.remove(trip);
-        trip.setRoute(null);
-        return this;
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
     public Station getOrigin() {
@@ -204,19 +196,6 @@ public class Route implements Serializable {
         return this;
     }
 
-    public Operator getOperator() {
-        return this.operator;
-    }
-
-    public void setOperator(Operator operator) {
-        this.operator = operator;
-    }
-
-    public Route operator(Operator operator) {
-        this.setOperator(operator);
-        return this;
-    }
-
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -241,11 +220,13 @@ public class Route implements Serializable {
     public String toString() {
         return "Route{" +
             "id=" + getId() +
-            ", transportType='" + getTransportType() + "'" +
-            ", distance=" + getDistance() +
-            ", estimatedDuration=" + getEstimatedDuration() +
-            ", basePrice=" + getBasePrice() +
-            ", isActive='" + getIsActive() + "'" +
+            ", routeCode='" + getRouteCode() + "'" +
+            ", distanceKm=" + getDistanceKm() +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             "}";
     }
 }

@@ -85,23 +85,17 @@ public class CacheConfiguration {
             createCache(cm, com.ticketsystem.route.domain.Ward.class.getName(), jcacheConfiguration);
             createCache(cm, com.ticketsystem.route.domain.Ward.class.getName() + ".addresses", jcacheConfiguration);
             createCache(cm, com.ticketsystem.route.domain.Address.class.getName(), jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.Operator.class.getName(), jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.Operator.class.getName() + ".vehicles", jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.Operator.class.getName() + ".routes", jcacheConfiguration);
             createCache(cm, com.ticketsystem.route.domain.Station.class.getName(), jcacheConfiguration);
             createCache(cm, com.ticketsystem.route.domain.Route.class.getName(), jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.Route.class.getName() + ".trips", jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.Trip.class.getName(), jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.Trip.class.getName() + ".seats", jcacheConfiguration);
             createCache(cm, com.ticketsystem.route.domain.Vehicle.class.getName(), jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.Vehicle.class.getName() + ".images", jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.Vehicle.class.getName() + ".reviews", jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.Vehicle.class.getName() + ".amenityItems", jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.VehicleImage.class.getName(), jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.VehicleReview.class.getName(), jcacheConfiguration);
+            createCache(cm, com.ticketsystem.route.domain.SeatMap.class.getName(), jcacheConfiguration);
+            createCache(cm, com.ticketsystem.route.domain.Floor.class.getName(), jcacheConfiguration);
             createCache(cm, com.ticketsystem.route.domain.Seat.class.getName(), jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.VehicleAmenity.class.getName(), jcacheConfiguration);
-            createCache(cm, com.ticketsystem.route.domain.ReviewSummary.class.getName(), jcacheConfiguration);
+            createCache(cm, com.ticketsystem.route.domain.Trip.class.getName(), jcacheConfiguration);
+            createCache(cm, com.ticketsystem.route.domain.TripSeat.class.getName(), jcacheConfiguration);
+            createCache(cm, com.ticketsystem.route.domain.Staff.class.getName(), jcacheConfiguration);
+            createCache(cm, com.ticketsystem.route.domain.Driver.class.getName(), jcacheConfiguration);
+            createCache(cm, com.ticketsystem.route.domain.Attendant.class.getName(), jcacheConfiguration);
             // jhipster-needle-redis-add-entry
         };
     }

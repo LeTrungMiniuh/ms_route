@@ -1,23 +1,14 @@
 {
   "annotations": {
-    "changelogDate": "20250914155523"
+    "changelogDate": "20250919165151"
   },
   "applications": ["ms_route"],
   "dto": "mapstruct",
   "fields": [
     {
-      "fieldName": "wardCode",
-      "fieldType": "String",
-      "fieldValidateRules": ["required"]
-    },
-    {
       "fieldName": "streetAddress",
       "fieldType": "String",
       "fieldValidateRules": ["required"]
-    },
-    {
-      "fieldName": "postalCode",
-      "fieldType": "String"
     },
     {
       "fieldName": "latitude",
@@ -28,8 +19,25 @@
       "fieldType": "BigDecimal"
     },
     {
-      "fieldName": "landmark",
-      "fieldType": "String"
+      "fieldName": "createdAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "updatedAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "isDeleted",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "deletedAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "deletedBy",
+      "fieldType": "UUID"
     }
   ],
   "jpaMetamodelFiltering": true,

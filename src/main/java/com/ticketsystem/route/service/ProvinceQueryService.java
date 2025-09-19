@@ -72,10 +72,19 @@ public class ProvinceQueryService extends QueryService<Province> {
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
                 buildRangeSpecification(criteria.getId(), Province_.id),
-                buildStringSpecification(criteria.getCode(), Province_.code),
+                buildStringSpecification(criteria.getProvinceCode(), Province_.provinceCode),
                 buildStringSpecification(criteria.getName(), Province_.name),
                 buildStringSpecification(criteria.getNameEn(), Province_.nameEn),
-                buildStringSpecification(criteria.getRegion(), Province_.region),
+                buildStringSpecification(criteria.getFullName(), Province_.fullName),
+                buildStringSpecification(criteria.getFullNameEn(), Province_.fullNameEn),
+                buildStringSpecification(criteria.getCodeName(), Province_.codeName),
+                buildRangeSpecification(criteria.getAdministrativeUnitId(), Province_.administrativeUnitId),
+                buildRangeSpecification(criteria.getAdministrativeRegionId(), Province_.administrativeRegionId),
+                buildRangeSpecification(criteria.getCreatedAt(), Province_.createdAt),
+                buildRangeSpecification(criteria.getUpdatedAt(), Province_.updatedAt),
+                buildSpecification(criteria.getIsDeleted(), Province_.isDeleted),
+                buildRangeSpecification(criteria.getDeletedAt(), Province_.deletedAt),
+                buildSpecification(criteria.getDeletedBy(), Province_.deletedBy),
                 buildSpecification(criteria.getDistrictsId(), root -> root.join(Province_.districts, JoinType.LEFT).get(District_.id))
             );
         }

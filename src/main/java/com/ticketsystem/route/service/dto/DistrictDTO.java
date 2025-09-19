@@ -2,7 +2,9 @@ package com.ticketsystem.route.service.dto;
 
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A DTO for the {@link com.ticketsystem.route.domain.District} entity.
@@ -13,14 +15,31 @@ public class DistrictDTO implements Serializable {
     private Long id;
 
     @NotNull
-    private String code;
+    private String districtCode;
 
     @NotNull
     private String name;
 
     private String nameEn;
 
-    private String type;
+    private String fullName;
+
+    private String fullNameEn;
+
+    private String codeName;
+
+    private Integer administrativeUnitId;
+
+    @NotNull
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+    private Boolean isDeleted;
+
+    private Instant deletedAt;
+
+    private UUID deletedBy;
 
     @NotNull
     private ProvinceDTO province;
@@ -33,12 +52,12 @@ public class DistrictDTO implements Serializable {
         this.id = id;
     }
 
-    public String getCode() {
-        return code;
+    public String getDistrictCode() {
+        return districtCode;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setDistrictCode(String districtCode) {
+        this.districtCode = districtCode;
     }
 
     public String getName() {
@@ -57,12 +76,76 @@ public class DistrictDTO implements Serializable {
         this.nameEn = nameEn;
     }
 
-    public String getType() {
-        return type;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getFullNameEn() {
+        return fullNameEn;
+    }
+
+    public void setFullNameEn(String fullNameEn) {
+        this.fullNameEn = fullNameEn;
+    }
+
+    public String getCodeName() {
+        return codeName;
+    }
+
+    public void setCodeName(String codeName) {
+        this.codeName = codeName;
+    }
+
+    public Integer getAdministrativeUnitId() {
+        return administrativeUnitId;
+    }
+
+    public void setAdministrativeUnitId(Integer administrativeUnitId) {
+        this.administrativeUnitId = administrativeUnitId;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Instant getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
     public ProvinceDTO getProvince() {
@@ -99,10 +182,18 @@ public class DistrictDTO implements Serializable {
     public String toString() {
         return "DistrictDTO{" +
             "id=" + getId() +
-            ", code='" + getCode() + "'" +
+            ", districtCode='" + getDistrictCode() + "'" +
             ", name='" + getName() + "'" +
             ", nameEn='" + getNameEn() + "'" +
-            ", type='" + getType() + "'" +
+            ", fullName='" + getFullName() + "'" +
+            ", fullNameEn='" + getFullNameEn() + "'" +
+            ", codeName='" + getCodeName() + "'" +
+            ", administrativeUnitId=" + getAdministrativeUnitId() +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             ", province=" + getProvince() +
             "}";
     }

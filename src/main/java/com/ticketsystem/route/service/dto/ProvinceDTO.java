@@ -2,7 +2,9 @@ package com.ticketsystem.route.service.dto;
 
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * A DTO for the {@link com.ticketsystem.route.domain.Province} entity.
@@ -13,14 +15,33 @@ public class ProvinceDTO implements Serializable {
     private Long id;
 
     @NotNull
-    private String code;
+    private String provinceCode;
 
     @NotNull
     private String name;
 
     private String nameEn;
 
-    private String region;
+    private String fullName;
+
+    private String fullNameEn;
+
+    private String codeName;
+
+    private Integer administrativeUnitId;
+
+    private Integer administrativeRegionId;
+
+    @NotNull
+    private Instant createdAt;
+
+    private Instant updatedAt;
+
+    private Boolean isDeleted;
+
+    private Instant deletedAt;
+
+    private UUID deletedBy;
 
     public Long getId() {
         return id;
@@ -30,12 +51,12 @@ public class ProvinceDTO implements Serializable {
         this.id = id;
     }
 
-    public String getCode() {
-        return code;
+    public String getProvinceCode() {
+        return provinceCode;
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    public void setProvinceCode(String provinceCode) {
+        this.provinceCode = provinceCode;
     }
 
     public String getName() {
@@ -54,12 +75,84 @@ public class ProvinceDTO implements Serializable {
         this.nameEn = nameEn;
     }
 
-    public String getRegion() {
-        return region;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setRegion(String region) {
-        this.region = region;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getFullNameEn() {
+        return fullNameEn;
+    }
+
+    public void setFullNameEn(String fullNameEn) {
+        this.fullNameEn = fullNameEn;
+    }
+
+    public String getCodeName() {
+        return codeName;
+    }
+
+    public void setCodeName(String codeName) {
+        this.codeName = codeName;
+    }
+
+    public Integer getAdministrativeUnitId() {
+        return administrativeUnitId;
+    }
+
+    public void setAdministrativeUnitId(Integer administrativeUnitId) {
+        this.administrativeUnitId = administrativeUnitId;
+    }
+
+    public Integer getAdministrativeRegionId() {
+        return administrativeRegionId;
+    }
+
+    public void setAdministrativeRegionId(Integer administrativeRegionId) {
+        this.administrativeRegionId = administrativeRegionId;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public Instant getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Instant deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public UUID getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(UUID deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
     @Override
@@ -88,10 +181,19 @@ public class ProvinceDTO implements Serializable {
     public String toString() {
         return "ProvinceDTO{" +
             "id=" + getId() +
-            ", code='" + getCode() + "'" +
+            ", provinceCode='" + getProvinceCode() + "'" +
             ", name='" + getName() + "'" +
             ", nameEn='" + getNameEn() + "'" +
-            ", region='" + getRegion() + "'" +
+            ", fullName='" + getFullName() + "'" +
+            ", fullNameEn='" + getFullNameEn() + "'" +
+            ", codeName='" + getCodeName() + "'" +
+            ", administrativeUnitId=" + getAdministrativeUnitId() +
+            ", administrativeRegionId=" + getAdministrativeRegionId() +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", updatedAt='" + getUpdatedAt() + "'" +
+            ", isDeleted='" + getIsDeleted() + "'" +
+            ", deletedAt='" + getDeletedAt() + "'" +
+            ", deletedBy='" + getDeletedBy() + "'" +
             "}";
     }
 }

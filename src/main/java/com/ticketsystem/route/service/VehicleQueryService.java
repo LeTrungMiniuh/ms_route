@@ -74,25 +74,17 @@ public class VehicleQueryService extends QueryService<Vehicle> {
             specification = Specification.allOf(
                 Boolean.TRUE.equals(criteria.getDistinct()) ? distinct(criteria.getDistinct()) : null,
                 buildRangeSpecification(criteria.getId(), Vehicle_.id),
+                buildSpecification(criteria.getType(), Vehicle_.type),
+                buildRangeSpecification(criteria.getTypeFactor(), Vehicle_.typeFactor),
                 buildStringSpecification(criteria.getPlateNumber(), Vehicle_.plateNumber),
-                buildStringSpecification(criteria.getModel(), Vehicle_.model),
-                buildRangeSpecification(criteria.getCapacity(), Vehicle_.capacity),
-                buildStringSpecification(criteria.getSeatLayout(), Vehicle_.seatLayout),
-                buildStringSpecification(criteria.getAmenities(), Vehicle_.amenities),
-                buildStringSpecification(criteria.getImageCoverUrl(), Vehicle_.imageCoverUrl),
-                buildRangeSpecification(criteria.getAverageRating(), Vehicle_.averageRating),
-                buildRangeSpecification(criteria.getTotalReviews(), Vehicle_.totalReviews),
-                buildSpecification(criteria.getIsActive(), Vehicle_.isActive),
-                buildRangeSpecification(criteria.getYearManufactured(), Vehicle_.yearManufactured),
-                buildRangeSpecification(criteria.getLastMaintenanceDate(), Vehicle_.lastMaintenanceDate),
-                buildSpecification(criteria.getSummaryId(), root -> root.join(Vehicle_.summary, JoinType.LEFT).get(ReviewSummary_.id)),
-                buildSpecification(criteria.getImagesId(), root -> root.join(Vehicle_.images, JoinType.LEFT).get(VehicleImage_.id)),
-                buildSpecification(criteria.getReviewsId(), root -> root.join(Vehicle_.reviews, JoinType.LEFT).get(VehicleReview_.id)),
-                buildSpecification(criteria.getAmenityItemsId(), root ->
-                    root.join(Vehicle_.amenityItems, JoinType.LEFT).get(VehicleAmenity_.id)
-                ),
-                buildSpecification(criteria.getHomeStationId(), root -> root.join(Vehicle_.homeStation, JoinType.LEFT).get(Station_.id)),
-                buildSpecification(criteria.getOperatorId(), root -> root.join(Vehicle_.operator, JoinType.LEFT).get(Operator_.id))
+                buildStringSpecification(criteria.getBrand(), Vehicle_.brand),
+                buildStringSpecification(criteria.getDescription(), Vehicle_.description),
+                buildRangeSpecification(criteria.getCreatedAt(), Vehicle_.createdAt),
+                buildRangeSpecification(criteria.getUpdatedAt(), Vehicle_.updatedAt),
+                buildSpecification(criteria.getIsDeleted(), Vehicle_.isDeleted),
+                buildRangeSpecification(criteria.getDeletedAt(), Vehicle_.deletedAt),
+                buildSpecification(criteria.getDeletedBy(), Vehicle_.deletedBy),
+                buildSpecification(criteria.getSeatMapId(), root -> root.join(Vehicle_.seatMap, JoinType.LEFT).get(SeatMap_.id))
             );
         }
         return specification;
