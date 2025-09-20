@@ -1,4 +1,4 @@
-package com.ticketsystem.route.config;
+package com.ridehub.route.config;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

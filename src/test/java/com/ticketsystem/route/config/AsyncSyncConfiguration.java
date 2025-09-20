@@ -1,4 +1,4 @@
-package com.ticketsystem.route.config;
+package com.ridehub.route.config;
 
 import java.util.concurrent.Executor;
 import org.springframework.context.annotation.Bean;

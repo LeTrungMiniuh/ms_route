@@ -1,8 +1,8 @@
-package com.ticketsystem.route.web.rest;
+package com.ridehub.route.web.rest;
 
-import static com.ticketsystem.route.domain.RouteAsserts.*;
-import static com.ticketsystem.route.web.rest.TestUtil.createUpdateProxyForBean;
-import static com.ticketsystem.route.web.rest.TestUtil.sameNumber;
+import static com.ridehub.route.domain.RouteAsserts.*;
+import static com.ridehub.route.web.rest.TestUtil.createUpdateProxyForBean;
+import static com.ridehub.route.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.hasItem;
@@ -12,13 +12,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ticketsystem.route.IntegrationTest;
-import com.ticketsystem.route.domain.Route;
-import com.ticketsystem.route.domain.Station;
-import com.ticketsystem.route.repository.RouteRepository;
-import com.ticketsystem.route.repository.search.RouteSearchRepository;
-import com.ticketsystem.route.service.dto.RouteDTO;
-import com.ticketsystem.route.service.mapper.RouteMapper;
+import com.ridehub.route.IntegrationTest;
+import com.ridehub.route.domain.Route;
+import com.ridehub.route.domain.Station;
+import com.ridehub.route.repository.RouteRepository;
+import com.ridehub.route.repository.search.RouteSearchRepository;
+import com.ridehub.route.service.dto.RouteDTO;
+import com.ridehub.route.service.mapper.RouteMapper;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.Instant;

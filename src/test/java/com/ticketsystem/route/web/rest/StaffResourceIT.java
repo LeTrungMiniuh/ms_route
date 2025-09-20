@@ -1,7 +1,7 @@
-package com.ticketsystem.route.web.rest;
+package com.ridehub.route.web.rest;
 
-import static com.ticketsystem.route.domain.StaffAsserts.*;
-import static com.ticketsystem.route.web.rest.TestUtil.createUpdateProxyForBean;
+import static com.ridehub.route.domain.StaffAsserts.*;
+import static com.ridehub.route.web.rest.TestUtil.createUpdateProxyForBean;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -9,13 +9,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ticketsystem.route.IntegrationTest;
-import com.ticketsystem.route.domain.Staff;
-import com.ticketsystem.route.domain.enumeration.Gender;
-import com.ticketsystem.route.domain.enumeration.StaffStatus;
-import com.ticketsystem.route.repository.StaffRepository;
-import com.ticketsystem.route.service.dto.StaffDTO;
-import com.ticketsystem.route.service.mapper.StaffMapper;
+import com.ridehub.route.IntegrationTest;
+import com.ridehub.route.domain.Staff;
+import com.ridehub.route.domain.enumeration.Gender;
+import com.ridehub.route.domain.enumeration.StaffStatus;
+import com.ridehub.route.repository.StaffRepository;
+import com.ridehub.route.service.dto.StaffDTO;
+import com.ridehub.route.service.mapper.StaffMapper;
 import jakarta.persistence.EntityManager;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;

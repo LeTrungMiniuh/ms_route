@@ -1,4 +1,4 @@
-package com.ticketsystem.route.security.oauth2;
+package com.ridehub.route.security.oauth2;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

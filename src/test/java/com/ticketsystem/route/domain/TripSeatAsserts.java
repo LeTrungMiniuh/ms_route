@@ -1,6 +1,6 @@
-package com.ticketsystem.route.domain;
+package com.ridehub.route.domain;
 
-import static com.ticketsystem.route.domain.AssertUtils.bigDecimalCompareTo;
+import static com.ridehub.route.domain.AssertUtils.bigDecimalCompareTo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TripSeatAsserts {

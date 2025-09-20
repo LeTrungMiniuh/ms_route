@@ -33,7 +33,7 @@
     "messageBroker": "kafka",
     "monorepository": true,
     "nativeLanguage": "en",
-    "packageName": "com.ticketsystem.route",
+    "packageName": "com.ridehub.route",
     "prodDatabaseType": "mysql",
     "searchEngine": "elasticsearch",
     "serverPort": "8082",

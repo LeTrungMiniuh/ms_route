@@ -1,6 +1,6 @@
-package com.ticketsystem.route.config;
+package com.ridehub.route.config;
 
-import com.ticketsystem.route.IntegrationTest;
+import com.ridehub.route.IntegrationTest;
 import java.util.Comparator;
 import org.junit.jupiter.api.ClassDescriptor;
 import org.junit.jupiter.api.ClassOrderer;

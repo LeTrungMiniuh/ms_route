@@ -1,4 +1,4 @@
-package com.ticketsystem.route.web.rest;
+package com.ridehub.route.web.rest;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

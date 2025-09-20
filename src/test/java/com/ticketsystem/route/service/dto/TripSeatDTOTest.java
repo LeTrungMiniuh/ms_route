@@ -1,8 +1,8 @@
-package com.ticketsystem.route.service.dto;
+package com.ridehub.route.service.dto;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ticketsystem.route.web.rest.TestUtil;
+import com.ridehub.route.web.rest.TestUtil;
 import org.junit.jupiter.api.Test;
 
 class TripSeatDTOTest {

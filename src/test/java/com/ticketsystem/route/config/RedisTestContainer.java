@@ -1,4 +1,4 @@
-package com.ticketsystem.route.config;
+package com.ridehub.route.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

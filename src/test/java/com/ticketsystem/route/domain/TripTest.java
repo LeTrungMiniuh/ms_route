@@ -1,12 +1,12 @@
-package com.ticketsystem.route.domain;
+package com.ridehub.route.domain;
 
-import static com.ticketsystem.route.domain.AttendantTestSamples.*;
-import static com.ticketsystem.route.domain.DriverTestSamples.*;
-import static com.ticketsystem.route.domain.RouteTestSamples.*;
-import static com.ticketsystem.route.domain.TripTestSamples.*;
+import static com.ridehub.route.domain.AttendantTestSamples.*;
+import static com.ridehub.route.domain.DriverTestSamples.*;
+import static com.ridehub.route.domain.RouteTestSamples.*;
+import static com.ridehub.route.domain.TripTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ticketsystem.route.web.rest.TestUtil;
+import com.ridehub.route.web.rest.TestUtil;
 import org.junit.jupiter.api.Test;
 
 class TripTest {

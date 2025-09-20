@@ -1,4 +1,4 @@
-package com.ticketsystem.route.config;
+package com.ridehub.route.config;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;

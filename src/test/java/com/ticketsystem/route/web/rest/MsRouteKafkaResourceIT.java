@@ -1,4 +1,4 @@
-package com.ticketsystem.route.web.rest;
+package com.ridehub.route.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -7,8 +7,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.ticketsystem.route.IntegrationTest;
-import com.ticketsystem.route.config.EmbeddedKafka;
+import com.ridehub.route.IntegrationTest;
+import com.ridehub.route.config.EmbeddedKafka;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;

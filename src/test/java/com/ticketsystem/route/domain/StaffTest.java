@@ -1,9 +1,9 @@
-package com.ticketsystem.route.domain;
+package com.ridehub.route.domain;
 
-import static com.ticketsystem.route.domain.StaffTestSamples.*;
+import static com.ridehub.route.domain.StaffTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ticketsystem.route.web.rest.TestUtil;
+import com.ridehub.route.web.rest.TestUtil;
 import org.junit.jupiter.api.Test;
 
 class StaffTest {

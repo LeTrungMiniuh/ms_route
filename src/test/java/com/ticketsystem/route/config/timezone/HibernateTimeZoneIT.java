@@ -1,11 +1,11 @@
-package com.ticketsystem.route.config.timezone;
+package com.ridehub.route.config.timezone;
 
 import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ticketsystem.route.IntegrationTest;
-import com.ticketsystem.route.repository.timezone.DateTimeWrapper;
-import com.ticketsystem.route.repository.timezone.DateTimeWrapperRepository;
+import com.ridehub.route.IntegrationTest;
+import com.ridehub.route.repository.timezone.DateTimeWrapper;
+import com.ridehub.route.repository.timezone.DateTimeWrapperRepository;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import org.junit.jupiter.api.BeforeEach;

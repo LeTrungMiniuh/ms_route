@@ -1,12 +1,12 @@
-package com.ticketsystem.route;
+package com.ridehub.route;
 
-import com.ticketsystem.route.config.AsyncSyncConfiguration;
-import com.ticketsystem.route.config.EmbeddedElasticsearch;
-import com.ticketsystem.route.config.EmbeddedKafka;
-import com.ticketsystem.route.config.EmbeddedRedis;
-import com.ticketsystem.route.config.EmbeddedSQL;
-import com.ticketsystem.route.config.JacksonConfiguration;
-import com.ticketsystem.route.config.TestSecurityConfiguration;
+import com.ridehub.route.config.AsyncSyncConfiguration;
+import com.ridehub.route.config.EmbeddedElasticsearch;
+import com.ridehub.route.config.EmbeddedKafka;
+import com.ridehub.route.config.EmbeddedRedis;
+import com.ridehub.route.config.EmbeddedSQL;
+import com.ridehub.route.config.JacksonConfiguration;
+import com.ridehub.route.config.TestSecurityConfiguration;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

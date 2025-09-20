@@ -1,11 +1,11 @@
-package com.ticketsystem.route.domain;
+package com.ridehub.route.domain;
 
-import static com.ticketsystem.route.domain.AddressTestSamples.*;
-import static com.ticketsystem.route.domain.DistrictTestSamples.*;
-import static com.ticketsystem.route.domain.WardTestSamples.*;
+import static com.ridehub.route.domain.AddressTestSamples.*;
+import static com.ridehub.route.domain.DistrictTestSamples.*;
+import static com.ridehub.route.domain.WardTestSamples.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.ticketsystem.route.web.rest.TestUtil;
+import com.ridehub.route.web.rest.TestUtil;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
-package com.ticketsystem.route.service.mapper;
+package com.ridehub.route.service.mapper;
 
-import static com.ticketsystem.route.domain.StaffAsserts.*;
-import static com.ticketsystem.route.domain.StaffTestSamples.*;
+import static com.ridehub.route.domain.StaffAsserts.*;
+import static com.ridehub.route.domain.StaffTestSamples.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

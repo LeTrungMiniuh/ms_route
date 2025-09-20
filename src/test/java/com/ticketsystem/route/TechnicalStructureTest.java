@@ -1,4 +1,4 @@
-package com.ticketsystem.route;
+package com.ridehub.route;
 
 import static com.tngtech.archunit.base.DescribedPredicate.alwaysTrue;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.belongToAnyOf;
@@ -32,7 +32,7 @@ class TechnicalStructureTest {
 
         .ignoreDependency(belongToAnyOf(MsRouteApp.class), alwaysTrue())
         .ignoreDependency(alwaysTrue(), belongToAnyOf(
-            com.ticketsystem.route.config.Constants.class,
-            com.ticketsystem.route.config.ApplicationProperties.class
+            com.ridehub.route.config.Constants.class,
+            com.ridehub.route.config.ApplicationProperties.class
         ));
 }

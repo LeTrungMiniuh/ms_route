@@ -1,8 +1,8 @@
-package com.ticketsystem.route.web.rest;
+package com.ridehub.route.web.rest;
 
-import static com.ticketsystem.route.domain.TripSeatAsserts.*;
-import static com.ticketsystem.route.web.rest.TestUtil.createUpdateProxyForBean;
-import static com.ticketsystem.route.web.rest.TestUtil.sameNumber;
+import static com.ridehub.route.domain.TripSeatAsserts.*;
+import static com.ridehub.route.web.rest.TestUtil.createUpdateProxyForBean;
+import static com.ridehub.route.web.rest.TestUtil.sameNumber;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -10,12 +10,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ticketsystem.route.IntegrationTest;
-import com.ticketsystem.route.domain.Trip;
-import com.ticketsystem.route.domain.TripSeat;
-import com.ticketsystem.route.repository.TripSeatRepository;
-import com.ticketsystem.route.service.dto.TripSeatDTO;
-import com.ticketsystem.route.service.mapper.TripSeatMapper;
+import com.ridehub.route.IntegrationTest;
+import com.ridehub.route.domain.Trip;
+import com.ridehub.route.domain.TripSeat;
+import com.ridehub.route.repository.TripSeatRepository;
+import com.ridehub.route.service.dto.TripSeatDTO;
+import com.ridehub.route.service.mapper.TripSeatMapper;
 import jakarta.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.Instant;

@@ -1,4 +1,4 @@
-package com.ticketsystem.route.config;
+package com.ridehub.route.config;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
